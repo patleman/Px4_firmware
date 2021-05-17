@@ -441,26 +441,33 @@ void VehicleAngularVelocity::UpdateDynamicNotchEscRpm(float new_scale, bool forc
 						const float frequency_hz = esc_hz * (harmonic + 1);
 
 						auto &dnf0 = _dynamic_notch_filter_esc_rpm[i][harmonic][0];
+
+						bool reset = false;
+
+						// notch was previously disabled
+						if (dnf0.getNotchFreq() <= FLT_EPSILON) {
+							reset = true;
+						}
+
 						const float change_percent = fabsf(dnf0.getNotchFreq() - frequency_hz) / frequency_hz;
 
-						if (change_percent > 0.001f) {
+						if (force || (change_percent > 0.001f)) {
 							// peak frequency changed by at least 0.1%
 							for (int axis = 0; axis < 3; axis++) {
 								auto &dnf = _dynamic_notch_filter_esc_rpm[i][harmonic][axis];
-								dnf.setParameters(_filter_sample_rate_hz, frequency_hz, 1.f); // TODO: configurable bandwidth
-							}
-
-							// only reset if there's sufficient change (> 1%)
-							if (force || (change_percent > 0.01f)) {
-								const Vector3f reset_angular_velocity{GetResetAngularVelocity(new_scale)};
-
-								for (int axis = 0; axis < 3; axis++) {
-									auto &dnf = _dynamic_notch_filter_esc_rpm[i][harmonic][axis];
-									dnf.reset(reset_angular_velocity(axis));
-								}
+								dnf.setParameters(_filter_sample_rate_hz, frequency_hz, 2.f); // TODO: configurable bandwidth
 							}
 
 							perf_count(_dynamic_notch_filter_esc_rpm_update_perf);
+						}
+
+						if (reset || force) {
+							const Vector3f reset_angular_velocity{GetResetAngularVelocity(new_scale)};
+
+							for (int axis = 0; axis < 3; axis++) {
+								auto &dnf = _dynamic_notch_filter_esc_rpm[i][harmonic][axis];
+								dnf.reset(reset_angular_velocity(axis));
+							}
 						}
 					}
 
@@ -489,6 +496,9 @@ void VehicleAngularVelocity::UpdateDynamicNotchFFT(float new_scale, bool force)
 	if (enabled && (_sensor_gyro_fft_sub.updated() || force)) {
 		_dynamic_notch_fft_available = false;
 
+		// ignore any peaks below half the gyro cutoff frequency
+		const float minimum_peak_freq = _param_imu_gyro_cutoff.get() / 2.f;
+
 		sensor_gyro_fft_s sensor_gyro_fft;
 
 		if (_sensor_gyro_fft_sub.copy(&sensor_gyro_fft) && (sensor_gyro_fft.device_id == _selected_sensor_device_id)
@@ -501,20 +511,25 @@ void VehicleAngularVelocity::UpdateDynamicNotchFFT(float new_scale, bool force)
 					auto &dnf = _dynamic_notch_filter_fft[i][axis];
 					const float &peak_freq = peak_frequencies[axis][i];
 
-					if (PX4_ISFINITE(peak_freq) && (peak_freq > 1.f)) {
-						const float peak_diff_abs = fabsf(dnf.getNotchFreq() - peak_freq);
-						const float change_percent = peak_diff_abs / peak_freq;
+					bool reset = false;
+
+					// notch was previously disabled
+					if (dnf.getNotchFreq() <= FLT_EPSILON) {
+						reset = true;
+					}
+
+					if (PX4_ISFINITE(peak_freq) && (peak_freq > minimum_peak_freq)) {
+						const float change_percent = fabsf(dnf.getNotchFreq() - peak_freq) / peak_freq;
 
 						if (force || (change_percent > 0.001f)) {
 							// peak frequency changed by at least 0.1%
 							dnf.setParameters(_filter_sample_rate_hz, peak_freq, sensor_gyro_fft.resolution_hz);
-
-							// only reset if there's sufficient change
-							if (peak_diff_abs > sensor_gyro_fft.resolution_hz) {
-								dnf.reset(GetResetAngularVelocity(new_scale)(axis));
-							}
-
 							perf_count(_dynamic_notch_filter_fft_update_perf);
+						}
+
+						if (reset || force) {
+							const Vector3f reset_angular_velocity{GetResetAngularVelocity(new_scale)};
+							dnf.reset(reset_angular_velocity(axis));
 						}
 
 						_dynamic_notch_fft_available = true;
