@@ -872,7 +872,7 @@ PARAM_DEFINE_INT32(NAV_DLL_ACT, 0);
  *
  * @group Mission
  */
-PARAM_DEFINE_INT32(NAV_RCL_ACT, 2);
+PARAM_DEFINE_INT32(NAV_RCL_ACT, 0);
 
 /**
  * Flag to enable obstacle avoidance.
@@ -1011,3 +1011,9 @@ PARAM_DEFINE_INT32(COM_ARM_ARSP_EN, 1);
  * @value 2 Enforce SD card presence
  */
 PARAM_DEFINE_INT32(COM_ARM_SDCARD, 1);
+
+
+PARAM_DEFINE_INT32(PA_CHECK, 0);
+
+
+PARAM_DEFINE_INT32(KEY_ROT, 0);
