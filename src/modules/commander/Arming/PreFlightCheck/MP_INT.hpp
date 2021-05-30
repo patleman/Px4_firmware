@@ -14,6 +14,8 @@
    Public Key = (e,n)
 
 */
+#pragma once
+
 #include<limits.h>
 #include <stddef.h>
 #include <stdint.h>
