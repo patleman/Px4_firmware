@@ -38,6 +38,7 @@
 #include "PreFlightCheck.hpp"
 #include "MP_INT.hpp"
 #include "PA_EXTRACT.hpp"
+#include "Identifier.hpp"
 
 #include <drivers/drv_hrt.h>
 #include <HealthFlags.h>
@@ -48,6 +49,7 @@
 #include <uORB/Subscription.hpp>
 
 #include <uORB/topics/vehicle_gps_position.h>
+#include <uORB/topics/sensor_gps.h>
 #include <dirent.h>
 #include <sys/stat.h>
 #include <errno.h>
@@ -80,14 +82,22 @@ bool PreFlightCheck::preflightCheck(orb_advert_t *mavlink_log_pub, vehicle_statu
 
 {
 //Function 1
-// for this harware parts would be needed.
+// for this hardware parts would be needed.
 // First we check for RPAS identifier, if any device has been changed or not
 // there is a true value for drone id and a value calculated every time powering on the system
 // if they both matched,then RPAS has not been tampered
 // if they didnt , RPAS has been tampered , not allow to fly, A file is created and send to
 //management client (signed by key/pair_C), then from management client to Management server.
 //file informaton: 1)timestamp 2)Component's device id that didnt match.
-// int RPAS_identifier();
+
+int identity_check= RPAS_identifier();
+
+if(identity_check==0){
+	printf("Hardware parts have been changed");
+	return false;
+}
+
+
 
 //Function 2
 // Drone_Id file is generated at each power cycle (if its not there in the directory)

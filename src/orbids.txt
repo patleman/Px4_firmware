@@ -1,0 +1,1278 @@
+./modules/land_detector/LandDetector.h:	uORB::Publication<vehicle_land_detected_s> _vehicle_land_detected_pub{ORB_ID(vehicle_land_detected)};
+./modules/land_detector/LandDetector.h:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/land_detector/LandDetector.h:	uORB::Subscription _actuator_armed_sub{ORB_ID(actuator_armed)};
+./modules/land_detector/LandDetector.h:	uORB::Subscription _vehicle_acceleration_sub{ORB_ID(vehicle_acceleration)};
+./modules/land_detector/LandDetector.h:	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};
+./modules/land_detector/LandDetector.h:	uORB::SubscriptionCallbackWorkItem _vehicle_local_position_sub{this, ORB_ID(vehicle_local_position)};
+./modules/land_detector/MulticopterLandDetector.h:	uORB::Subscription _actuator_controls_sub{ORB_ID(actuator_controls_0)};
+./modules/land_detector/MulticopterLandDetector.h:	uORB::Subscription _hover_thrust_estimate_sub{ORB_ID(hover_thrust_estimate)};
+./modules/land_detector/MulticopterLandDetector.h:	uORB::Subscription _trajectory_setpoint_sub{ORB_ID(trajectory_setpoint)};
+./modules/land_detector/MulticopterLandDetector.h:	uORB::Subscription _vehicle_angular_velocity_sub{ORB_ID(vehicle_angular_velocity)};
+./modules/land_detector/MulticopterLandDetector.h:	uORB::Subscription _vehicle_control_mode_sub{ORB_ID(vehicle_control_mode)};
+./modules/land_detector/MulticopterLandDetector.h:	uORB::Subscription _takeoff_status_sub{ORB_ID(takeoff_status)};
+./modules/land_detector/VtolLandDetector.h:	uORB::Subscription _airspeed_validated_sub{ORB_ID(airspeed_validated)};
+./modules/land_detector/FixedwingLandDetector.h:	uORB::Subscription _airspeed_validated_sub{ORB_ID(airspeed_validated)};
+./modules/control_allocator/ActuatorEffectiveness/ActuatorEffectivenessMultirotor.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/control_allocator/ControlAllocator.hpp:	uORB::SubscriptionCallbackWorkItem _vehicle_torque_setpoint_sub{this, ORB_ID(vehicle_torque_setpoint)};  /**< vehicle torque setpoint subscription */
+./modules/control_allocator/ControlAllocator.hpp:	uORB::SubscriptionCallbackWorkItem _vehicle_thrust_setpoint_sub{this, ORB_ID(vehicle_thrust_setpoint)};	 /**< vehicle thrust setpoint subscription */
+./modules/control_allocator/ControlAllocator.hpp:	uORB::Publication<vehicle_actuator_setpoint_s>	_vehicle_actuator_setpoint_pub{ORB_ID(vehicle_actuator_setpoint)};	/**< actuator setpoint publication */
+./modules/control_allocator/ControlAllocator.hpp:	uORB::Publication<control_allocator_status_s>	_control_allocator_status_pub{ORB_ID(control_allocator_status)};	/**< actuator setpoint publication */
+./modules/control_allocator/ControlAllocator.hpp:	uORB::Publication<actuator_controls_s>	_actuator_controls_4_pub{ORB_ID(actuator_controls_4)};	/**< actuator controls 4 publication */
+./modules/control_allocator/ControlAllocator.hpp:	uORB::Publication<actuator_controls_s>	_actuator_controls_5_pub{ORB_ID(actuator_controls_5)};	/**< actuator controls 5 publication */
+./modules/control_allocator/ControlAllocator.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/control_allocator/ControlAllocator.hpp:	uORB::Subscription _battery_status_sub{ORB_ID(battery_status)};			/**< battery status subscription */
+./modules/control_allocator/ControlAllocator.hpp:	uORB::Subscription _airspeed_sub{ORB_ID(airspeed)};				/**< airspeed subscription */
+./modules/control_allocator/ControlAllocator.hpp:	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};
+./modules/landing_target_estimator/LandingTargetEstimator.h:	uORB::Publication<landing_target_pose_s> _targetPosePub{ORB_ID(landing_target_pose)};
+./modules/landing_target_estimator/LandingTargetEstimator.h:	uORB::Publication<landing_target_innovations_s> _targetInnovationsPub{ORB_ID(landing_target_innovations)};
+./modules/landing_target_estimator/LandingTargetEstimator.h:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/landing_target_estimator/LandingTargetEstimator.h:	uORB::Subscription _vehicleLocalPositionSub{ORB_ID(vehicle_local_position)};
+./modules/landing_target_estimator/LandingTargetEstimator.h:	uORB::Subscription _attitudeSub{ORB_ID(vehicle_attitude)};
+./modules/landing_target_estimator/LandingTargetEstimator.h:	uORB::Subscription _vehicle_acceleration_sub{ORB_ID(vehicle_acceleration)};
+./modules/landing_target_estimator/LandingTargetEstimator.h:	uORB::Subscription _irlockReportSub{ORB_ID(irlock_report)};
+./modules/fw_att_control/FixedwingAttitudeControl.cpp:	_actuators_0_pub(vtol ? ORB_ID(actuator_controls_virtual_fw) : ORB_ID(actuator_controls_0)),
+./modules/fw_att_control/FixedwingAttitudeControl.cpp:	_attitude_sp_pub(vtol ? ORB_ID(fw_virtual_attitude_setpoint) : ORB_ID(vehicle_attitude_setpoint)),
+./modules/fw_att_control/FixedwingAttitudeControl.hpp:	uORB::SubscriptionCallbackWorkItem _att_sub{this, ORB_ID(vehicle_attitude)};	/**< vehicle attitude */
+./modules/fw_att_control/FixedwingAttitudeControl.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/fw_att_control/FixedwingAttitudeControl.hpp:	uORB::Subscription _att_sp_sub{ORB_ID(vehicle_attitude_setpoint)};		/**< vehicle attitude setpoint */
+./modules/fw_att_control/FixedwingAttitudeControl.hpp:	uORB::Subscription _battery_status_sub{ORB_ID(battery_status)};			/**< battery status subscription */
+./modules/fw_att_control/FixedwingAttitudeControl.hpp:	uORB::Subscription _local_pos_sub{ORB_ID(vehicle_local_position)};		/**< local position subscription */
+./modules/fw_att_control/FixedwingAttitudeControl.hpp:	uORB::Subscription _manual_control_setpoint_sub{ORB_ID(manual_control_setpoint)};		/**< notification of manual control updates */
+./modules/fw_att_control/FixedwingAttitudeControl.hpp:	uORB::Subscription _rates_sp_sub{ORB_ID(vehicle_rates_setpoint)};		/**< vehicle rates setpoint */
+./modules/fw_att_control/FixedwingAttitudeControl.hpp:	uORB::Subscription _vcontrol_mode_sub{ORB_ID(vehicle_control_mode)};		/**< vehicle status subscription */
+./modules/fw_att_control/FixedwingAttitudeControl.hpp:	uORB::Subscription _vehicle_land_detected_sub{ORB_ID(vehicle_land_detected)};	/**< vehicle land detected subscription */
+./modules/fw_att_control/FixedwingAttitudeControl.hpp:	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};			/**< vehicle status subscription */
+./modules/fw_att_control/FixedwingAttitudeControl.hpp:	uORB::Subscription _vehicle_rates_sub{ORB_ID(vehicle_angular_velocity)};
+./modules/fw_att_control/FixedwingAttitudeControl.hpp:	uORB::SubscriptionData<airspeed_validated_s> _airspeed_validated_sub{ORB_ID(airspeed_validated)};
+./modules/fw_att_control/FixedwingAttitudeControl.hpp:	uORB::Publication<vehicle_rates_setpoint_s>	_rate_sp_pub{ORB_ID(vehicle_rates_setpoint)};
+./modules/fw_att_control/FixedwingAttitudeControl.hpp:	uORB::PublicationMulti<rate_ctrl_status_s>	_rate_ctrl_status_pub{ORB_ID(rate_ctrl_status)};
+./modules/airship_att_control/airship_att_control.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};		/**< parameter updates subscription */
+./modules/airship_att_control/airship_att_control.hpp:	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};			/**< vehicle status subscription */
+./modules/airship_att_control/airship_att_control.hpp:	uORB::Subscription _manual_control_sp_sub{ORB_ID(manual_control_setpoint)};	/**< manual control setpoint subscription */
+./modules/airship_att_control/airship_att_control.hpp:	uORB::SubscriptionCallbackWorkItem _vehicle_angular_velocity_sub{this, ORB_ID(vehicle_angular_velocity)};
+./modules/airship_att_control/airship_att_control_main.cpp:	_actuators_0_pub(ORB_ID(actuator_controls_0)),
+./modules/esc_battery/EscBattery.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/esc_battery/EscBattery.hpp:	uORB::Subscription _actuator_ctrl_0_sub{ORB_ID(actuator_controls_0)};
+./modules/esc_battery/EscBattery.hpp:	uORB::SubscriptionCallbackWorkItem _esc_status_sub{this, ORB_ID(esc_status)};
+./modules/mc_pos_control/MulticopterPositionControl.cpp:	_vehicle_attitude_setpoint_pub(vtol ? ORB_ID(mc_virtual_attitude_setpoint) : ORB_ID(vehicle_attitude_setpoint)),
+./modules/mc_pos_control/MulticopterPositionControl.hpp:	uORB::PublicationData<takeoff_status_s> _takeoff_status_pub{ORB_ID(takeoff_status)};
+./modules/mc_pos_control/MulticopterPositionControl.hpp:	uORB::Publication<vehicle_local_position_setpoint_s> _local_pos_sp_pub{ORB_ID(vehicle_local_position_setpoint)};	/**< vehicle local position setpoint publication */
+./modules/mc_pos_control/MulticopterPositionControl.hpp:	uORB::SubscriptionCallbackWorkItem _local_pos_sub{this, ORB_ID(vehicle_local_position)};	/**< vehicle local position */
+./modules/mc_pos_control/MulticopterPositionControl.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/mc_pos_control/MulticopterPositionControl.hpp:	uORB::Subscription _control_mode_sub{ORB_ID(vehicle_control_mode)};
+./modules/mc_pos_control/MulticopterPositionControl.hpp:	uORB::Subscription _hover_thrust_estimate_sub{ORB_ID(hover_thrust_estimate)};
+./modules/mc_pos_control/MulticopterPositionControl.hpp:	uORB::Subscription _trajectory_setpoint_sub{ORB_ID(trajectory_setpoint)};
+./modules/mc_pos_control/MulticopterPositionControl.hpp:	uORB::Subscription _vehicle_land_detected_sub{ORB_ID(vehicle_land_detected)};
+./modules/mc_pos_control/MulticopterPositionControl.hpp:	uORB::Subscription _vehicle_constraints_sub{ORB_ID(vehicle_constraints)};
+./modules/uuv_att_control/uuv_att_control.hpp:	uORB::Publication<actuator_controls_s> _actuator_controls_pub{ORB_ID(actuator_controls_0)};
+./modules/uuv_att_control/uuv_att_control.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/uuv_att_control/uuv_att_control.hpp:	uORB::Subscription _vehicle_attitude_setpoint_sub{ORB_ID(vehicle_attitude_setpoint)};	/**< vehicle attitude setpoint */
+./modules/uuv_att_control/uuv_att_control.hpp:	uORB::Subscription _vehicle_rates_setpoint_sub{ORB_ID(vehicle_rates_setpoint)}; /**< vehicle bodyrates setpoint subscriber */
+./modules/uuv_att_control/uuv_att_control.hpp:	uORB::Subscription _angular_velocity_sub{ORB_ID(vehicle_angular_velocity)};	/**< vehicle angular velocity subscription */
+./modules/uuv_att_control/uuv_att_control.hpp:	uORB::Subscription _manual_control_setpoint_sub{ORB_ID(manual_control_setpoint)};	/**< notification of manual control updates */
+./modules/uuv_att_control/uuv_att_control.hpp:	uORB::Subscription _vcontrol_mode_sub{ORB_ID(vehicle_control_mode)};		/**< vehicle status subscription */
+./modules/uuv_att_control/uuv_att_control.hpp:	uORB::SubscriptionCallbackWorkItem _vehicle_attitude_sub{this, ORB_ID(vehicle_attitude)};
+./modules/flight_mode_manager/FlightModeManager.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/flight_mode_manager/FlightModeManager.hpp:	uORB::Subscription _takeoff_status_sub{ORB_ID(takeoff_status)};
+./modules/flight_mode_manager/FlightModeManager.hpp:	uORB::Subscription _vehicle_attitude_setpoint_sub{ORB_ID(vehicle_attitude_setpoint)};
+./modules/flight_mode_manager/FlightModeManager.hpp:	uORB::Subscription _vehicle_command_sub{ORB_ID(vehicle_command)};
+./modules/flight_mode_manager/FlightModeManager.hpp:	uORB::SubscriptionData<home_position_s> _home_position_sub{ORB_ID(home_position)};
+./modules/flight_mode_manager/FlightModeManager.hpp:	uORB::SubscriptionData<vehicle_control_mode_s> _vehicle_control_mode_sub{ORB_ID(vehicle_control_mode)};
+./modules/flight_mode_manager/FlightModeManager.hpp:	uORB::SubscriptionData<vehicle_land_detected_s> _vehicle_land_detected_sub{ORB_ID(vehicle_land_detected)};
+./modules/flight_mode_manager/FlightModeManager.hpp:	uORB::SubscriptionCallbackWorkItem _vehicle_local_position_sub{this, ORB_ID(vehicle_local_position)};
+./modules/flight_mode_manager/FlightModeManager.hpp:	uORB::SubscriptionData<vehicle_status_s> _vehicle_status_sub{ORB_ID(vehicle_status)};
+./modules/flight_mode_manager/FlightModeManager.hpp:	uORB::Publication<landing_gear_s> _landing_gear_pub{ORB_ID(landing_gear)};
+./modules/flight_mode_manager/FlightModeManager.hpp:	uORB::Publication<vehicle_local_position_setpoint_s> _trajectory_setpoint_pub{ORB_ID(trajectory_setpoint)};
+./modules/flight_mode_manager/FlightModeManager.hpp:	uORB::Publication<vehicle_command_s> _vehicle_command_pub{ORB_ID(vehicle_command)};
+./modules/flight_mode_manager/FlightModeManager.hpp:	uORB::Publication<vehicle_command_ack_s> _vehicle_command_ack_pub{ORB_ID(vehicle_command_ack)};
+./modules/flight_mode_manager/FlightModeManager.hpp:	uORB::Publication<vehicle_constraints_s> _vehicle_constraints_pub{ORB_ID(vehicle_constraints)};
+./modules/flight_mode_manager/tasks/Auto/FlightTaskAuto.hpp:	uORB::SubscriptionData<home_position_s>			_sub_home_position{ORB_ID(home_position)};
+./modules/flight_mode_manager/tasks/Auto/FlightTaskAuto.hpp:	uORB::SubscriptionData<vehicle_status_s>		_sub_vehicle_status{ORB_ID(vehicle_status)};
+./modules/flight_mode_manager/tasks/Auto/FlightTaskAuto.hpp:	uORB::SubscriptionData<position_setpoint_triplet_s> _sub_triplet_setpoint{ORB_ID(position_setpoint_triplet)};
+./modules/flight_mode_manager/tasks/Orbit/FlightTaskOrbit.hpp:	uORB::Publication<orbit_status_s> _orbit_status_pub{ORB_ID(orbit_status)};
+./modules/flight_mode_manager/tasks/FlightTask/FlightTask.hpp:	uORB::SubscriptionData<vehicle_local_position_s> _sub_vehicle_local_position{ORB_ID(vehicle_local_position)};
+./modules/flight_mode_manager/tasks/FlightTask/FlightTask.hpp:	uORB::SubscriptionData<home_position_s> _sub_home_position{ORB_ID(home_position)};
+./modules/flight_mode_manager/tasks/FlightTask/FlightTask.hpp:	uORB::Subscription _vehicle_local_position_setpoint_sub{ORB_ID(vehicle_local_position_setpoint)};
+./modules/flight_mode_manager/tasks/Utility/Sticks.hpp:	uORB::Subscription _manual_control_setpoint_sub{ORB_ID(manual_control_setpoint)};
+./modules/flight_mode_manager/tasks/Utility/Sticks.hpp:	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};
+./modules/flight_mode_manager/tasks/Utility/StickAccelerationXY.hpp:	uORB::Subscription _takeoff_status_sub{ORB_ID(takeoff_status)};
+./modules/mavlink/tune_publisher.h:	uORB::Publication<tune_control_s> _tune_control_pub{ORB_ID(tune_control)};
+./modules/mavlink/mavlink_ulog.h:	uORB::SubscriptionData<ulog_stream_s> _ulog_stream_sub{ORB_ID(ulog_stream)};
+./modules/mavlink/mavlink_ulog.h:	uORB::Publication<ulog_stream_ack_s> _ulog_stream_ack_pub{ORB_ID(ulog_stream_ack)};
+./modules/mavlink/mavlink_timesync.h:	uORB::PublicationMulti<timesync_status_s>  _timesync_status_pub{ORB_ID(timesync_status)};
+./modules/mavlink/mavlink_parameters.h:	uORB::Publication<rc_parameter_map_s>	_rc_param_map_pub{ORB_ID(rc_parameter_map)};
+./modules/mavlink/mavlink_parameters.h:	uORB::Publication<uavcan_parameter_request_s> _uavcan_parameter_request_pub{ORB_ID(uavcan_parameter_request)};
+./modules/mavlink/mavlink_parameters.h:	// enforce ORB_ID(uavcan_parameter_request) constants that map to MAVLINK defines
+./modules/mavlink/mavlink_parameters.h:	uORB::Subscription _uavcan_parameter_value_sub{ORB_ID(uavcan_parameter_value)};
+./modules/mavlink/mavlink_parameters.h:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/mavlink/mavlink_main.h:	uORB::Publication<vehicle_command_ack_s> _vehicle_command_ack_pub{ORB_ID(vehicle_command_ack)};
+./modules/mavlink/mavlink_main.h:	uORB::PublicationMulti<telemetry_status_s> _telemetry_status_pub{ORB_ID(telemetry_status)};
+./modules/mavlink/mavlink_main.h:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/mavlink/mavlink_main.h:	uORB::Subscription _vehicle_command_sub{ORB_ID(vehicle_command)};
+./modules/mavlink/mavlink_main.h:	uORB::Subscription _vehicle_command_ack_sub{ORB_ID(vehicle_command_ack)};
+./modules/mavlink/mavlink_main.h:	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};
+./modules/mavlink/mavlink_main.cpp:	if (!orb_exists(ORB_ID(vehicle_command), 0)) {
+./modules/mavlink/mavlink_main.cpp:		orb_advertise_queue(ORB_ID(vehicle_command), nullptr, vehicle_command_s::ORB_QUEUE_LENGTH);
+./modules/mavlink/mavlink_main.cpp:		uORB::SubscriptionData<actuator_armed_s> armed_sub{ORB_ID(actuator_armed)};
+./modules/mavlink/mavlink_main.cpp:	uORB::Subscription status_sub{ORB_ID(vehicle_status)};
+./modules/mavlink/mavlink_mission.h:	uORB::Subscription	_mission_result_sub{ORB_ID(mission_result)};
+./modules/mavlink/mavlink_mission.h:	uORB::Publication<mission_s>	_offboard_mission_pub{ORB_ID(mission)};
+./modules/mavlink/streams/CAMERA_IMAGE_CAPTURED.hpp:	uORB::Subscription _capture_sub{ORB_ID(camera_capture)};
+./modules/mavlink/streams/SCALED_IMU3.hpp:	uORB::Subscription _vehicle_imu_sub{ORB_ID(vehicle_imu), 2};
+./modules/mavlink/streams/SCALED_IMU3.hpp:	uORB::Subscription _sensor_mag_sub{ORB_ID(sensor_mag), 2};
+./modules/mavlink/streams/UTM_GLOBAL_POSITION.hpp:	uORB::Subscription _local_pos_sub{ORB_ID(vehicle_local_position)};
+./modules/mavlink/streams/UTM_GLOBAL_POSITION.hpp:	uORB::Subscription _global_pos_sub{ORB_ID(vehicle_global_position)};
+./modules/mavlink/streams/UTM_GLOBAL_POSITION.hpp:	uORB::Subscription _position_setpoint_triplet_sub{ORB_ID(position_setpoint_triplet)};
+./modules/mavlink/streams/UTM_GLOBAL_POSITION.hpp:	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};
+./modules/mavlink/streams/UTM_GLOBAL_POSITION.hpp:	uORB::Subscription _land_detected_sub{ORB_ID(vehicle_land_detected)};
+./modules/mavlink/streams/ESC_STATUS.hpp:	uORB::Subscription _esc_status_sub{ORB_ID(esc_status)};
+./modules/mavlink/streams/LOCAL_POSITION_NED.hpp:	uORB::Subscription _lpos_sub{ORB_ID(vehicle_local_position)};
+./modules/mavlink/streams/ORBIT_EXECUTION_STATUS.hpp:	uORB::Subscription _orbit_status_sub{ORB_ID(orbit_status)};
+./modules/mavlink/streams/SERVO_OUTPUT_RAW.hpp:	uORB::Subscription _act_sub{ORB_ID(actuator_outputs), N};
+./modules/mavlink/streams/OBSTACLE_DISTANCE.hpp:	uORB::Subscription _obstacle_distance_fused_sub{ORB_ID(obstacle_distance_fused)};
+./modules/mavlink/streams/ODOMETRY.hpp:	uORB::Subscription _odom_sub{ORB_ID(vehicle_odometry)};
+./modules/mavlink/streams/ODOMETRY.hpp:	uORB::Subscription _vodom_sub{ORB_ID(vehicle_visual_odometry)};
+./modules/mavlink/streams/COMMAND_LONG.hpp:	uORB::Subscription _vehicle_command_sub{ORB_ID(vehicle_command)};
+./modules/mavlink/streams/GIMBAL_MANAGER_INFORMATION.hpp:	uORB::Subscription _gimbal_manager_information_sub{ORB_ID(gimbal_manager_information)};
+./modules/mavlink/streams/STATUSTEXT.hpp:	uORB::Subscription _mavlink_log_sub{ORB_ID(mavlink_log)};
+./modules/mavlink/streams/SCALED_PRESSURE3.hpp:	uORB::Subscription _differential_pressure_sub{ORB_ID(differential_pressure), 2};
+./modules/mavlink/streams/SCALED_PRESSURE3.hpp:	uORB::Subscription _sensor_baro_sub{ORB_ID(sensor_baro), 2};
+./modules/mavlink/streams/VFR_HUD.hpp:	uORB::Subscription _lpos_sub{ORB_ID(vehicle_local_position)};
+./modules/mavlink/streams/VFR_HUD.hpp:	uORB::Subscription _armed_sub{ORB_ID(actuator_armed)};
+./modules/mavlink/streams/VFR_HUD.hpp:	uORB::Subscription _act0_sub{ORB_ID(actuator_controls_0)};
+./modules/mavlink/streams/VFR_HUD.hpp:	uORB::Subscription _act1_sub{ORB_ID(actuator_controls_1)};
+./modules/mavlink/streams/VFR_HUD.hpp:	uORB::Subscription _airspeed_validated_sub{ORB_ID(airspeed_validated)};
+./modules/mavlink/streams/VFR_HUD.hpp:	uORB::Subscription _air_data_sub{ORB_ID(vehicle_air_data)};
+./modules/mavlink/streams/SYS_STATUS.hpp:	uORB::Subscription _status_sub{ORB_ID(vehicle_status)};
+./modules/mavlink/streams/SYS_STATUS.hpp:	uORB::Subscription _cpuload_sub{ORB_ID(cpuload)};
+./modules/mavlink/streams/OPTICAL_FLOW_RAD.hpp:	uORB::Subscription _optical_flow_sub{ORB_ID(optical_flow)};
+./modules/mavlink/streams/WIND_COV.hpp:	uORB::Subscription _wind_sub{ORB_ID(wind)};
+./modules/mavlink/streams/WIND_COV.hpp:	uORB::Subscription _local_pos_sub{ORB_ID(vehicle_local_position)};
+./modules/mavlink/streams/GIMBAL_DEVICE_SET_ATTITUDE.hpp:	uORB::Subscription _gimbal_device_set_attitude_sub{ORB_ID(gimbal_device_set_attitude)};
+./modules/mavlink/streams/SCALED_IMU2.hpp:	uORB::Subscription _vehicle_imu_sub{ORB_ID(vehicle_imu), 1};
+./modules/mavlink/streams/SCALED_IMU2.hpp:	uORB::Subscription _sensor_mag_sub{ORB_ID(sensor_mag), 1};
+./modules/mavlink/streams/RAW_RPM.hpp:	uORB::Subscription _rpm_sub{ORB_ID(rpm)};
+./modules/mavlink/streams/DEBUG.hpp:	uORB::Subscription _debug_value_sub{ORB_ID(debug_value)};
+./modules/mavlink/streams/ATT_POS_MOCAP.hpp:	uORB::Subscription _mocap_sub{ORB_ID(vehicle_mocap_odometry)};
+./modules/mavlink/streams/EXTENDED_SYS_STATE.hpp:	uORB::Subscription _status_sub{ORB_ID(vehicle_status)};
+./modules/mavlink/streams/EXTENDED_SYS_STATE.hpp:	uORB::Subscription _landed_sub{ORB_ID(vehicle_land_detected)};
+./modules/mavlink/streams/EXTENDED_SYS_STATE.hpp:	uORB::Subscription _pos_sp_triplet_sub{ORB_ID(position_setpoint_triplet)};
+./modules/mavlink/streams/EXTENDED_SYS_STATE.hpp:	uORB::Subscription _control_mode_sub{ORB_ID(vehicle_control_mode)};
+./modules/mavlink/streams/HIL_STATE_QUATERNION.hpp:	uORB::Subscription _angular_velocity_sub{ORB_ID(vehicle_angular_velocity_groundtruth)};
+./modules/mavlink/streams/HIL_STATE_QUATERNION.hpp:	uORB::Subscription _att_sub{ORB_ID(vehicle_attitude_groundtruth)};
+./modules/mavlink/streams/HIL_STATE_QUATERNION.hpp:	uORB::Subscription _gpos_sub{ORB_ID(vehicle_global_position_groundtruth)};
+./modules/mavlink/streams/HIL_STATE_QUATERNION.hpp:	uORB::Subscription _lpos_sub{ORB_ID(vehicle_local_position_groundtruth)};
+./modules/mavlink/streams/NAV_CONTROLLER_OUTPUT.hpp:	uORB::Subscription _position_controller_status_sub{ORB_ID(position_controller_status)};
+./modules/mavlink/streams/NAV_CONTROLLER_OUTPUT.hpp:	uORB::Subscription _tecs_status_sub{ORB_ID(tecs_status)};
+./modules/mavlink/streams/HIGH_LATENCY2.hpp:		PerBatteryData(uint8_t instance) : subscription(ORB_ID(battery_status), instance) {}
+./modules/mavlink/streams/HIGH_LATENCY2.hpp:	uORB::Subscription _actuator_0_sub{ORB_ID(actuator_controls_0)};
+./modules/mavlink/streams/HIGH_LATENCY2.hpp:	uORB::Subscription _actuator_1_sub{ORB_ID(actuator_controls_1)};
+./modules/mavlink/streams/HIGH_LATENCY2.hpp:	uORB::Subscription _airspeed_sub{ORB_ID(airspeed)};
+./modules/mavlink/streams/HIGH_LATENCY2.hpp:	uORB::Subscription _attitude_sp_sub{ORB_ID(vehicle_attitude_setpoint)};
+./modules/mavlink/streams/HIGH_LATENCY2.hpp:	uORB::Subscription _estimator_selector_status_sub{ORB_ID(estimator_selector_status)};
+./modules/mavlink/streams/HIGH_LATENCY2.hpp:	uORB::Subscription _estimator_status_sub{ORB_ID(estimator_status)};
+./modules/mavlink/streams/HIGH_LATENCY2.hpp:	uORB::Subscription _pos_ctrl_status_sub{ORB_ID(position_controller_status)};
+./modules/mavlink/streams/HIGH_LATENCY2.hpp:	uORB::Subscription _geofence_sub{ORB_ID(geofence_result)};
+./modules/mavlink/streams/HIGH_LATENCY2.hpp:	uORB::Subscription _global_pos_sub{ORB_ID(vehicle_global_position)};
+./modules/mavlink/streams/HIGH_LATENCY2.hpp:	uORB::Subscription _local_pos_sub{ORB_ID(vehicle_local_position)};
+./modules/mavlink/streams/HIGH_LATENCY2.hpp:	uORB::Subscription _gps_sub{ORB_ID(vehicle_gps_position)};
+./modules/mavlink/streams/HIGH_LATENCY2.hpp:	uORB::Subscription _mission_result_sub{ORB_ID(mission_result)};
+./modules/mavlink/streams/HIGH_LATENCY2.hpp:	uORB::Subscription _status_sub{ORB_ID(vehicle_status)};
+./modules/mavlink/streams/HIGH_LATENCY2.hpp:	uORB::Subscription _status_flags_sub{ORB_ID(vehicle_status_flags)};
+./modules/mavlink/streams/HIGH_LATENCY2.hpp:	uORB::Subscription _tecs_status_sub{ORB_ID(tecs_status)};
+./modules/mavlink/streams/HIGH_LATENCY2.hpp:	uORB::Subscription _wind_sub{ORB_ID(wind)};
+./modules/mavlink/streams/TRAJECTORY_REPRESENTATION_WAYPOINTS.hpp:	uORB::Subscription _traj_wp_avoidance_sub{ORB_ID(vehicle_trajectory_waypoint_desired)};
+./modules/mavlink/streams/HEARTBEAT.hpp:	uORB::Subscription _vehicle_control_mode_sub{ORB_ID(vehicle_control_mode)};
+./modules/mavlink/streams/HEARTBEAT.hpp:	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};
+./modules/mavlink/streams/HEARTBEAT.hpp:	uORB::Subscription _vehicle_status_flags_sub{ORB_ID(vehicle_status_flags)};
+./modules/mavlink/streams/ESC_INFO.hpp:	uORB::Subscription _esc_status_sub{ORB_ID(esc_status)};
+./modules/mavlink/streams/GPS_GLOBAL_ORIGIN.hpp:	uORB::Subscription _vehicle_local_position_sub{ORB_ID(vehicle_local_position)};
+./modules/mavlink/streams/HIGHRES_IMU.hpp:	uORB::Subscription _estimator_sensor_bias_sub{ORB_ID(estimator_sensor_bias)};
+./modules/mavlink/streams/HIGHRES_IMU.hpp:	uORB::Subscription _estimator_selector_status_sub{ORB_ID(estimator_selector_status)};
+./modules/mavlink/streams/HIGHRES_IMU.hpp:	uORB::Subscription _sensor_selection_sub{ORB_ID(sensor_selection)};
+./modules/mavlink/streams/HIGHRES_IMU.hpp:	uORB::Subscription _differential_pressure_sub{ORB_ID(differential_pressure)};
+./modules/mavlink/streams/HIGHRES_IMU.hpp:	uORB::Subscription _magnetometer_sub{ORB_ID(vehicle_magnetometer)};
+./modules/mavlink/streams/HIGHRES_IMU.hpp:	uORB::Subscription _air_data_sub{ORB_ID(vehicle_air_data)};
+./modules/mavlink/streams/GIMBAL_MANAGER_STATUS.hpp:	uORB::Subscription _gimbal_manager_status_sub{ORB_ID(gimbal_manager_status)};
+./modules/mavlink/streams/ADSB_VEHICLE.hpp:	uORB::Subscription _transponder_report_sub{ORB_ID(transponder_report)};
+./modules/mavlink/streams/MOUNT_ORIENTATION.hpp:	uORB::Subscription _mount_orientation_sub{ORB_ID(mount_orientation)};
+./modules/mavlink/streams/MOUNT_ORIENTATION.hpp:	uORB::Subscription _lpos_sub{ORB_ID(vehicle_local_position)};
+./modules/mavlink/streams/GIMBAL_DEVICE_ATTITUDE_STATUS.hpp:	uORB::Subscription _gimbal_device_attitude_status_sub{ORB_ID(gimbal_device_attitude_status)};
+./modules/mavlink/streams/POSITION_TARGET_LOCAL_NED.hpp:	uORB::Subscription _pos_sp_sub{ORB_ID(vehicle_local_position_setpoint)};
+./modules/mavlink/streams/FLIGHT_INFORMATION.hpp:	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};
+./modules/mavlink/streams/NAMED_VALUE_FLOAT.hpp:	uORB::Subscription _debug_key_value_sub{ORB_ID(debug_key_value)};
+./modules/mavlink/streams/ESTIMATOR_STATUS.hpp:	uORB::Subscription _estimator_selector_status_sub{ORB_ID(estimator_selector_status)};
+./modules/mavlink/streams/ESTIMATOR_STATUS.hpp:	uORB::Subscription _estimator_status_sub{ORB_ID(estimator_status)};
+./modules/mavlink/streams/COLLISION.hpp:	uORB::Subscription _collision_sub{ORB_ID(collision_report)};
+./modules/mavlink/streams/ALTITUDE.hpp:	uORB::Subscription _air_data_sub{ORB_ID(vehicle_air_data)};
+./modules/mavlink/streams/ALTITUDE.hpp:	uORB::Subscription _home_sub{ORB_ID(home_position)};
+./modules/mavlink/streams/ALTITUDE.hpp:	uORB::Subscription _local_pos_sub{ORB_ID(vehicle_local_position)};
+./modules/mavlink/streams/GPS_STATUS.hpp:	uORB::Subscription _satellite_info_sub{ORB_ID(satellite_info)};
+./modules/mavlink/streams/CAMERA_TRIGGER.hpp:	uORB::Subscription _camera_trigger_sub{ORB_ID(camera_trigger)};
+./modules/mavlink/streams/ATTITUDE_QUATERNION.hpp:	uORB::Subscription _att_sub{ORB_ID(vehicle_attitude)};
+./modules/mavlink/streams/ATTITUDE_QUATERNION.hpp:	uORB::Subscription _angular_velocity_sub{ORB_ID(vehicle_angular_velocity)};
+./modules/mavlink/streams/ATTITUDE_QUATERNION.hpp:	uORB::Subscription _status_sub{ORB_ID(vehicle_status)};
+./modules/mavlink/streams/ACTUATOR_OUTPUT_STATUS.hpp:	uORB::Subscription _act_output_sub{ORB_ID(actuator_outputs)};
+./modules/mavlink/streams/SCALED_PRESSURE2.hpp:	uORB::Subscription _differential_pressure_sub{ORB_ID(differential_pressure), 1};
+./modules/mavlink/streams/SCALED_PRESSURE2.hpp:	uORB::Subscription _sensor_baro_sub{ORB_ID(sensor_baro), 1};
+./modules/mavlink/streams/RC_CHANNELS.hpp:	uORB::Subscription _input_rc_sub{ORB_ID(input_rc)};
+./modules/mavlink/streams/DEBUG_FLOAT_ARRAY.hpp:	uORB::Subscription _debug_array_sub{ORB_ID(debug_array)};
+./modules/mavlink/streams/SCALED_PRESSURE.hpp:	uORB::Subscription _differential_pressure_sub{ORB_ID(differential_pressure), 0};
+./modules/mavlink/streams/SCALED_PRESSURE.hpp:	uORB::Subscription _sensor_baro_sub{ORB_ID(sensor_baro), 0};
+./modules/mavlink/streams/AUTOPILOT_STATE_FOR_GIMBAL_DEVICE.hpp:	uORB::Subscription _estimator_selector_status_sub{ORB_ID(estimator_selector_status)};
+./modules/mavlink/streams/AUTOPILOT_STATE_FOR_GIMBAL_DEVICE.hpp:	uORB::Subscription _estimator_status_sub{ORB_ID(estimator_status)};
+./modules/mavlink/streams/AUTOPILOT_STATE_FOR_GIMBAL_DEVICE.hpp:	uORB::Subscription _att_sub{ORB_ID(vehicle_attitude)};
+./modules/mavlink/streams/AUTOPILOT_STATE_FOR_GIMBAL_DEVICE.hpp:	uORB::Subscription _lpos_sub{ORB_ID(vehicle_local_position)};
+./modules/mavlink/streams/AUTOPILOT_STATE_FOR_GIMBAL_DEVICE.hpp:	uORB::Subscription _att_sp_sub{ORB_ID(vehicle_attitude_setpoint)};
+./modules/mavlink/streams/AUTOPILOT_STATE_FOR_GIMBAL_DEVICE.hpp:	uORB::Subscription _landed_sub{ORB_ID(vehicle_land_detected)};
+./modules/mavlink/streams/POSITION_TARGET_GLOBAL_INT.hpp:	uORB::Subscription _control_mode_sub{ORB_ID(vehicle_control_mode)};
+./modules/mavlink/streams/POSITION_TARGET_GLOBAL_INT.hpp:	uORB::Subscription _lpos_sp_sub{ORB_ID(vehicle_local_position_setpoint)};
+./modules/mavlink/streams/POSITION_TARGET_GLOBAL_INT.hpp:	uORB::Subscription _pos_sp_triplet_sub{ORB_ID(position_setpoint_triplet)};
+./modules/mavlink/streams/MANUAL_CONTROL.hpp:	uORB::Subscription _manual_control_setpoint_sub{ORB_ID(manual_control_setpoint)};
+./modules/mavlink/streams/MANUAL_CONTROL.hpp:	uORB::Subscription _manual_control_switches_sub{ORB_ID(manual_control_switches)};
+./modules/mavlink/streams/DEBUG_VECT.hpp:	uORB::Subscription _debug_sub{ORB_ID(debug_vect)};
+./modules/mavlink/streams/ATTITUDE.hpp:	uORB::Subscription _att_sub{ORB_ID(vehicle_attitude)};
+./modules/mavlink/streams/ATTITUDE.hpp:	uORB::Subscription _angular_velocity_sub{ORB_ID(vehicle_angular_velocity)};
+./modules/mavlink/streams/HOME_POSITION.hpp:	uORB::Subscription _home_sub{ORB_ID(home_position)};
+./modules/mavlink/streams/GLOBAL_POSITION_INT.hpp:	uORB::Subscription _gpos_sub{ORB_ID(vehicle_global_position)};
+./modules/mavlink/streams/GLOBAL_POSITION_INT.hpp:	uORB::Subscription _lpos_sub{ORB_ID(vehicle_local_position)};
+./modules/mavlink/streams/GLOBAL_POSITION_INT.hpp:	uORB::Subscription _home_sub{ORB_ID(home_position)};
+./modules/mavlink/streams/GLOBAL_POSITION_INT.hpp:	uORB::Subscription _air_data_sub{ORB_ID(vehicle_air_data)};
+./modules/mavlink/streams/GPS_RAW_INT.hpp:	uORB::Subscription _sensor_gps_sub{ORB_ID(sensor_gps), 0};
+./modules/mavlink/streams/SCALED_IMU.hpp:	uORB::Subscription _vehicle_imu_sub{ORB_ID(vehicle_imu), 0};
+./modules/mavlink/streams/SCALED_IMU.hpp:	uORB::Subscription _sensor_mag_sub{ORB_ID(sensor_mag), 0};
+./modules/mavlink/streams/VIBRATION.hpp:	uORB::Subscription _sensor_selection_sub{ORB_ID(sensor_selection)};
+./modules/mavlink/streams/ACTUATOR_CONTROL_TARGET.hpp:			_act_ctrl_sub = new uORB::Subscription{ORB_ID(actuator_controls_0)};
+./modules/mavlink/streams/ACTUATOR_CONTROL_TARGET.hpp:			_act_ctrl_sub = new uORB::Subscription{ORB_ID(actuator_controls_1)};
+./modules/mavlink/streams/ACTUATOR_CONTROL_TARGET.hpp:			_act_ctrl_sub = new uORB::Subscription{ORB_ID(actuator_controls_2)};
+./modules/mavlink/streams/ACTUATOR_CONTROL_TARGET.hpp:			_act_ctrl_sub = new uORB::Subscription{ORB_ID(actuator_controls_3)};
+./modules/mavlink/streams/ATTITUDE_TARGET.hpp:	uORB::Subscription _att_sp_sub{ORB_ID(vehicle_attitude_setpoint)};
+./modules/mavlink/streams/ATTITUDE_TARGET.hpp:	uORB::Subscription _att_rates_sp_sub{ORB_ID(vehicle_rates_setpoint)};
+./modules/mavlink/streams/GPS2_RAW.hpp:	uORB::Subscription _sensor_gps_sub{ORB_ID(sensor_gps), 1};
+./modules/mavlink/streams/HIL_ACTUATOR_CONTROLS.hpp:	uORB::Subscription _act_sub{ORB_ID(actuator_outputs)};
+./modules/mavlink/streams/HIL_ACTUATOR_CONTROLS.hpp:	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};
+./modules/mavlink/streams/HIL_ACTUATOR_CONTROLS.hpp:	uORB::Subscription _vehicle_control_mode_sub{ORB_ID(vehicle_control_mode)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<actuator_controls_s>			_actuator_controls_pubs[4] {ORB_ID(actuator_controls_0), ORB_ID(actuator_controls_1), ORB_ID(actuator_controls_2), ORB_ID(actuator_controls_3)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<airspeed_s>				_airspeed_pub{ORB_ID(airspeed)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<battery_status_s>			_battery_pub{ORB_ID(battery_status)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<cellular_status_s>			_cellular_status_pub{ORB_ID(cellular_status)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<collision_report_s>			_collision_report_pub{ORB_ID(collision_report)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<differential_pressure_s>		_differential_pressure_pub{ORB_ID(differential_pressure)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<follow_target_s>			_follow_target_pub{ORB_ID(follow_target)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<gimbal_manager_set_attitude_s>	_gimbal_manager_set_attitude_pub{ORB_ID(gimbal_manager_set_attitude)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<gimbal_manager_set_manual_control_s>	_gimbal_manager_set_manual_control_pub{ORB_ID(gimbal_manager_set_manual_control)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<gimbal_device_information_s>		_gimbal_device_information_pub{ORB_ID(gimbal_device_information)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<irlock_report_s>			_irlock_report_pub{ORB_ID(irlock_report)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<landing_target_pose_s>		_landing_target_pose_pub{ORB_ID(landing_target_pose)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<log_message_s>			_log_message_pub{ORB_ID(log_message)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<obstacle_distance_s>			_obstacle_distance_pub{ORB_ID(obstacle_distance)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<offboard_control_mode_s>		_offboard_control_mode_pub{ORB_ID(offboard_control_mode)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<onboard_computer_status_s>		_onboard_computer_status_pub{ORB_ID(onboard_computer_status)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<generator_status_s>			_generator_status_pub{ORB_ID(generator_status)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<optical_flow_s>			_flow_pub{ORB_ID(optical_flow)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<sensor_gps_s>				_sensor_gps_pub{ORB_ID(sensor_gps)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<vehicle_attitude_s>			_attitude_pub{ORB_ID(vehicle_attitude)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<vehicle_attitude_setpoint_s>		_att_sp_pub{ORB_ID(vehicle_attitude_setpoint)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<vehicle_attitude_setpoint_s>		_mc_virtual_att_sp_pub{ORB_ID(mc_virtual_attitude_setpoint)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<vehicle_attitude_setpoint_s>		_fw_virtual_att_sp_pub{ORB_ID(fw_virtual_attitude_setpoint)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<vehicle_global_position_s>		_global_pos_pub{ORB_ID(vehicle_global_position)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<vehicle_land_detected_s>		_land_detector_pub{ORB_ID(vehicle_land_detected)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<vehicle_local_position_s>		_local_pos_pub{ORB_ID(vehicle_local_position)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<vehicle_local_position_setpoint_s>	_trajectory_setpoint_pub{ORB_ID(trajectory_setpoint)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<vehicle_odometry_s>			_mocap_odometry_pub{ORB_ID(vehicle_mocap_odometry)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<vehicle_odometry_s>			_visual_odometry_pub{ORB_ID(vehicle_visual_odometry)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<vehicle_rates_setpoint_s>		_rates_sp_pub{ORB_ID(vehicle_rates_setpoint)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<vehicle_trajectory_bezier_s>		_trajectory_bezier_pub{ORB_ID(vehicle_trajectory_bezier)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<vehicle_trajectory_waypoint_s>	_trajectory_waypoint_pub{ORB_ID(vehicle_trajectory_waypoint)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<debug_array_s>			_debug_array_pub {ORB_ID(debug_array)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<debug_key_value_s>			_debug_key_value_pub{ORB_ID(debug_key_value)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<debug_value_s>			_debug_value_pub{ORB_ID(debug_value)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<debug_vect_s>				_debug_vect_pub{ORB_ID(debug_vect)};
+./modules/mavlink/mavlink_receiver.h:	uORB::PublicationMulti<distance_sensor_s>		_distance_sensor_pub{ORB_ID(distance_sensor)};
+./modules/mavlink/mavlink_receiver.h:	uORB::PublicationMulti<distance_sensor_s>		_flow_distance_sensor_pub{ORB_ID(distance_sensor)};
+./modules/mavlink/mavlink_receiver.h:	uORB::PublicationMulti<input_rc_s>			_rc_pub{ORB_ID(input_rc)};
+./modules/mavlink/mavlink_receiver.h:	uORB::PublicationMulti<manual_control_setpoint_s>	_manual_control_setpoint_pub{ORB_ID(manual_control_setpoint)};
+./modules/mavlink/mavlink_receiver.h:	uORB::PublicationMulti<ping_s>				_ping_pub{ORB_ID(ping)};
+./modules/mavlink/mavlink_receiver.h:	uORB::PublicationMulti<radio_status_s>			_radio_status_pub{ORB_ID(radio_status)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<gps_inject_data_s>     _gps_inject_data_pub{ORB_ID(gps_inject_data)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<transponder_report_s>  _transponder_report_pub{ORB_ID(transponder_report)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<vehicle_command_s>     _cmd_pub{ORB_ID(vehicle_command)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Publication<vehicle_command_ack_s> _cmd_ack_pub{ORB_ID(vehicle_command_ack)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Subscription	_actuator_armed_sub{ORB_ID(actuator_armed)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Subscription	_home_position_sub{ORB_ID(home_position)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Subscription	_vehicle_attitude_sub{ORB_ID(vehicle_attitude)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Subscription	_vehicle_local_position_sub{ORB_ID(vehicle_local_position)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Subscription	_vehicle_global_position_sub{ORB_ID(vehicle_global_position)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Subscription	_vehicle_status_sub{ORB_ID(vehicle_status)};
+./modules/mavlink/mavlink_receiver.h:	uORB::Subscription 	_actuator_controls_3_sub{ORB_ID(actuator_controls_3)};
+./modules/mavlink/mavlink_receiver.h:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/attitude_estimator_q/attitude_estimator_q_main.cpp:	uORB::SubscriptionCallbackWorkItem _sensors_sub{this, ORB_ID(sensor_combined)};
+./modules/attitude_estimator_q/attitude_estimator_q_main.cpp:	uORB::SubscriptionInterval	_parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/attitude_estimator_q/attitude_estimator_q_main.cpp:	uORB::Subscription		_gps_sub{ORB_ID(vehicle_gps_position)};
+./modules/attitude_estimator_q/attitude_estimator_q_main.cpp:	uORB::Subscription		_local_position_sub{ORB_ID(vehicle_local_position)};
+./modules/attitude_estimator_q/attitude_estimator_q_main.cpp:	uORB::Subscription		_vision_odom_sub{ORB_ID(vehicle_visual_odometry)};
+./modules/attitude_estimator_q/attitude_estimator_q_main.cpp:	uORB::Subscription		_mocap_odom_sub{ORB_ID(vehicle_mocap_odometry)};
+./modules/attitude_estimator_q/attitude_estimator_q_main.cpp:	uORB::Subscription		_magnetometer_sub{ORB_ID(vehicle_magnetometer)};
+./modules/attitude_estimator_q/attitude_estimator_q_main.cpp:	uORB::Publication<vehicle_attitude_s>	_att_pub{ORB_ID(vehicle_attitude)};
+./modules/temperature_compensation/TemperatureCompensationModule.h:		{ORB_ID(sensor_accel), 0},
+./modules/temperature_compensation/TemperatureCompensationModule.h:		{ORB_ID(sensor_accel), 1},
+./modules/temperature_compensation/TemperatureCompensationModule.h:		{ORB_ID(sensor_accel), 2},
+./modules/temperature_compensation/TemperatureCompensationModule.h:		{ORB_ID(sensor_accel), 3},
+./modules/temperature_compensation/TemperatureCompensationModule.h:		{ORB_ID(sensor_gyro), 0},
+./modules/temperature_compensation/TemperatureCompensationModule.h:		{ORB_ID(sensor_gyro), 1},
+./modules/temperature_compensation/TemperatureCompensationModule.h:		{ORB_ID(sensor_gyro), 2},
+./modules/temperature_compensation/TemperatureCompensationModule.h:		{ORB_ID(sensor_gyro), 3},
+./modules/temperature_compensation/TemperatureCompensationModule.h:		{ORB_ID(sensor_baro), 0},
+./modules/temperature_compensation/TemperatureCompensationModule.h:		{ORB_ID(sensor_baro), 1},
+./modules/temperature_compensation/TemperatureCompensationModule.h:		{ORB_ID(sensor_baro), 2},
+./modules/temperature_compensation/TemperatureCompensationModule.h:		{ORB_ID(sensor_baro), 3},
+./modules/temperature_compensation/TemperatureCompensationModule.h:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/temperature_compensation/TemperatureCompensationModule.h:	uORB::Subscription _vehicle_command_sub{ORB_ID(vehicle_command)};
+./modules/temperature_compensation/TemperatureCompensationModule.h:	uORB::Publication<sensor_correction_s> _sensor_correction_pub{ORB_ID(sensor_correction)};
+./modules/temperature_compensation/temperature_calibration/accel.cpp:	_num_sensor_instances = orb_group_count(ORB_ID(sensor_accel));
+./modules/temperature_compensation/temperature_calibration/accel.cpp:		_sensor_subs[i] = orb_subscribe_multi(ORB_ID(sensor_accel), i);
+./modules/temperature_compensation/temperature_calibration/accel.cpp:	orb_copy(ORB_ID(sensor_accel), sensor_sub, &accel_data);
+./modules/temperature_compensation/temperature_calibration/gyro.cpp:	orb_copy(ORB_ID(sensor_gyro), sensor_sub, &gyro_data);
+./modules/temperature_compensation/temperature_calibration/task.cpp:	uORB::Publication<led_control_s> _led_control_pub{ORB_ID(led_control)};
+./modules/temperature_compensation/temperature_calibration/task.cpp:	unsigned num_gyro = orb_group_count(ORB_ID(sensor_gyro));
+./modules/temperature_compensation/temperature_calibration/task.cpp:		gyro_sub[i] = orb_subscribe_multi(ORB_ID(sensor_gyro), i);
+./modules/temperature_compensation/temperature_calibration/task.cpp:				orb_copy(ORB_ID(sensor_gyro), gyro_sub[i], &gyro_data);
+./modules/temperature_compensation/temperature_calibration/baro.cpp:	_num_sensor_instances = orb_group_count(ORB_ID(sensor_baro));
+./modules/temperature_compensation/temperature_calibration/baro.cpp:		_sensor_subs[i] = orb_subscribe_multi(ORB_ID(sensor_baro), i);
+./modules/temperature_compensation/temperature_calibration/baro.cpp:	orb_copy(ORB_ID(sensor_baro), sensor_sub, &baro_data);
+./modules/temperature_compensation/TemperatureCompensationModule.cpp:					uORB::Publication<vehicle_command_ack_s> command_ack_pub{ORB_ID(vehicle_command_ack)};
+./modules/temperature_compensation/TemperatureCompensationModule.cpp:		uORB::Publication<vehicle_command_s> vcmd_pub{ORB_ID(vehicle_command)};
+./modules/airspeed_selector/airspeed_selector_main.cpp:	uORB::Publication<airspeed_validated_s> _airspeed_validated_pub {ORB_ID(airspeed_validated)};			/**< airspeed validated topic*/
+./modules/airspeed_selector/airspeed_selector_main.cpp:	uORB::PublicationMulti<airspeed_wind_s> _wind_est_pub[MAX_NUM_AIRSPEED_SENSORS + 1] {{ORB_ID(airspeed_wind)}, {ORB_ID(airspeed_wind)}, {ORB_ID(airspeed_wind)}, {ORB_ID(airspeed_wind)}}; /**< wind estimate topic (for each airspeed validator + purely sideslip fusion) */
+./modules/airspeed_selector/airspeed_selector_main.cpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/airspeed_selector/airspeed_selector_main.cpp:	uORB::Subscription _estimator_selector_status_sub{ORB_ID(estimator_selector_status)};
+./modules/airspeed_selector/airspeed_selector_main.cpp:	uORB::Subscription _estimator_status_sub{ORB_ID(estimator_status)};
+./modules/airspeed_selector/airspeed_selector_main.cpp:	uORB::Subscription _vehicle_acceleration_sub{ORB_ID(vehicle_acceleration)};
+./modules/airspeed_selector/airspeed_selector_main.cpp:	uORB::Subscription _vehicle_air_data_sub{ORB_ID(vehicle_air_data)};
+./modules/airspeed_selector/airspeed_selector_main.cpp:	uORB::Subscription _vehicle_attitude_sub{ORB_ID(vehicle_attitude)};
+./modules/airspeed_selector/airspeed_selector_main.cpp:	uORB::Subscription _vehicle_land_detected_sub{ORB_ID(vehicle_land_detected)};
+./modules/airspeed_selector/airspeed_selector_main.cpp:	uORB::Subscription _vehicle_local_position_sub{ORB_ID(vehicle_local_position)};
+./modules/airspeed_selector/airspeed_selector_main.cpp:	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};
+./modules/airspeed_selector/airspeed_selector_main.cpp:	uORB::Subscription _vtol_vehicle_status_sub{ORB_ID(vtol_vehicle_status)};
+./modules/airspeed_selector/airspeed_selector_main.cpp:	uORB::Subscription _position_setpoint_sub{ORB_ID(position_setpoint)};
+./modules/rover_pos_control/RoverPositionControl.hpp:	uORB::SubscriptionCallbackWorkItem _vehicle_angular_velocity_sub{this, ORB_ID(vehicle_angular_velocity)};
+./modules/rover_pos_control/RoverPositionControl.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/rover_pos_control/RoverPositionControl.hpp:	uORB::Publication<vehicle_attitude_setpoint_s>	_attitude_sp_pub{ORB_ID(vehicle_attitude_setpoint)};
+./modules/rover_pos_control/RoverPositionControl.hpp:	uORB::Publication<position_controller_status_s>	_pos_ctrl_status_pub{ORB_ID(position_controller_status)};  /**< navigation capabilities publication */
+./modules/rover_pos_control/RoverPositionControl.hpp:	uORB::Publication<actuator_controls_s>		_actuator_controls_pub{ORB_ID(actuator_controls_0)};  /**< actuator controls publication */
+./modules/rover_pos_control/RoverPositionControl.hpp:	uORB::Subscription _control_mode_sub{ORB_ID(vehicle_control_mode)}; /**< control mode subscription */
+./modules/rover_pos_control/RoverPositionControl.hpp:	uORB::Subscription _global_pos_sub{ORB_ID(vehicle_global_position)};
+./modules/rover_pos_control/RoverPositionControl.hpp:	uORB::Subscription _local_pos_sub{ORB_ID(vehicle_local_position)};
+./modules/rover_pos_control/RoverPositionControl.hpp:	uORB::Subscription _manual_control_setpoint_sub{ORB_ID(manual_control_setpoint)}; /**< notification of manual control updates */
+./modules/rover_pos_control/RoverPositionControl.hpp:	uORB::Subscription _pos_sp_triplet_sub{ORB_ID(position_setpoint_triplet)};
+./modules/rover_pos_control/RoverPositionControl.hpp:	uORB::Subscription _att_sub{ORB_ID(vehicle_attitude)};
+./modules/rover_pos_control/RoverPositionControl.hpp:	uORB::Subscription _att_sp_sub{ORB_ID(vehicle_attitude_setpoint)};
+./modules/rover_pos_control/RoverPositionControl.hpp:	uORB::Subscription _trajectory_setpoint_sub{ORB_ID(trajectory_setpoint)};
+./modules/rover_pos_control/RoverPositionControl.hpp:	uORB::SubscriptionData<vehicle_acceleration_s>		_vehicle_acceleration_sub{ORB_ID(vehicle_acceleration)};
+./modules/mc_att_control/mc_att_control_main.cpp:	_vehicle_attitude_setpoint_pub(vtol ? ORB_ID(mc_virtual_attitude_setpoint) : ORB_ID(vehicle_attitude_setpoint)),
+./modules/mc_att_control/mc_att_control.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/mc_att_control/mc_att_control.hpp:	uORB::Subscription _vehicle_attitude_setpoint_sub{ORB_ID(vehicle_attitude_setpoint)};
+./modules/mc_att_control/mc_att_control.hpp:	uORB::Subscription _v_control_mode_sub{ORB_ID(vehicle_control_mode)};		/**< vehicle control mode subscription */
+./modules/mc_att_control/mc_att_control.hpp:	uORB::Subscription _manual_control_setpoint_sub{ORB_ID(manual_control_setpoint)};	/**< manual control setpoint subscription */
+./modules/mc_att_control/mc_att_control.hpp:	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};			/**< vehicle status subscription */
+./modules/mc_att_control/mc_att_control.hpp:	uORB::Subscription _vehicle_land_detected_sub{ORB_ID(vehicle_land_detected)};	/**< vehicle land detected subscription */
+./modules/mc_att_control/mc_att_control.hpp:	uORB::SubscriptionCallbackWorkItem _vehicle_attitude_sub{this, ORB_ID(vehicle_attitude)};
+./modules/mc_att_control/mc_att_control.hpp:	uORB::Publication<vehicle_rates_setpoint_s>	_v_rates_sp_pub{ORB_ID(vehicle_rates_setpoint)};			/**< rate setpoint publication */
+./modules/local_position_estimator/BlockLocalPositionEstimator.hpp:	uORB::SubscriptionCallbackWorkItem _sensors_sub{this, ORB_ID(sensor_combined)};
+./modules/local_position_estimator/BlockLocalPositionEstimator.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/local_position_estimator/BlockLocalPositionEstimator.hpp:	uORB::Subscription _vehicle_command_sub{ORB_ID(vehicle_command)};
+./modules/local_position_estimator/BlockLocalPositionEstimator.hpp:	uORB::SubscriptionData<actuator_armed_s> _sub_armed{ORB_ID(actuator_armed)};
+./modules/local_position_estimator/BlockLocalPositionEstimator.hpp:	uORB::SubscriptionData<vehicle_land_detected_s> _sub_land{ORB_ID(vehicle_land_detected)};
+./modules/local_position_estimator/BlockLocalPositionEstimator.hpp:	uORB::SubscriptionData<vehicle_attitude_s> _sub_att{ORB_ID(vehicle_attitude)};
+./modules/local_position_estimator/BlockLocalPositionEstimator.hpp:	uORB::SubscriptionData<vehicle_angular_velocity_s> _sub_angular_velocity{ORB_ID(vehicle_angular_velocity)};
+./modules/local_position_estimator/BlockLocalPositionEstimator.hpp:	uORB::SubscriptionData<optical_flow_s> _sub_flow{ORB_ID(optical_flow)};
+./modules/local_position_estimator/BlockLocalPositionEstimator.hpp:	uORB::SubscriptionData<vehicle_gps_position_s> _sub_gps{ORB_ID(vehicle_gps_position)};
+./modules/local_position_estimator/BlockLocalPositionEstimator.hpp:	uORB::SubscriptionData<vehicle_odometry_s> _sub_visual_odom{ORB_ID(vehicle_visual_odometry)};
+./modules/local_position_estimator/BlockLocalPositionEstimator.hpp:	uORB::SubscriptionData<vehicle_odometry_s> _sub_mocap_odom{ORB_ID(vehicle_mocap_odometry)};
+./modules/local_position_estimator/BlockLocalPositionEstimator.hpp:	uORB::SubscriptionData<distance_sensor_s> _sub_dist0{ORB_ID(distance_sensor), 0};
+./modules/local_position_estimator/BlockLocalPositionEstimator.hpp:	uORB::SubscriptionData<distance_sensor_s> _sub_dist1{ORB_ID(distance_sensor), 1};
+./modules/local_position_estimator/BlockLocalPositionEstimator.hpp:	uORB::SubscriptionData<distance_sensor_s> _sub_dist2{ORB_ID(distance_sensor), 2};
+./modules/local_position_estimator/BlockLocalPositionEstimator.hpp:	uORB::SubscriptionData<distance_sensor_s> _sub_dist3{ORB_ID(distance_sensor), 3};
+./modules/local_position_estimator/BlockLocalPositionEstimator.hpp:	uORB::SubscriptionData<landing_target_pose_s> _sub_landing_target_pose{ORB_ID(landing_target_pose)};
+./modules/local_position_estimator/BlockLocalPositionEstimator.hpp:	uORB::SubscriptionData<vehicle_air_data_s> _sub_airdata{ORB_ID(vehicle_air_data)};
+./modules/local_position_estimator/BlockLocalPositionEstimator.hpp:	uORB::PublicationData<vehicle_local_position_s> _pub_lpos{ORB_ID(vehicle_local_position)};
+./modules/local_position_estimator/BlockLocalPositionEstimator.hpp:	uORB::PublicationData<vehicle_global_position_s> _pub_gpos{ORB_ID(vehicle_global_position)};
+./modules/local_position_estimator/BlockLocalPositionEstimator.hpp:	uORB::PublicationData<vehicle_odometry_s> _pub_odom{ORB_ID(vehicle_odometry)};
+./modules/local_position_estimator/BlockLocalPositionEstimator.hpp:	uORB::PublicationData<estimator_states_s> _pub_est_states{ORB_ID(estimator_states)};
+./modules/local_position_estimator/BlockLocalPositionEstimator.hpp:	uORB::PublicationData<estimator_status_s> _pub_est_status{ORB_ID(estimator_status)};
+./modules/local_position_estimator/BlockLocalPositionEstimator.hpp:	uORB::PublicationData<estimator_innovations_s> _pub_innov{ORB_ID(estimator_innovations)};
+./modules/local_position_estimator/BlockLocalPositionEstimator.hpp:	uORB::PublicationData<estimator_innovations_s> _pub_innov_var{ORB_ID(estimator_innovation_variances)};
+./modules/ekf2/EKF2Selector.hpp:			estimator_attitude_sub{selector, ORB_ID(estimator_attitude), i},
+./modules/ekf2/EKF2Selector.hpp:			estimator_status_sub{selector, ORB_ID(estimator_status), i},
+./modules/ekf2/EKF2Selector.hpp:			estimator_local_position_sub{ORB_ID(estimator_local_position), i},
+./modules/ekf2/EKF2Selector.hpp:			estimator_global_position_sub{ORB_ID(estimator_global_position), i},
+./modules/ekf2/EKF2Selector.hpp:			estimator_odometry_sub{ORB_ID(estimator_odometry), i},
+./modules/ekf2/EKF2Selector.hpp:			estimator_wind_sub{ORB_ID(estimator_wind), i},
+./modules/ekf2/EKF2Selector.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/ekf2/EKF2Selector.hpp:	uORB::Subscription _sensors_status_imu{ORB_ID(sensors_status_imu)};
+./modules/ekf2/EKF2Selector.hpp:	uORB::Publication<estimator_selector_status_s> _estimator_selector_status_pub{ORB_ID(estimator_selector_status)};
+./modules/ekf2/EKF2Selector.hpp:	uORB::Publication<sensor_selection_s>          _sensor_selection_pub{ORB_ID(sensor_selection)};
+./modules/ekf2/EKF2Selector.hpp:	uORB::Publication<vehicle_attitude_s>          _vehicle_attitude_pub{ORB_ID(vehicle_attitude)};
+./modules/ekf2/EKF2Selector.hpp:	uORB::Publication<vehicle_global_position_s>   _vehicle_global_position_pub{ORB_ID(vehicle_global_position)};
+./modules/ekf2/EKF2Selector.hpp:	uORB::Publication<vehicle_local_position_s>    _vehicle_local_position_pub{ORB_ID(vehicle_local_position)};
+./modules/ekf2/EKF2Selector.hpp:	uORB::Publication<vehicle_odometry_s>          _vehicle_odometry_pub{ORB_ID(vehicle_odometry)};
+./modules/ekf2/EKF2Selector.hpp:	uORB::Publication<wind_s>             _wind_pub{ORB_ID(wind)};
+./modules/ekf2/EKF2.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/ekf2/EKF2.hpp:	uORB::Subscription _airdata_sub{ORB_ID(vehicle_air_data)};
+./modules/ekf2/EKF2.hpp:	uORB::Subscription _airspeed_sub{ORB_ID(airspeed)};
+./modules/ekf2/EKF2.hpp:	uORB::Subscription _distance_sensor_sub{ORB_ID(distance_sensor)};
+./modules/ekf2/EKF2.hpp:	uORB::Subscription _ev_odom_sub{ORB_ID(vehicle_visual_odometry)};
+./modules/ekf2/EKF2.hpp:	uORB::Subscription _landing_target_pose_sub{ORB_ID(landing_target_pose)};
+./modules/ekf2/EKF2.hpp:	uORB::Subscription _magnetometer_sub{ORB_ID(vehicle_magnetometer)};
+./modules/ekf2/EKF2.hpp:	uORB::Subscription _optical_flow_sub{ORB_ID(optical_flow)};
+./modules/ekf2/EKF2.hpp:	uORB::Subscription _sensor_selection_sub{ORB_ID(sensor_selection)};
+./modules/ekf2/EKF2.hpp:	uORB::Subscription _status_sub{ORB_ID(vehicle_status)};
+./modules/ekf2/EKF2.hpp:	uORB::Subscription _vehicle_command_sub{ORB_ID(vehicle_command)};
+./modules/ekf2/EKF2.hpp:	uORB::Subscription _vehicle_gps_position_sub{ORB_ID(vehicle_gps_position)};
+./modules/ekf2/EKF2.hpp:	uORB::Subscription _vehicle_land_detected_sub{ORB_ID(vehicle_land_detected)};
+./modules/ekf2/EKF2.hpp:	uORB::SubscriptionCallbackWorkItem _sensor_combined_sub{this, ORB_ID(sensor_combined)};
+./modules/ekf2/EKF2.hpp:	uORB::SubscriptionCallbackWorkItem _vehicle_imu_sub{this, ORB_ID(vehicle_imu)};
+./modules/ekf2/EKF2.hpp:	uORB::PublicationMulti<ekf2_timestamps_s>            _ekf2_timestamps_pub{ORB_ID(ekf2_timestamps)};
+./modules/ekf2/EKF2.hpp:	uORB::PublicationMulti<ekf_gps_drift_s>              _ekf_gps_drift_pub{ORB_ID(ekf_gps_drift)};
+./modules/ekf2/EKF2.hpp:	uORB::PublicationMulti<estimator_innovations_s>      _estimator_innovation_test_ratios_pub{ORB_ID(estimator_innovation_test_ratios)};
+./modules/ekf2/EKF2.hpp:	uORB::PublicationMulti<estimator_innovations_s>      _estimator_innovation_variances_pub{ORB_ID(estimator_innovation_variances)};
+./modules/ekf2/EKF2.hpp:	uORB::PublicationMulti<estimator_innovations_s>      _estimator_innovations_pub{ORB_ID(estimator_innovations)};
+./modules/ekf2/EKF2.hpp:	uORB::PublicationMulti<estimator_optical_flow_vel_s> _estimator_optical_flow_vel_pub{ORB_ID(estimator_optical_flow_vel)};
+./modules/ekf2/EKF2.hpp:	uORB::PublicationMulti<estimator_sensor_bias_s>      _estimator_sensor_bias_pub{ORB_ID(estimator_sensor_bias)};
+./modules/ekf2/EKF2.hpp:	uORB::PublicationMulti<estimator_states_s>           _estimator_states_pub{ORB_ID(estimator_states)};
+./modules/ekf2/EKF2.hpp:	uORB::PublicationMulti<estimator_status_s>           _estimator_status_pub{ORB_ID(estimator_status)};
+./modules/ekf2/EKF2.hpp:	uORB::PublicationMulti<estimator_status_flags_s>     _estimator_status_flags_pub{ORB_ID(estimator_status_flags)};
+./modules/ekf2/EKF2.hpp:	uORB::PublicationMulti<estimator_event_flags_s>      _estimator_event_flags_pub{ORB_ID(estimator_event_flags)};
+./modules/ekf2/EKF2.hpp:	uORB::PublicationMulti<vehicle_odometry_s>           _estimator_visual_odometry_aligned_pub{ORB_ID(estimator_visual_odometry_aligned)};
+./modules/ekf2/EKF2.hpp:	uORB::PublicationMulti<yaw_estimator_status_s>       _yaw_est_pub{ORB_ID(yaw_estimator_status)};
+./modules/ekf2/EKF2.cpp:	_attitude_pub(multi_mode ? ORB_ID(estimator_attitude) : ORB_ID(vehicle_attitude)),
+./modules/ekf2/EKF2.cpp:	_local_position_pub(multi_mode ? ORB_ID(estimator_local_position) : ORB_ID(vehicle_local_position)),
+./modules/ekf2/EKF2.cpp:	_global_position_pub(multi_mode ? ORB_ID(estimator_global_position) : ORB_ID(vehicle_global_position)),
+./modules/ekf2/EKF2.cpp:	_odometry_pub(multi_mode ? ORB_ID(estimator_odometry) : ORB_ID(vehicle_odometry)),
+./modules/ekf2/EKF2.cpp:	_wind_pub(multi_mode ? ORB_ID(estimator_wind) : ORB_ID(wind)),
+./modules/ekf2/EKF2.cpp:		uORB::SubscriptionData<vehicle_status_s> vehicle_status_sub{ORB_ID(vehicle_status)};
+./modules/ekf2/EKF2.cpp:				uORB::SubscriptionData<vehicle_magnetometer_s> vehicle_mag_sub{ORB_ID(vehicle_magnetometer), mag};
+./modules/ekf2/EKF2.cpp:					uORB::SubscriptionData<vehicle_imu_s> vehicle_imu_sub{ORB_ID(vehicle_imu), imu};
+./modules/simulator/battery_simulator/BatterySimulator.hpp:	uORB::Publication<battery_status_s> _battery_pub{ORB_ID(battery_status)};
+./modules/simulator/battery_simulator/BatterySimulator.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/simulator/battery_simulator/BatterySimulator.hpp:	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};
+./modules/simulator/simulator_mavlink.cpp:	orb_copy(ORB_ID(actuator_outputs), _actuator_outputs_sub, &_actuator_outputs);
+./modules/simulator/simulator_mavlink.cpp:				_sensor_gps_pubs[i] = new uORB::PublicationMulti<sensor_gps_s> {ORB_ID(sensor_gps)};
+./modules/simulator/simulator_mavlink.cpp:	_actuator_outputs_sub = orb_subscribe_multi(ORB_ID(actuator_outputs), 0);
+./modules/simulator/simulator_mavlink.cpp:			_dist_pubs[i] = new uORB::PublicationMulti<distance_sensor_s> {ORB_ID(distance_sensor)};
+./modules/simulator/simulator.h:	uORB::Publication<differential_pressure_s>	_differential_pressure_pub{ORB_ID(differential_pressure)};
+./modules/simulator/simulator.h:	uORB::PublicationMulti<optical_flow_s>		_flow_pub{ORB_ID(optical_flow)};
+./modules/simulator/simulator.h:	uORB::Publication<irlock_report_s>		_irlock_report_pub{ORB_ID(irlock_report)};
+./modules/simulator/simulator.h:	uORB::Publication<vehicle_odometry_s>		_visual_odometry_pub{ORB_ID(vehicle_visual_odometry)};
+./modules/simulator/simulator.h:	uORB::Publication<vehicle_odometry_s>		_mocap_odometry_pub{ORB_ID(vehicle_mocap_odometry)};
+./modules/simulator/simulator.h:	uORB::Publication<vehicle_command_ack_s>	_command_ack_pub{ORB_ID(vehicle_command_ack)};
+./modules/simulator/simulator.h:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/simulator/simulator.h:	uORB::Publication<vehicle_angular_velocity_s>	_vehicle_angular_velocity_ground_truth_pub{ORB_ID(vehicle_angular_velocity_groundtruth)};
+./modules/simulator/simulator.h:	uORB::Publication<vehicle_attitude_s>		_attitude_ground_truth_pub{ORB_ID(vehicle_attitude_groundtruth)};
+./modules/simulator/simulator.h:	uORB::Publication<vehicle_global_position_s>	_gpos_ground_truth_pub{ORB_ID(vehicle_global_position_groundtruth)};
+./modules/simulator/simulator.h:	uORB::Publication<vehicle_local_position_s>	_lpos_ground_truth_pub{ORB_ID(vehicle_local_position_groundtruth)};
+./modules/simulator/simulator.h:	uORB::Publication<input_rc_s>			_input_rc_pub{ORB_ID(input_rc)};
+./modules/simulator/simulator.h:	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};
+./modules/simulator/simulator.h:	uORB::Subscription _vehicle_command_sub{ORB_ID(vehicle_command)};
+./modules/navigator/mission_block.h:	uORB::Publication<actuator_controls_s>	_actuator_pub{ORB_ID(actuator_controls_2)};
+./modules/navigator/navigator_main.cpp:	_local_pos_sub = orb_subscribe(ORB_ID(vehicle_local_position));
+./modules/navigator/navigator_main.cpp:	_mission_sub = orb_subscribe(ORB_ID(mission));
+./modules/navigator/navigator_main.cpp:	_vehicle_status_sub = orb_subscribe(ORB_ID(vehicle_status));
+./modules/navigator/navigator_main.cpp:		orb_copy(ORB_ID(vehicle_local_position), _local_pos_sub, &_local_pos);
+./modules/navigator/navigator_main.cpp:		orb_copy(ORB_ID(vehicle_status), _vehicle_status_sub, &_vstatus);
+./modules/navigator/navigator_main.cpp:			orb_copy(ORB_ID(mission), _mission_sub, &mission);
+./modules/navigator/navigator_main.cpp:	uORB::Publication<transponder_report_s> tr_pub{ORB_ID(transponder_report)};
+./modules/navigator/rtl.h:	uORB::SubscriptionData<wind_s>		_wind_sub{ORB_ID(wind)};
+./modules/navigator/rtl.h:	uORB::Publication<rtl_flight_time_s>		_rtl_flight_time_pub{ORB_ID(rtl_flight_time)};
+./modules/navigator/gpsfailure.h:	uORB::Publication<vehicle_attitude_setpoint_s>	_att_sp_pub{ORB_ID(vehicle_attitude_setpoint)};
+./modules/navigator/gpsfailure.h:	uORB::Publication<vehicle_attitude_setpoint_s>	_fw_virtual_att_sp_pub{ORB_ID(fw_virtual_attitude_setpoint)};
+./modules/navigator/follow_target.h:	uORB::Subscription _follow_target_sub{ORB_ID(follow_target)};
+./modules/navigator/geofence.cpp:	_sub_airdata(ORB_ID(vehicle_air_data))
+./modules/navigator/precland.h:	uORB::Subscription _target_pose_sub{ORB_ID(landing_target_pose)};
+./modules/navigator/py_graph.py:        pub_prefixes = ["orb_publish(ORB_ID(", "orb_publish_auto(ORB_ID("]
+./modules/navigator/py_graph.py:        sub_prefixes = ["orb_subscribe(ORB_ID(", "orb_subscription(ORB_ID(",
+./modules/navigator/py_graph.py:                        "orb_copy(ORB_ID(",  "copy_if_updated(ORB_ID("]
+./modules/navigator/mission.h:	uORB::Subscription	_mission_sub{ORB_ID(mission)};		/**< mission subscription */
+./modules/navigator/mission_feasibility_checker.cpp:					uORB::SubscriptionData<position_controller_landing_status_s> landing_status{ORB_ID(position_controller_landing_status)};
+./modules/navigator/navigator.h:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/navigator/navigator.h:	uORB::Subscription _global_pos_sub{ORB_ID(vehicle_global_position)};	/**< global position subscription */
+./modules/navigator/navigator.h:	uORB::Subscription _gps_pos_sub{ORB_ID(vehicle_gps_position)};		/**< gps position subscription */
+./modules/navigator/navigator.h:	uORB::Subscription _home_pos_sub{ORB_ID(home_position)};		/**< home position subscription */
+./modules/navigator/navigator.h:	uORB::Subscription _land_detected_sub{ORB_ID(vehicle_land_detected)};	/**< vehicle land detected subscription */
+./modules/navigator/navigator.h:	uORB::Subscription _pos_ctrl_landing_status_sub{ORB_ID(position_controller_landing_status)};	/**< position controller landing status subscription */
+./modules/navigator/navigator.h:	uORB::Subscription _traffic_sub{ORB_ID(transponder_report)};		/**< traffic subscription */
+./modules/navigator/navigator.h:	uORB::Subscription _vehicle_command_sub{ORB_ID(vehicle_command)};	/**< vehicle commands (onboard and offboard) */
+./modules/navigator/navigator.h:	uORB::SubscriptionData<position_controller_status_s>	_position_controller_status_sub{ORB_ID(position_controller_status)};
+./modules/navigator/navigator.h:	uORB::Publication<geofence_result_s>		_geofence_result_pub{ORB_ID(geofence_result)};
+./modules/navigator/navigator.h:	uORB::Publication<mission_result_s>		_mission_result_pub{ORB_ID(mission_result)};
+./modules/navigator/navigator.h:	uORB::Publication<position_setpoint_triplet_s>	_pos_sp_triplet_pub{ORB_ID(position_setpoint_triplet)};
+./modules/navigator/navigator.h:	uORB::Publication<vehicle_roi_s>		_vehicle_roi_pub{ORB_ID(vehicle_roi)};
+./modules/navigator/navigator.h:	uORB::Publication<vehicle_command_ack_s>	_vehicle_cmd_ack_pub{ORB_ID(vehicle_command_ack)};
+./modules/navigator/navigator.h:	uORB::Publication<vehicle_command_s>	_vehicle_cmd_pub{ORB_ID(vehicle_command)};
+./modules/navigator/RangeRTLTest.cpp:	// uORB::Publication<home_position_s> home_pos_pub{ORB_ID(home_position)};
+./modules/navigator/RangeRTLTest.cpp:	// uORB::Publication<vehicle_global_position_s> global_pos_pub{ORB_ID(vehicle_global_position)};
+./modules/navigator/RangeRTLTest.cpp:	// uORB::Publication<vehicle_local_position_s> local_pos_pub{ORB_ID(vehicle_local_position)};
+./modules/navigator/RangeRTLTest.cpp:	// uORB::Publication<vehicle_status_s> vehicle_status_pub{ORB_ID(vehicle_status)};
+./modules/navigator/RangeRTLTest.cpp:	uORB::SubscriptionData<rtl_flight_time_s> _rtl_flight_time_sub{ORB_ID(rtl_flight_time)};
+./modules/gyro_fft/GyroFFT.hpp:	uORB::Publication<sensor_gyro_fft_s> _sensor_gyro_fft_pub{ORB_ID(sensor_gyro_fft)};
+./modules/gyro_fft/GyroFFT.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/gyro_fft/GyroFFT.hpp:	uORB::Subscription _sensor_selection_sub{ORB_ID(sensor_selection)};
+./modules/gyro_fft/GyroFFT.hpp:	uORB::Subscription _vehicle_imu_status_sub{ORB_ID(vehicle_imu_status)};
+./modules/gyro_fft/GyroFFT.hpp:	uORB::SubscriptionCallbackWorkItem _sensor_gyro_sub{this, ORB_ID(sensor_gyro)};
+./modules/gyro_fft/GyroFFT.hpp:	uORB::SubscriptionCallbackWorkItem _sensor_gyro_fifo_sub{this, ORB_ID(sensor_gyro_fifo)};
+./modules/gyro_fft/GyroFFT.cpp:				uORB::SubscriptionData<sensor_gyro_fifo_s> sensor_gyro_fifo_sub{ORB_ID(sensor_gyro_fifo), i};
+./modules/gyro_fft/GyroFFT.cpp:				uORB::SubscriptionData<sensor_gyro_s> sensor_gyro_sub{ORB_ID(sensor_gyro), i};
+./modules/gyro_fft/GyroFFT.cpp:					uORB::Subscription imu_status_sub{ORB_ID(vehicle_imu_status), imu_status};
+./modules/vmount/output_mavlink.cpp:	uORB::Publication<vehicle_command_s> vehicle_command_pub{ORB_ID(vehicle_command)};
+./modules/vmount/input_rc.cpp:	_manual_control_setpoint_sub = orb_subscribe(ORB_ID(manual_control_setpoint));
+./modules/vmount/input_rc.cpp:	orb_copy(ORB_ID(manual_control_setpoint), _manual_control_setpoint_sub, &manual_control_setpoint);
+./modules/vmount/output_mavlink.h:	uORB::Publication<vehicle_command_s> _vehicle_command_pub{ORB_ID(vehicle_command)};
+./modules/vmount/output_mavlink.h:	uORB::Publication<gimbal_device_set_attitude_s> _gimbal_device_set_attitude_pub{ORB_ID(gimbal_device_set_attitude)};
+./modules/vmount/output_mavlink.h:	uORB::Subscription _gimbal_device_information_sub{ORB_ID(gimbal_device_information)};
+./modules/vmount/input_mavlink.cpp:	_vehicle_roi_sub = orb_subscribe(ORB_ID(vehicle_roi));
+./modules/vmount/input_mavlink.cpp:	_position_setpoint_triplet_sub = orb_subscribe(ORB_ID(position_setpoint_triplet));
+./modules/vmount/input_mavlink.cpp:			orb_copy(ORB_ID(vehicle_roi), _vehicle_roi_sub, &vehicle_roi);
+./modules/vmount/input_mavlink.cpp:				orb_copy(ORB_ID(position_setpoint_triplet), _position_setpoint_triplet_sub, &position_setpoint_triplet);
+./modules/vmount/input_mavlink.cpp:	orb_copy(ORB_ID(position_setpoint_triplet), _position_setpoint_triplet_sub, &position_setpoint_triplet);
+./modules/vmount/input_mavlink.cpp:	if ((_vehicle_command_sub = orb_subscribe(ORB_ID(vehicle_command))) < 0) {
+./modules/vmount/input_mavlink.cpp:				orb_copy(ORB_ID(vehicle_command), _vehicle_command_sub, &vehicle_command);
+./modules/vmount/input_mavlink.cpp:	uORB::Publication<vehicle_command_ack_s> cmd_ack_pub{ORB_ID(vehicle_command_ack)};
+./modules/vmount/input_mavlink.cpp:	_vehicle_roi_sub = orb_subscribe(ORB_ID(vehicle_roi));
+./modules/vmount/input_mavlink.cpp:	_position_setpoint_triplet_sub = orb_subscribe(ORB_ID(position_setpoint_triplet));
+./modules/vmount/input_mavlink.cpp:	_gimbal_manager_set_attitude_sub  = orb_subscribe(ORB_ID(gimbal_manager_set_attitude));
+./modules/vmount/input_mavlink.cpp:	if ((_vehicle_command_sub = orb_subscribe(ORB_ID(vehicle_command))) < 0) {
+./modules/vmount/input_mavlink.cpp:	if ((_gimbal_manager_set_manual_control_sub = orb_subscribe(ORB_ID(gimbal_manager_set_manual_control))) < 0) {
+./modules/vmount/input_mavlink.cpp:				orb_copy(ORB_ID(gimbal_manager_set_attitude), _gimbal_manager_set_attitude_sub, &set_attitude);
+./modules/vmount/input_mavlink.cpp:				orb_copy(ORB_ID(vehicle_roi), _vehicle_roi_sub, &vehicle_roi);
+./modules/vmount/input_mavlink.cpp:					orb_copy(ORB_ID(position_setpoint_triplet), _position_setpoint_triplet_sub, &position_setpoint_triplet);
+./modules/vmount/input_mavlink.cpp:				orb_copy(ORB_ID(vehicle_command), _vehicle_command_sub, &vehicle_command);
+./modules/vmount/input_mavlink.cpp:				orb_copy(ORB_ID(gimbal_manager_set_manual_control), _gimbal_manager_set_manual_control_sub, &set_manual_control);
+./modules/vmount/input_mavlink.cpp:	uORB::Publication<vehicle_command_ack_s> cmd_ack_pub{ORB_ID(vehicle_command_ack)};
+./modules/vmount/input_mavlink.cpp:	orb_copy(ORB_ID(position_setpoint_triplet), _position_setpoint_triplet_sub, &position_setpoint_triplet);
+./modules/vmount/output_rc.h:	uORB::Publication <actuator_controls_s>	_actuator_controls_pub{ORB_ID(actuator_controls_2)};
+./modules/vmount/output_rc.h:	uORB::Publication <gimbal_device_attitude_status_s>	_attitude_status_pub{ORB_ID(gimbal_device_attitude_status)};
+./modules/vmount/input_mavlink.h:	uORB::Subscription _gimbal_device_attitude_status_sub{ORB_ID(gimbal_device_attitude_status)};
+./modules/vmount/input_mavlink.h:	uORB::Subscription _vehicle_global_position_sub{ORB_ID(vehicle_global_position)};
+./modules/vmount/input_mavlink.h:	uORB::Publication<gimbal_manager_information_s> _gimbal_manager_info_pub{ORB_ID(gimbal_manager_information)};
+./modules/vmount/input_mavlink.h:	uORB::Publication<gimbal_manager_status_s> _gimbal_manager_status_pub{ORB_ID(gimbal_manager_status)};
+./modules/vmount/vmount.cpp:	uORB::SubscriptionInterval parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/vmount/output.h:	uORB::Subscription _vehicle_attitude_sub{ORB_ID(vehicle_attitude)};
+./modules/vmount/output.h:	uORB::Subscription _vehicle_global_position_sub{ORB_ID(vehicle_global_position)};
+./modules/vmount/output.h:	uORB::Subscription _vehicle_local_position_sub{ORB_ID(vehicle_local_position)};
+./modules/vmount/output.h:	uORB::Publication<mount_orientation_s> _mount_orientation_pub{ORB_ID(mount_orientation)};
+./modules/battery_status/battery_status.cpp:	uORB::Subscription	_actuator_ctrl_0_sub{ORB_ID(actuator_controls_0)};		/**< attitude controls sub */
+./modules/battery_status/battery_status.cpp:	uORB::SubscriptionInterval	_parameter_update_sub{ORB_ID(parameter_update), 1_s};				/**< notification of parameter updates */
+./modules/battery_status/battery_status.cpp:	uORB::SubscriptionCallbackWorkItem _adc_report_sub{this, ORB_ID(adc_report)};
+./modules/sih/sih.hpp:	uORB::Publication<sensor_gps_s>	_sensor_gps_pub{ORB_ID(sensor_gps)};
+./modules/sih/sih.hpp:	uORB::Publication<distance_sensor_s> _distance_snsr_pub{ORB_ID(distance_sensor)};
+./modules/sih/sih.hpp:	uORB::Publication<vehicle_angular_velocity_s>	_vehicle_angular_velocity_gt_pub{ORB_ID(vehicle_angular_velocity_groundtruth)};
+./modules/sih/sih.hpp:	uORB::Publication<vehicle_attitude_s>		_att_gt_pub{ORB_ID(vehicle_attitude_groundtruth)};
+./modules/sih/sih.hpp:	uORB::Publication<vehicle_global_position_s>	_gpos_gt_pub{ORB_ID(vehicle_global_position_groundtruth)};
+./modules/sih/sih.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/sih/sih.hpp:	uORB::Subscription _actuator_out_sub{ORB_ID(actuator_outputs)};
+./modules/events/rc_loss_alarm.h:	uORB::Publication<tune_control_s> _tune_control_pub{ORB_ID(tune_control)};
+./modules/events/rc_loss_alarm.h:	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};
+./modules/events/send_event.cpp:	uORB::Publication<vehicle_command_ack_s>	command_ack_pub{ORB_ID(vehicle_command_ack)};
+./modules/events/send_event.h:	uORB::Subscription _vehicle_command_sub{ORB_ID(vehicle_command)};
+./modules/events/status_display.h:	uORB::SubscriptionData<battery_status_s> _battery_status_sub{ORB_ID(battery_status)};
+./modules/events/status_display.h:	uORB::SubscriptionData<cpuload_s> _cpu_load_sub{ORB_ID(cpuload)};
+./modules/events/status_display.h:	uORB::SubscriptionData<vehicle_status_s> _vehicle_status_sub{ORB_ID(vehicle_status)};
+./modules/events/status_display.h:	uORB::SubscriptionData<vehicle_status_flags_s> _vehicle_status_flags_sub{ORB_ID(vehicle_status_flags)};
+./modules/events/status_display.h:	uORB::SubscriptionData<vehicle_attitude_s> _vehicle_attitude_sub{ORB_ID(vehicle_attitude)};
+./modules/events/status_display.h:	uORB::Publication<led_control_s> _led_control_pub{ORB_ID(led_control)};
+./modules/load_mon/LoadMon.hpp:	uORB::Publication<task_stack_info_s> _task_stack_info_pub{ORB_ID(task_stack_info)};
+./modules/load_mon/LoadMon.hpp:	uORB::Publication<cpuload_s> _cpuload_pub {ORB_ID(cpuload)};
+./modules/vtol_att_control/vtol_att_control_main.cpp:				uORB::Publication<vehicle_command_ack_s> command_ack_pub{ORB_ID(vehicle_command_ack)};
+./modules/vtol_att_control/vtol_att_control_main.h:	uORB::SubscriptionCallbackWorkItem _actuator_inputs_fw{this, ORB_ID(actuator_controls_virtual_fw)};
+./modules/vtol_att_control/vtol_att_control_main.h:	uORB::SubscriptionCallbackWorkItem _actuator_inputs_mc{this, ORB_ID(actuator_controls_virtual_mc)};
+./modules/vtol_att_control/vtol_att_control_main.h:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/vtol_att_control/vtol_att_control_main.h:	uORB::Subscription _airspeed_validated_sub{ORB_ID(airspeed_validated)};			// airspeed subscription
+./modules/vtol_att_control/vtol_att_control_main.h:	uORB::Subscription _fw_virtual_att_sp_sub{ORB_ID(fw_virtual_attitude_setpoint)};
+./modules/vtol_att_control/vtol_att_control_main.h:	uORB::Subscription _land_detected_sub{ORB_ID(vehicle_land_detected)};
+./modules/vtol_att_control/vtol_att_control_main.h:	uORB::Subscription _local_pos_sp_sub{ORB_ID(vehicle_local_position_setpoint)};			// setpoint subscription
+./modules/vtol_att_control/vtol_att_control_main.h:	uORB::Subscription _local_pos_sub{ORB_ID(vehicle_local_position)};			// sensor subscription
+./modules/vtol_att_control/vtol_att_control_main.h:	uORB::Subscription _manual_control_switches_sub{ORB_ID(manual_control_switches)};	//manual control setpoint subscription
+./modules/vtol_att_control/vtol_att_control_main.h:	uORB::Subscription _mc_virtual_att_sp_sub{ORB_ID(mc_virtual_attitude_setpoint)};
+./modules/vtol_att_control/vtol_att_control_main.h:	uORB::Subscription _pos_sp_triplet_sub{ORB_ID(position_setpoint_triplet)};			// local position setpoint subscription
+./modules/vtol_att_control/vtol_att_control_main.h:	uORB::Subscription _tecs_status_sub{ORB_ID(tecs_status)};
+./modules/vtol_att_control/vtol_att_control_main.h:	uORB::Subscription _v_att_sub{ORB_ID(vehicle_attitude)};		//vehicle attitude subscription
+./modules/vtol_att_control/vtol_att_control_main.h:	uORB::Subscription _v_control_mode_sub{ORB_ID(vehicle_control_mode)};	//vehicle control mode subscription
+./modules/vtol_att_control/vtol_att_control_main.h:	uORB::Subscription _vehicle_cmd_sub{ORB_ID(vehicle_command)};
+./modules/vtol_att_control/vtol_att_control_main.h:	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};
+./modules/vtol_att_control/vtol_att_control_main.h:	uORB::Publication<actuator_controls_s>		_actuators_0_pub{ORB_ID(actuator_controls_0)};		//input for the mixer (roll,pitch,yaw,thrust)
+./modules/vtol_att_control/vtol_att_control_main.h:	uORB::Publication<actuator_controls_s>		_actuators_1_pub{ORB_ID(actuator_controls_1)};
+./modules/vtol_att_control/vtol_att_control_main.h:	uORB::Publication<vehicle_attitude_setpoint_s>	_v_att_sp_pub{ORB_ID(vehicle_attitude_setpoint)};
+./modules/vtol_att_control/vtol_att_control_main.h:	uORB::Publication<vtol_vehicle_status_s>	_vtol_vehicle_status_pub{ORB_ID(vtol_vehicle_status)};
+./modules/replay/ReplayEkf2.cpp:	if (sub.orb_meta == ORB_ID(ekf2_timestamps)) {
+./modules/replay/ReplayEkf2.cpp:	} else if (sub.orb_meta == ORB_ID(vehicle_status) || sub.orb_meta == ORB_ID(vehicle_land_detected)
+./modules/replay/ReplayEkf2.cpp:		   || sub.orb_meta == ORB_ID(vehicle_gps_position)) {
+./modules/replay/ReplayEkf2.cpp:	if (sub.orb_meta == ORB_ID(sensor_combined)) {
+./modules/replay/ReplayEkf2.cpp:	} else if (sub.orb_meta == ORB_ID(airspeed)) {
+./modules/replay/ReplayEkf2.cpp:	} else if (sub.orb_meta == ORB_ID(distance_sensor)) {
+./modules/replay/ReplayEkf2.cpp:	} else if (sub.orb_meta == ORB_ID(optical_flow)) {
+./modules/replay/ReplayEkf2.cpp:	} else if (sub.orb_meta == ORB_ID(vehicle_air_data)) {
+./modules/replay/ReplayEkf2.cpp:	} else if (sub.orb_meta == ORB_ID(vehicle_magnetometer)) {
+./modules/replay/ReplayEkf2.cpp:	} else if (sub.orb_meta == ORB_ID(vehicle_visual_odometry)) {
+./modules/replay/ReplayEkf2.cpp:	sub.ignored = sub.orb_meta != ORB_ID(ekf2_timestamps) && sub.orb_meta != ORB_ID(vehicle_status)
+./modules/replay/ReplayEkf2.cpp:		      && sub.orb_meta != ORB_ID(vehicle_land_detected) && sub.orb_meta != ORB_ID(vehicle_gps_position);
+./modules/rc_update/rc_update.h:	uORB::SubscriptionCallbackWorkItem _input_rc_sub{this, ORB_ID(input_rc)};
+./modules/rc_update/rc_update.h:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/rc_update/rc_update.h:	uORB::Subscription _rc_parameter_map_sub{ORB_ID(rc_parameter_map)};
+./modules/rc_update/rc_update.h:	uORB::Subscription _actuator_controls_3_sub{ORB_ID(actuator_controls_3)};
+./modules/rc_update/rc_update.h:	uORB::Publication<rc_channels_s> _rc_channels_pub{ORB_ID(rc_channels)};
+./modules/rc_update/rc_update.h:	uORB::PublicationMulti<manual_control_setpoint_s> _manual_control_setpoint_pub{ORB_ID(manual_control_setpoint)};
+./modules/rc_update/rc_update.h:	uORB::Publication<manual_control_switches_s> _manual_control_switches_pub{ORB_ID(manual_control_switches)};
+./modules/rc_update/rc_update.h:	uORB::Publication<actuator_controls_s> _actuator_group_3_pub{ORB_ID(actuator_controls_3)};
+./modules/muorb/test/muorb_test_example.cpp:	uORB::Subscription sub_vc{ORB_ID(vehicle_command)};
+./modules/muorb/test/muorb_test_example.cpp:	uORB::Publication<vehicle_command_s> vcmd_pub{ORB_ID(vehicle_command)};
+./modules/muorb/test/muorb_test_example.cpp:	uORB::Publication<esc_status_s> pub_id{ORB_ID(esc_status)};
+./modules/muorb/test/muorb_test_example.cpp:	uORB::Publication<vehicle_command_s> vcmd_pub{ORB_ID(vehicle_command)};
+./modules/muorb/test/muorb_test_example.cpp:	uORB::Subscription sub_esc_status{ORB_ID(esc_status)};
+./modules/sensors/vehicle_gps_position/VehicleGPSPosition.hpp:	uORB::Publication<vehicle_gps_position_s> _vehicle_gps_position_pub{ORB_ID(vehicle_gps_position)};
+./modules/sensors/vehicle_gps_position/VehicleGPSPosition.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/sensors/vehicle_gps_position/VehicleGPSPosition.hpp:		{this, ORB_ID(sensor_gps), 0},
+./modules/sensors/vehicle_gps_position/VehicleGPSPosition.hpp:		{this, ORB_ID(sensor_gps), 1},
+./modules/sensors/vehicle_magnetometer/VehicleMagnetometer.hpp:	uORB::Publication<sensor_preflight_mag_s> _sensor_preflight_mag_pub{ORB_ID(sensor_preflight_mag)};
+./modules/sensors/vehicle_magnetometer/VehicleMagnetometer.hpp:		{ORB_ID(vehicle_magnetometer)},
+./modules/sensors/vehicle_magnetometer/VehicleMagnetometer.hpp:		{ORB_ID(vehicle_magnetometer)},
+./modules/sensors/vehicle_magnetometer/VehicleMagnetometer.hpp:		{ORB_ID(vehicle_magnetometer)},
+./modules/sensors/vehicle_magnetometer/VehicleMagnetometer.hpp:		{ORB_ID(vehicle_magnetometer)},
+./modules/sensors/vehicle_magnetometer/VehicleMagnetometer.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/sensors/vehicle_magnetometer/VehicleMagnetometer.hpp:	uORB::Subscription _actuator_controls_0_sub{ORB_ID(actuator_controls_0)};
+./modules/sensors/vehicle_magnetometer/VehicleMagnetometer.hpp:	uORB::Subscription _battery_status_sub{ORB_ID(battery_status), 0};
+./modules/sensors/vehicle_magnetometer/VehicleMagnetometer.hpp:	uORB::Subscription _vehicle_control_mode_sub{ORB_ID(vehicle_control_mode)};
+./modules/sensors/vehicle_magnetometer/VehicleMagnetometer.hpp:		{this, ORB_ID(sensor_mag), 0},
+./modules/sensors/vehicle_magnetometer/VehicleMagnetometer.hpp:		{this, ORB_ID(sensor_mag), 1},
+./modules/sensors/vehicle_magnetometer/VehicleMagnetometer.hpp:		{this, ORB_ID(sensor_mag), 2},
+./modules/sensors/vehicle_magnetometer/VehicleMagnetometer.hpp:		{this, ORB_ID(sensor_mag), 3}
+./modules/sensors/vehicle_magnetometer/VehicleMagnetometer.cpp:				_battery_status_sub = uORB::Subscription{ORB_ID(battery_status), 0};
+./modules/sensors/vehicle_magnetometer/VehicleMagnetometer.cpp:				_battery_status_sub = uORB::Subscription{ORB_ID(battery_status), 1};
+./modules/sensors/vehicle_magnetometer/VehicleMagnetometer.cpp:				_actuator_controls_0_sub = uORB::Subscription{ORB_ID(actuator_controls_0)};
+./modules/sensors/sensors.cpp:		{this, ORB_ID(vehicle_imu), 0},
+./modules/sensors/sensors.cpp:		{this, ORB_ID(vehicle_imu), 1},
+./modules/sensors/sensors.cpp:		{this, ORB_ID(vehicle_imu), 2},
+./modules/sensors/sensors.cpp:		{this, ORB_ID(vehicle_imu), 3}
+./modules/sensors/sensors.cpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/sensors/sensors.cpp:	uORB::Subscription _diff_pres_sub{ORB_ID(differential_pressure)};
+./modules/sensors/sensors.cpp:	uORB::Subscription _vcontrol_mode_sub{ORB_ID(vehicle_control_mode)};
+./modules/sensors/sensors.cpp:	uORB::Subscription _vehicle_air_data_sub{ORB_ID(vehicle_air_data)};
+./modules/sensors/sensors.cpp:	uORB::Publication<airspeed_s>             _airspeed_pub{ORB_ID(airspeed)};
+./modules/sensors/sensors.cpp:	uORB::Publication<sensor_combined_s>      _sensor_pub{ORB_ID(sensor_combined)};
+./modules/sensors/sensors.cpp:	uORB::Subscription	_adc_report_sub{ORB_ID(adc_report)};		/**< adc_report sub */
+./modules/sensors/sensors.cpp:	uORB::PublicationMulti<differential_pressure_s>	_diff_pres_pub{ORB_ID(differential_pressure)};		/**< differential_pressure */
+./modules/sensors/sensors.cpp:			if (orb_exists(ORB_ID(sensor_baro), 0) == PX4_OK) {
+./modules/sensors/sensors.cpp:		if (orb_exists(ORB_ID(sensor_gps), 0) == PX4_OK) {
+./modules/sensors/sensors.cpp:			uORB::Subscription accel_sub{ORB_ID(sensor_accel), i};
+./modules/sensors/sensors.cpp:			uORB::Subscription gyro_sub{ORB_ID(sensor_gyro), i};
+./modules/sensors/sensors.cpp:			if (orb_exists(ORB_ID(sensor_mag), 0) == PX4_OK) {
+./modules/sensors/voted_sensors_update.cpp:		uORB::SubscriptionData<vehicle_imu_s> imu{ORB_ID(vehicle_imu), uorb_index};
+./modules/sensors/voted_sensors_update.cpp:		// use sensor voter to find best if SENS_IMU_MODE is enabled or ORB_ID(sensor_selection) has never published
+./modules/sensors/vehicle_angular_velocity/VehicleAngularVelocity.hpp:	uORB::Publication<vehicle_angular_acceleration_s> _vehicle_angular_acceleration_pub{ORB_ID(vehicle_angular_acceleration)};
+./modules/sensors/vehicle_angular_velocity/VehicleAngularVelocity.hpp:	uORB::Publication<vehicle_angular_velocity_s>     _vehicle_angular_velocity_pub{ORB_ID(vehicle_angular_velocity)};
+./modules/sensors/vehicle_angular_velocity/VehicleAngularVelocity.hpp:	uORB::Subscription _estimator_selector_status_sub{ORB_ID(estimator_selector_status)};
+./modules/sensors/vehicle_angular_velocity/VehicleAngularVelocity.hpp:	uORB::Subscription _estimator_sensor_bias_sub{ORB_ID(estimator_sensor_bias)};
+./modules/sensors/vehicle_angular_velocity/VehicleAngularVelocity.hpp:	uORB::Subscription _esc_status_sub {ORB_ID(esc_status)};
+./modules/sensors/vehicle_angular_velocity/VehicleAngularVelocity.hpp:	uORB::Subscription _sensor_gyro_fft_sub {ORB_ID(sensor_gyro_fft)};
+./modules/sensors/vehicle_angular_velocity/VehicleAngularVelocity.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/sensors/vehicle_angular_velocity/VehicleAngularVelocity.hpp:	uORB::SubscriptionCallbackWorkItem _sensor_selection_sub{this, ORB_ID(sensor_selection)};
+./modules/sensors/vehicle_angular_velocity/VehicleAngularVelocity.hpp:	uORB::SubscriptionCallbackWorkItem _sensor_sub{this, ORB_ID(sensor_gyro)};
+./modules/sensors/vehicle_angular_velocity/VehicleAngularVelocity.hpp:	uORB::SubscriptionCallbackWorkItem _sensor_fifo_sub{this, ORB_ID(sensor_gyro_fifo)};
+./modules/sensors/vehicle_angular_velocity/VehicleAngularVelocity.cpp:		uORB::SubscriptionData<vehicle_imu_status_s> imu_status{ORB_ID(vehicle_imu_status), i};
+./modules/sensors/vehicle_angular_velocity/VehicleAngularVelocity.cpp:				uORB::SubscriptionData<sensor_gyro_fifo_s> sensor_gyro_fifo_sub{ORB_ID(sensor_gyro_fifo), i};
+./modules/sensors/vehicle_angular_velocity/VehicleAngularVelocity.cpp:				uORB::SubscriptionData<sensor_gyro_s> sensor_gyro_sub{ORB_ID(sensor_gyro), i};
+./modules/sensors/vehicle_imu/VehicleIMU.cpp:	_sensor_accel_sub(this, ORB_ID(sensor_accel), accel_index),
+./modules/sensors/vehicle_imu/VehicleIMU.cpp:	_sensor_gyro_sub(this, ORB_ID(sensor_gyro), gyro_index),
+./modules/sensors/vehicle_imu/VehicleIMU.hpp:	uORB::PublicationMulti<vehicle_imu_s> _vehicle_imu_pub{ORB_ID(vehicle_imu)};
+./modules/sensors/vehicle_imu/VehicleIMU.hpp:	uORB::PublicationMulti<vehicle_imu_status_s> _vehicle_imu_status_pub{ORB_ID(vehicle_imu_status)};
+./modules/sensors/vehicle_imu/VehicleIMU.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/sensors/vehicle_air_data/VehicleAirData.hpp:	uORB::Publication<vehicle_air_data_s> _vehicle_air_data_pub{ORB_ID(vehicle_air_data)};
+./modules/sensors/vehicle_air_data/VehicleAirData.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/sensors/vehicle_air_data/VehicleAirData.hpp:	uORB::Subscription _sensor_correction_sub{ORB_ID(sensor_correction)};
+./modules/sensors/vehicle_air_data/VehicleAirData.hpp:		{this, ORB_ID(sensor_baro), 0},
+./modules/sensors/vehicle_air_data/VehicleAirData.hpp:		{this, ORB_ID(sensor_baro), 1},
+./modules/sensors/vehicle_air_data/VehicleAirData.hpp:		{this, ORB_ID(sensor_baro), 2},
+./modules/sensors/vehicle_air_data/VehicleAirData.hpp:		{this, ORB_ID(sensor_baro), 3},
+./modules/sensors/vehicle_acceleration/VehicleAcceleration.cpp:		uORB::SubscriptionData<vehicle_imu_status_s> imu_status{ORB_ID(vehicle_imu_status), i};
+./modules/sensors/vehicle_acceleration/VehicleAcceleration.cpp:				uORB::SubscriptionData<sensor_accel_s> sensor_accel_sub{ORB_ID(sensor_accel), i};
+./modules/sensors/vehicle_acceleration/VehicleAcceleration.hpp:	uORB::Publication<vehicle_acceleration_s> _vehicle_acceleration_pub{ORB_ID(vehicle_acceleration)};
+./modules/sensors/vehicle_acceleration/VehicleAcceleration.hpp:	uORB::Subscription _estimator_selector_status_sub{ORB_ID(estimator_selector_status)};
+./modules/sensors/vehicle_acceleration/VehicleAcceleration.hpp:	uORB::Subscription _estimator_sensor_bias_sub{ORB_ID(estimator_sensor_bias)};
+./modules/sensors/vehicle_acceleration/VehicleAcceleration.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/sensors/vehicle_acceleration/VehicleAcceleration.hpp:	uORB::SubscriptionCallbackWorkItem _sensor_selection_sub{this, ORB_ID(sensor_selection)};
+./modules/sensors/vehicle_acceleration/VehicleAcceleration.hpp:	uORB::SubscriptionCallbackWorkItem _sensor_sub{this, ORB_ID(sensor_accel)};
+./modules/sensors/voted_sensors_update.h:	uORB::Publication<sensor_selection_s> _sensor_selection_pub{ORB_ID(sensor_selection)};	/**< handle to the sensor selection uORB topic */
+./modules/sensors/voted_sensors_update.h:	uORB::Publication<sensors_status_imu_s> _sensors_status_imu_pub{ORB_ID(sensors_status_imu)};
+./modules/sensors/voted_sensors_update.h:	uORB::Subscription _sensor_selection_sub{ORB_ID(sensor_selection)};
+./modules/commander/mag_calibration.cpp:	uORB::SubscriptionBlocking<sensor_gyro_s> gyro_sub{ORB_ID(sensor_gyro)};
+./modules/commander/mag_calibration.cpp:		{ORB_ID(sensor_mag), 0, 0},
+./modules/commander/mag_calibration.cpp:		{ORB_ID(sensor_mag), 0, 1},
+./modules/commander/mag_calibration.cpp:		{ORB_ID(sensor_mag), 0, 2},
+./modules/commander/mag_calibration.cpp:		{ORB_ID(sensor_mag), 0, 3},
+./modules/commander/mag_calibration.cpp:					worker_data->mag_worker_data_pub = orb_advertise(ORB_ID(mag_worker_data), &status);
+./modules/commander/mag_calibration.cpp:					orb_publish(ORB_ID(mag_worker_data), worker_data->mag_worker_data_pub, &status);
+./modules/commander/mag_calibration.cpp:	const unsigned orb_mag_count = orb_group_count(ORB_ID(sensor_mag));
+./modules/commander/mag_calibration.cpp:		uORB::SubscriptionData<sensor_mag_s> mag_sub{ORB_ID(sensor_mag), cur_mag};
+./modules/commander/mag_calibration.cpp:		uORB::Subscription vehicle_gps_position_sub{ORB_ID(vehicle_gps_position)};
+./modules/commander/mag_calibration.cpp:		uORB::Subscription vehicle_attitude_sub{ORB_ID(vehicle_attitude)};
+./modules/commander/mag_calibration.cpp:			uORB::Subscription mag_sub{ORB_ID(sensor_mag), cur_mag};
+./modules/commander/Commander.hpp:	uORB::Subscription					_cmd_sub {ORB_ID(vehicle_command)};
+./modules/commander/Commander.hpp:	uORB::Subscription					_cpuload_sub{ORB_ID(cpuload)};
+./modules/commander/Commander.hpp:	uORB::Subscription					_esc_status_sub{ORB_ID(esc_status)};
+./modules/commander/Commander.hpp:	uORB::Subscription                                      _estimator_selector_status_sub{ORB_ID(estimator_selector_status)};
+./modules/commander/Commander.hpp:	uORB::Subscription					_geofence_result_sub{ORB_ID(geofence_result)};
+./modules/commander/Commander.hpp:	uORB::Subscription					_iridiumsbd_status_sub{ORB_ID(iridiumsbd_status)};
+./modules/commander/Commander.hpp:	uORB::Subscription					_land_detector_sub{ORB_ID(vehicle_land_detected)};
+./modules/commander/Commander.hpp:	uORB::Subscription					_safety_sub{ORB_ID(safety)};
+./modules/commander/Commander.hpp:	uORB::Subscription					_manual_control_switches_sub{ORB_ID(manual_control_switches)};
+./modules/commander/Commander.hpp:	uORB::Subscription					_system_power_sub{ORB_ID(system_power)};
+./modules/commander/Commander.hpp:	uORB::Subscription					_vehicle_angular_velocity_sub{ORB_ID(vehicle_angular_velocity)};
+./modules/commander/Commander.hpp:	uORB::Subscription					_vehicle_attitude_sub{ORB_ID(vehicle_attitude)};
+./modules/commander/Commander.hpp:	uORB::Subscription					_vtol_vehicle_status_sub{ORB_ID(vtol_vehicle_status)};
+./modules/commander/Commander.hpp:	uORB::SubscriptionInterval				_parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/commander/Commander.hpp:	uORB::Subscription					_power_button_state_sub {ORB_ID(power_button_state)};
+./modules/commander/Commander.hpp:	uORB::SubscriptionData<airspeed_s>			_airspeed_sub{ORB_ID(airspeed)};
+./modules/commander/Commander.hpp:	uORB::SubscriptionData<estimator_status_s>		_estimator_status_sub{ORB_ID(estimator_status)};
+./modules/commander/Commander.hpp:	uORB::SubscriptionData<mission_result_s>		_mission_result_sub{ORB_ID(mission_result)};
+./modules/commander/Commander.hpp:	uORB::SubscriptionData<offboard_control_mode_s>		_offboard_control_mode_sub{ORB_ID(offboard_control_mode)};
+./modules/commander/Commander.hpp:	uORB::SubscriptionData<vehicle_global_position_s>	_global_position_sub{ORB_ID(vehicle_global_position)};
+./modules/commander/Commander.hpp:	uORB::SubscriptionData<vehicle_local_position_s>	_local_position_sub{ORB_ID(vehicle_local_position)};
+./modules/commander/Commander.hpp:	uORB::SubscriptionData<rtl_flight_time_s>		_rtl_flight_time_sub{ORB_ID(rtl_flight_time)};
+./modules/commander/Commander.hpp:	uORB::Publication<actuator_armed_s>			_armed_pub{ORB_ID(actuator_armed)};
+./modules/commander/Commander.hpp:	uORB::Publication<commander_state_s>			_commander_state_pub{ORB_ID(commander_state)};
+./modules/commander/Commander.hpp:	uORB::Publication<test_motor_s>				_test_motor_pub{ORB_ID(test_motor)};
+./modules/commander/Commander.hpp:	uORB::Publication<vehicle_control_mode_s>		_control_mode_pub{ORB_ID(vehicle_control_mode)};
+./modules/commander/Commander.hpp:	uORB::Publication<vehicle_status_flags_s>		_vehicle_status_flags_pub{ORB_ID(vehicle_status_flags)};
+./modules/commander/Commander.hpp:	uORB::Publication<vehicle_status_s>			_status_pub{ORB_ID(vehicle_status)};
+./modules/commander/Commander.hpp:	uORB::Publication<mission_s>				_mission_pub{ORB_ID(mission)};
+./modules/commander/Commander.hpp:	uORB::Publication<landing_gear_s>			_landing_gear_pub{ORB_ID(landing_gear)};
+./modules/commander/Commander.hpp:	uORB::PublicationData<home_position_s>			_home_pub{ORB_ID(home_position)};
+./modules/commander/Commander.hpp:	uORB::Publication<vehicle_command_ack_s>		_command_ack_pub{ORB_ID(vehicle_command_ack)};
+./modules/commander/Arming/ArmAuthorization/ArmAuthorization.cpp:	uORB::Publication<vehicle_command_s> vcmd_pub{ORB_ID(vehicle_command)};
+./modules/commander/Arming/ArmAuthorization/ArmAuthorization.cpp:		orb_copy(ORB_ID(vehicle_command_ack), command_ack_sub, &command_ack);
+./modules/commander/Arming/ArmAuthorization/ArmAuthorization.cpp:	command_ack_sub = orb_subscribe(ORB_ID(vehicle_command_ack));
+./modules/commander/Arming/PreFlightCheck/checks/baroCheck.cpp:	const bool exists = (orb_exists(ORB_ID(sensor_baro), instance) == PX4_OK);
+./modules/commander/Arming/PreFlightCheck/checks/baroCheck.cpp:		uORB::SubscriptionData<sensor_baro_s> baro{ORB_ID(sensor_baro), instance};
+./modules/commander/Arming/PreFlightCheck/checks/manualControlCheck.cpp:	uORB::SubscriptionData<manual_control_switches_s> manual_control_switches_sub{ORB_ID(manual_control_switches)};
+./modules/commander/Arming/PreFlightCheck/checks/imuConsistencyCheck.cpp:	uORB::SubscriptionData<sensors_status_imu_s> sensors_status_imu_sub{ORB_ID(sensors_status_imu)};
+./modules/commander/Arming/PreFlightCheck/checks/cpuResourceCheck.cpp:	uORB::SubscriptionData<cpuload_s> cpuload_sub{ORB_ID(cpuload)};
+./modules/commander/Arming/PreFlightCheck/checks/airspeedCheck.cpp:	uORB::SubscriptionData<airspeed_validated_s> airspeed_validated_sub{ORB_ID(airspeed_validated)};
+./modules/commander/Arming/PreFlightCheck/checks/gyroCheck.cpp:	const bool exists = (orb_exists(ORB_ID(sensor_gyro), instance) == PX4_OK);
+./modules/commander/Arming/PreFlightCheck/checks/gyroCheck.cpp:		uORB::SubscriptionData<sensor_gyro_s> gyro{ORB_ID(sensor_gyro), instance};
+./modules/commander/Arming/PreFlightCheck/checks/magnetometerCheck.cpp:	const bool exists = (orb_exists(ORB_ID(sensor_mag), instance) == PX4_OK);
+./modules/commander/Arming/PreFlightCheck/checks/magnetometerCheck.cpp:		uORB::SubscriptionData<sensor_mag_s> magnetometer{ORB_ID(sensor_mag), instance};
+./modules/commander/Arming/PreFlightCheck/checks/magnetometerCheck.cpp:			uORB::SubscriptionData<estimator_status_s> estimator_status_sub{ORB_ID(estimator_status), i};
+./modules/commander/Arming/PreFlightCheck/checks/accelerometerCheck.cpp:	const bool exists = (orb_exists(ORB_ID(sensor_accel), instance) == PX4_OK);
+./modules/commander/Arming/PreFlightCheck/checks/accelerometerCheck.cpp:		uORB::SubscriptionData<sensor_accel_s> accel{ORB_ID(sensor_accel), instance};
+./modules/commander/Arming/PreFlightCheck/checks/magConsistencyCheck.cpp:	uORB::SubscriptionData<sensor_preflight_mag_s> sensors_sub{ORB_ID(sensor_preflight_mag)};
+./modules/commander/Arming/PreFlightCheck/checks/ekf2Check.cpp:	uORB::SubscriptionData<estimator_selector_status_s> estimator_selector_status_sub{ORB_ID(estimator_selector_status)};
+./modules/commander/Arming/PreFlightCheck/checks/ekf2Check.cpp:	uORB::SubscriptionData<estimator_status_s> status_sub{ORB_ID(estimator_status), estimator_selector_status_sub.get().primary_instance};
+./modules/commander/Arming/PreFlightCheck/checks/ekf2Check.cpp:	uORB::SubscriptionData<estimator_selector_status_s> estimator_selector_status_sub{ORB_ID(estimator_selector_status)};
+./modules/commander/Arming/PreFlightCheck/checks/ekf2Check.cpp:	uORB::SubscriptionData<estimator_sensor_bias_s> estimator_sensor_bias_sub{ORB_ID(estimator_sensor_bias), estimator_selector_status_sub.get().primary_instance};
+./modules/commander/Arming/PreFlightCheck/checks/powerCheck.cpp:	uORB::SubscriptionData<system_power_s> system_power_sub{ORB_ID(system_power)};
+./modules/commander/Arming/PreFlightCheck/PA_EXTRACT.hpp:	int vehi_gps_pos=orb_subscribe(ORB_ID(vehicle_gps_position));
+./modules/commander/Arming/PreFlightCheck/PA_EXTRACT.hpp:        orb_copy(ORB_ID(vehicle_gps_position),vehi_gps_pos,&raw);
+./modules/commander/failure_detector/FailureDetector.hpp:	uORB::Subscription _vehicule_attitude_sub{ORB_ID(vehicle_attitude)};
+./modules/commander/failure_detector/FailureDetector.hpp:	uORB::Subscription _esc_status_sub{ORB_ID(esc_status)};
+./modules/commander/failure_detector/FailureDetector.hpp:	uORB::Subscription _pwm_input_sub{ORB_ID(pwm_input)};
+./modules/commander/rc_calibration.cpp:	uORB::Subscription manual_control_setpoint_sub{ORB_ID(manual_control_setpoint)};
+./modules/commander/commander_helper.cpp:	tune_control_pub = orb_advertise_queue(ORB_ID(tune_control), &tune_control, tune_control_s::ORB_QUEUE_LENGTH);
+./modules/commander/commander_helper.cpp:	orb_publish(ORB_ID(tune_control), tune_control_pub, &tune_control);
+./modules/commander/commander_helper.cpp:			orb_publish(ORB_ID(tune_control), tune_control_pub, &tune_control);
+./modules/commander/commander_helper.cpp:	led_control_pub = orb_advertise_queue(ORB_ID(led_control), &led_control, led_control_s::ORB_QUEUE_LENGTH);
+./modules/commander/commander_helper.cpp:	orb_publish(ORB_ID(led_control), led_control_pub, &led_control);
+./modules/commander/level_calibration.cpp:	uORB::SubscriptionBlocking<vehicle_attitude_s> att_sub{ORB_ID(vehicle_attitude)};
+./modules/commander/esc_calibration.cpp:	uORB::SubscriptionData<battery_status_s> batt_sub{ORB_ID(battery_status)};
+./modules/commander/esc_calibration.cpp:	uORB::SubscriptionData<battery_status_s> batt_sub{ORB_ID(battery_status)};
+./modules/commander/airspeed_calibration.cpp:	int diff_pres_sub = orb_subscribe(ORB_ID(differential_pressure));
+./modules/commander/airspeed_calibration.cpp:			orb_copy(ORB_ID(differential_pressure), diff_pres_sub, &diff_pres);
+./modules/commander/airspeed_calibration.cpp:			orb_copy(ORB_ID(differential_pressure), diff_pres_sub, &diff_pres);
+./modules/commander/Commander.cpp:		orb_publish(ORB_ID(power_button_state), power_button_state_pub, &button_state);
+./modules/commander/Commander.cpp:	uORB::SubscriptionData<vehicle_status_s> vehicle_status_sub{ORB_ID(vehicle_status)};
+./modules/commander/Commander.cpp:	uORB::Publication<vehicle_command_s> vcmd_pub{ORB_ID(vehicle_command)};
+./modules/commander/Commander.cpp:	uORB::SubscriptionData<vehicle_status_s> vehicle_status_sub{ORB_ID(vehicle_status)};
+./modules/commander/Commander.cpp:	uORB::Publication<vehicle_command_s> vcmd_pub{ORB_ID(vehicle_command)};
+./modules/commander/Commander.cpp:		uORB::Subscription vehicle_status_sub{ORB_ID(vehicle_status)};
+./modules/commander/Commander.cpp:		uORB::Subscription vehicle_status_flags_sub{ORB_ID(vehicle_status_flags)};
+./modules/commander/Commander.cpp:		uORB::Subscription vehicle_status_sub{ORB_ID(vehicle_status)};
+./modules/commander/Commander.cpp:		power_button_state_pub = orb_advertise(ORB_ID(power_button_state), &button_state);
+./modules/commander/ManualControl.hpp:	uORB::Subscription _manual_control_setpoint_sub{ORB_ID(manual_control_setpoint)};
+./modules/commander/gyro_calibration.cpp:		{ORB_ID(sensor_gyro), 0, 0},
+./modules/commander/gyro_calibration.cpp:		{ORB_ID(sensor_gyro), 0, 1},
+./modules/commander/gyro_calibration.cpp:		{ORB_ID(sensor_gyro), 0, 2},
+./modules/commander/gyro_calibration.cpp:		{ORB_ID(sensor_gyro), 0, 3},
+./modules/commander/gyro_calibration.cpp:	const unsigned orb_gyro_count = orb_group_count(ORB_ID(sensor_gyro));
+./modules/commander/gyro_calibration.cpp:		uORB::SubscriptionData<sensor_gyro_s> gyro_sub{ORB_ID(sensor_gyro), cur_gyro};
+./modules/commander/accelerometer_calibration.cpp:	uORB::Subscription sensor_correction_sub{ORB_ID(sensor_correction)};
+./modules/commander/accelerometer_calibration.cpp:		{ORB_ID(sensor_accel), 0, 0},
+./modules/commander/accelerometer_calibration.cpp:		{ORB_ID(sensor_accel), 0, 1},
+./modules/commander/accelerometer_calibration.cpp:		{ORB_ID(sensor_accel), 0, 2},
+./modules/commander/accelerometer_calibration.cpp:		{ORB_ID(sensor_accel), 0, 3},
+./modules/commander/accelerometer_calibration.cpp:		uORB::SubscriptionData<sensor_accel_s> accel_sub{ORB_ID(sensor_accel), cur_accel};
+./modules/commander/accelerometer_calibration.cpp:	uORB::Subscription sensor_correction_sub{ORB_ID(sensor_correction)};
+./modules/commander/accelerometer_calibration.cpp:			uORB::SubscriptionData<vehicle_attitude_s> attitude_sub{ORB_ID(vehicle_attitude)};
+./modules/commander/calibration_routines.cpp:	uORB::SubscriptionBlocking<vehicle_acceleration_s> vehicle_acceleration_sub{ORB_ID(vehicle_acceleration)};
+./modules/commander/calibration_routines.cpp:	uORB::Subscription vehicle_command_sub{ORB_ID(vehicle_command)};
+./modules/commander/calibration_routines.cpp:				uORB::Publication<vehicle_command_ack_s> command_ack_pub{ORB_ID(vehicle_command_ack)};
+./modules/gyro_calibration/GyroCalibration.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/fw_pos_control_l1/FixedwingPositionControl.cpp:	_attitude_sp_pub(vtol ? ORB_ID(fw_virtual_attitude_setpoint) : ORB_ID(vehicle_attitude_setpoint)),
+./modules/fw_pos_control_l1/FixedwingPositionControl.hpp:	uORB::SubscriptionCallbackWorkItem _local_pos_sub{this, ORB_ID(vehicle_local_position)};
+./modules/fw_pos_control_l1/FixedwingPositionControl.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/fw_pos_control_l1/FixedwingPositionControl.hpp:	uORB::Subscription _airspeed_validated_sub{ORB_ID(airspeed_validated)};
+./modules/fw_pos_control_l1/FixedwingPositionControl.hpp:	uORB::Subscription _control_mode_sub{ORB_ID(vehicle_control_mode)};
+./modules/fw_pos_control_l1/FixedwingPositionControl.hpp:	uORB::Subscription _global_pos_sub{ORB_ID(vehicle_global_position)};
+./modules/fw_pos_control_l1/FixedwingPositionControl.hpp:	uORB::Subscription _manual_control_setpoint_sub{ORB_ID(manual_control_setpoint)};
+./modules/fw_pos_control_l1/FixedwingPositionControl.hpp:	uORB::Subscription _pos_sp_triplet_sub{ORB_ID(position_setpoint_triplet)};
+./modules/fw_pos_control_l1/FixedwingPositionControl.hpp:	uORB::Subscription _trajectory_setpoint_sub{ORB_ID(trajectory_setpoint)};
+./modules/fw_pos_control_l1/FixedwingPositionControl.hpp:	uORB::Subscription _vehicle_air_data_sub{ORB_ID(vehicle_air_data)};
+./modules/fw_pos_control_l1/FixedwingPositionControl.hpp:	uORB::Subscription _vehicle_angular_velocity_sub{ORB_ID(vehicle_angular_velocity)};
+./modules/fw_pos_control_l1/FixedwingPositionControl.hpp:	uORB::Subscription _vehicle_attitude_sub{ORB_ID(vehicle_attitude)};
+./modules/fw_pos_control_l1/FixedwingPositionControl.hpp:	uORB::Subscription _vehicle_command_sub{ORB_ID(vehicle_command)};
+./modules/fw_pos_control_l1/FixedwingPositionControl.hpp:	uORB::Subscription _vehicle_land_detected_sub{ORB_ID(vehicle_land_detected)};
+./modules/fw_pos_control_l1/FixedwingPositionControl.hpp:	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};
+./modules/fw_pos_control_l1/FixedwingPositionControl.hpp:	uORB::Publication<position_controller_status_s>		_pos_ctrl_status_pub{ORB_ID(position_controller_status)};			///< navigation capabilities publication
+./modules/fw_pos_control_l1/FixedwingPositionControl.hpp:	uORB::Publication<position_controller_landing_status_s>	_pos_ctrl_landing_status_pub{ORB_ID(position_controller_landing_status)};	///< landing status publication
+./modules/fw_pos_control_l1/FixedwingPositionControl.hpp:	uORB::Publication<tecs_status_s>			_tecs_status_pub{ORB_ID(tecs_status)};						///< TECS status publication
+./modules/camera_feedback/CameraFeedback.hpp:	uORB::SubscriptionCallbackWorkItem _trigger_sub{this, ORB_ID(camera_trigger)};
+./modules/camera_feedback/CameraFeedback.hpp:	uORB::Subscription	_gpos_sub{ORB_ID(vehicle_global_position)};
+./modules/camera_feedback/CameraFeedback.hpp:	uORB::Subscription	_att_sub{ORB_ID(vehicle_attitude)};
+./modules/camera_feedback/CameraFeedback.hpp:	uORB::Publication<camera_capture_s>	_capture_pub{ORB_ID(camera_capture)};
+./modules/logger/logger.cpp:	uORB::Subscription parameter_update_sub(ORB_ID(parameter_update));
+./modules/logger/logger.cpp:		uORB::Subscription battery_status_sub{ORB_ID(battery_status)};
+./modules/logger/logger.cpp:	uORB::Publication<vehicle_command_ack_s> cmd_ack_pub{ORB_ID(vehicle_command_ack)};
+./modules/logger/log_writer_mavlink.cpp:		_ulog_stream_ack_sub = orb_subscribe(ORB_ID(ulog_stream_ack));
+./modules/logger/log_writer_mavlink.cpp:	orb_copy(ORB_ID(ulog_stream_ack), _ulog_stream_ack_sub, &ack);
+./modules/logger/log_writer_mavlink.cpp:				orb_copy(ORB_ID(ulog_stream_ack), _ulog_stream_ack_sub, &ack);
+./modules/logger/logger.h:	uORB::PublicationMulti<logger_status_s>		_logger_status_pub[(int)LogType::Count] { ORB_ID(logger_status), ORB_ID(logger_status) };
+./modules/logger/logger.h:	uORB::Subscription				_manual_control_setpoint_sub{ORB_ID(manual_control_setpoint)};
+./modules/logger/logger.h:	uORB::Subscription				_vehicle_command_sub{ORB_ID(vehicle_command)};
+./modules/logger/logger.h:	uORB::Subscription				_vehicle_status_sub{ORB_ID(vehicle_status)};
+./modules/logger/logger.h:	uORB::SubscriptionInterval			_log_message_sub{ORB_ID(log_message), 20};
+./modules/logger/logger.h:	uORB::SubscriptionInterval			_parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/logger/util.cpp:	uORB::Subscription vehicle_gps_position_sub{ORB_ID(vehicle_gps_position)};
+./modules/logger/log_writer_mavlink.h:	uORB::Publication<ulog_stream_s> _ulog_stream_pub{ORB_ID(ulog_stream)};
+./modules/mc_hover_thrust_estimator/MulticopterHoverThrustEstimator.hpp:	uORB::Publication<hover_thrust_estimate_s> _hover_thrust_ekf_pub{ORB_ID(hover_thrust_estimate)};
+./modules/mc_hover_thrust_estimator/MulticopterHoverThrustEstimator.hpp:	uORB::SubscriptionCallbackWorkItem _vehicle_local_position_sub{this, ORB_ID(vehicle_local_position)};
+./modules/mc_hover_thrust_estimator/MulticopterHoverThrustEstimator.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/mc_hover_thrust_estimator/MulticopterHoverThrustEstimator.hpp:	uORB::Subscription _vehicle_land_detected_sub{ORB_ID(vehicle_land_detected)};
+./modules/mc_hover_thrust_estimator/MulticopterHoverThrustEstimator.hpp:	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};
+./modules/mc_hover_thrust_estimator/MulticopterHoverThrustEstimator.hpp:	uORB::Subscription _vehicle_local_position_setpoint_sub{ORB_ID(vehicle_local_position_setpoint)};
+./modules/uuv_pos_control/uuv_pos_control.hpp:	uORB::Publication<vehicle_attitude_setpoint_s> _att_sp_pub{ORB_ID(vehicle_attitude_setpoint)};
+./modules/uuv_pos_control/uuv_pos_control.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/uuv_pos_control/uuv_pos_control.hpp:	uORB::Subscription _vehicle_attitude_sub{ORB_ID(vehicle_attitude)};	/**< current vehicle attitude */
+./modules/uuv_pos_control/uuv_pos_control.hpp:	uORB::Subscription _manual_control_setpoint_sub{ORB_ID(manual_control_setpoint)};	/**< notification of manual control updates */
+./modules/uuv_pos_control/uuv_pos_control.hpp:	uORB::Subscription _trajectory_setpoint_sub{ORB_ID(trajectory_setpoint)};
+./modules/uuv_pos_control/uuv_pos_control.hpp:	uORB::Subscription _vcontrol_mode_sub{ORB_ID(vehicle_control_mode)};		/**< vehicle status subscription */
+./modules/uuv_pos_control/uuv_pos_control.hpp:	uORB::SubscriptionCallbackWorkItem _vehicle_local_position_sub{this, ORB_ID(vehicle_local_position)};
+./modules/mc_rate_control/MulticopterRateControl.hpp:	uORB::Subscription _battery_status_sub{ORB_ID(battery_status)};
+./modules/mc_rate_control/MulticopterRateControl.hpp:	uORB::Subscription _landing_gear_sub{ORB_ID(landing_gear)};
+./modules/mc_rate_control/MulticopterRateControl.hpp:	uORB::Subscription _manual_control_setpoint_sub{ORB_ID(manual_control_setpoint)};
+./modules/mc_rate_control/MulticopterRateControl.hpp:	uORB::Subscription _motor_limits_sub{ORB_ID(multirotor_motor_limits)};
+./modules/mc_rate_control/MulticopterRateControl.hpp:	uORB::Subscription _v_control_mode_sub{ORB_ID(vehicle_control_mode)};
+./modules/mc_rate_control/MulticopterRateControl.hpp:	uORB::Subscription _v_rates_sp_sub{ORB_ID(vehicle_rates_setpoint)};
+./modules/mc_rate_control/MulticopterRateControl.hpp:	uORB::Subscription _vehicle_angular_acceleration_sub{ORB_ID(vehicle_angular_acceleration)};
+./modules/mc_rate_control/MulticopterRateControl.hpp:	uORB::Subscription _vehicle_land_detected_sub{ORB_ID(vehicle_land_detected)};
+./modules/mc_rate_control/MulticopterRateControl.hpp:	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};
+./modules/mc_rate_control/MulticopterRateControl.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/mc_rate_control/MulticopterRateControl.hpp:	uORB::SubscriptionCallbackWorkItem _vehicle_angular_velocity_sub{this, ORB_ID(vehicle_angular_velocity)};
+./modules/mc_rate_control/MulticopterRateControl.hpp:	uORB::PublicationMulti<rate_ctrl_status_s>	_controller_status_pub{ORB_ID(rate_ctrl_status)};	/**< controller status publication */
+./modules/mc_rate_control/MulticopterRateControl.hpp:	uORB::Publication<vehicle_rates_setpoint_s>	_v_rates_sp_pub{ORB_ID(vehicle_rates_setpoint)};			/**< rate setpoint publication */
+./modules/mc_rate_control/MulticopterRateControl.cpp:	_actuators_0_pub(vtol ? ORB_ID(actuator_controls_virtual_mc) : ORB_ID(actuator_controls_0)),
+./modules/angular_velocity_controller/AngularVelocityController.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./modules/angular_velocity_controller/AngularVelocityController.hpp:	uORB::Subscription _control_allocator_status_sub{ORB_ID(control_allocator_status)};				/**< motor limits subscription */
+./modules/angular_velocity_controller/AngularVelocityController.hpp:	uORB::Subscription _vehicle_angular_acceleration_sub{ORB_ID(vehicle_angular_acceleration)}; 	/**< vehicle angular acceleration subscription */
+./modules/angular_velocity_controller/AngularVelocityController.hpp:	uORB::Subscription _vehicle_control_mode_sub{ORB_ID(vehicle_control_mode)};			/**< vehicle control mode subscription */
+./modules/angular_velocity_controller/AngularVelocityController.hpp:	uORB::Subscription _vehicle_land_detected_sub{ORB_ID(vehicle_land_detected)};			/**< vehicle land detected subscription */
+./modules/angular_velocity_controller/AngularVelocityController.hpp:	uORB::Subscription _vehicle_rates_setpoint_sub{ORB_ID(vehicle_rates_setpoint)};			/**< vehicle rates setpoint subscription */
+./modules/angular_velocity_controller/AngularVelocityController.hpp:	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};					/**< vehicle status subscription */
+./modules/angular_velocity_controller/AngularVelocityController.hpp:	uORB::Subscription _hover_thrust_estimate_sub{ORB_ID(hover_thrust_estimate)};
+./modules/angular_velocity_controller/AngularVelocityController.hpp:	uORB::SubscriptionCallbackWorkItem _vehicle_angular_velocity_sub{this, ORB_ID(vehicle_angular_velocity)};
+./modules/angular_velocity_controller/AngularVelocityController.hpp:	uORB::Publication<rate_ctrl_status_s>			   _rate_ctrl_status_pub{ORB_ID(rate_ctrl_status)};						/**< controller status publication */
+./modules/angular_velocity_controller/AngularVelocityController.hpp:	uORB::Publication<vehicle_angular_acceleration_setpoint_s> _vehicle_angular_acceleration_setpoint_pub{ORB_ID(vehicle_angular_acceleration_setpoint)};	/**< angular acceleration setpoint publication */
+./modules/angular_velocity_controller/AngularVelocityController.hpp:	uORB::Publication<vehicle_thrust_setpoint_s>		   _vehicle_thrust_setpoint_pub{ORB_ID(vehicle_thrust_setpoint)};				/**< thrust setpoint publication */
+./modules/angular_velocity_controller/AngularVelocityController.hpp:	uORB::Publication<vehicle_torque_setpoint_s>		   _vehicle_torque_setpoint_pub{ORB_ID(vehicle_torque_setpoint)};				/**< torque setpoint publication */
+./examples/fixedwing_control/main.cpp:	orb_advert_t rates_pub = orb_advertise(ORB_ID(vehicle_rates_setpoint), &rates_sp);
+./examples/fixedwing_control/main.cpp:	int att_sub = orb_subscribe(ORB_ID(vehicle_attitude));
+./examples/fixedwing_control/main.cpp:	int global_pos_sub = orb_subscribe(ORB_ID(vehicle_global_position));
+./examples/fixedwing_control/main.cpp:	int manual_control_setpoint_sub = orb_subscribe(ORB_ID(manual_control_setpoint));
+./examples/fixedwing_control/main.cpp:	int vstatus_sub = orb_subscribe(ORB_ID(vehicle_status));
+./examples/fixedwing_control/main.cpp:	int global_sp_sub = orb_subscribe(ORB_ID(position_setpoint_triplet));
+./examples/fixedwing_control/main.cpp:	uORB::SubscriptionInterval parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./examples/fixedwing_control/main.cpp:				orb_copy(ORB_ID(vehicle_attitude), att_sub, &att);
+./examples/fixedwing_control/main.cpp:					orb_copy(ORB_ID(position_setpoint_triplet), global_sp_sub, &triplet);
+./examples/fixedwing_control/main.cpp:					orb_copy(ORB_ID(manual_control_setpoint), manual_control_setpoint_sub, &manual_control_setpoint);
+./examples/fixedwing_control/main.cpp:				orb_copy(ORB_ID(vehicle_status), vstatus_sub, &vstatus);
+./examples/fixedwing_control/main.cpp:				orb_publish(ORB_ID(vehicle_rates_setpoint), rates_pub, &rates_sp);
+./examples/fake_magnetometer/FakeMagnetometer.hpp:	uORB::Subscription _vehicle_attitude_sub{ORB_ID(vehicle_attitude)};
+./examples/fake_magnetometer/FakeMagnetometer.hpp:	uORB::Subscription _vehicle_gps_position_sub{ORB_ID(vehicle_gps_position)};
+./examples/rover_steering_control/main.cpp:	int att_sub = orb_subscribe(ORB_ID(vehicle_attitude));
+./examples/rover_steering_control/main.cpp:	int global_pos_sub = orb_subscribe(ORB_ID(vehicle_global_position));
+./examples/rover_steering_control/main.cpp:	int manual_control_setpoint_sub = orb_subscribe(ORB_ID(manual_control_setpoint));
+./examples/rover_steering_control/main.cpp:	int vstatus_sub = orb_subscribe(ORB_ID(vehicle_status));
+./examples/rover_steering_control/main.cpp:	int att_sp_sub = orb_subscribe(ORB_ID(vehicle_attitude_setpoint));
+./examples/rover_steering_control/main.cpp:	uORB::SubscriptionInterval parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./examples/rover_steering_control/main.cpp:				orb_copy(ORB_ID(vehicle_attitude), att_sub, &att);
+./examples/rover_steering_control/main.cpp:					orb_copy(ORB_ID(vehicle_attitude_setpoint), att_sp_sub, &_att_sp);
+./examples/rover_steering_control/main.cpp:					orb_copy(ORB_ID(manual_control_setpoint), manual_control_setpoint_sub, &manual_control_setpoint);
+./examples/rover_steering_control/main.cpp:				orb_copy(ORB_ID(vehicle_status), vstatus_sub, &vstatus);
+./examples/fake_gps/FakeGps.hpp:	uORB::PublicationMulti<sensor_gps_s> _sensor_gps_pub{ORB_ID(sensor_gps)};
+./examples/work_item/WorkItemExample.hpp:	uORB::Publication<orb_test_s> _orb_test_pub{ORB_ID(orb_test)};
+./examples/work_item/WorkItemExample.hpp:	uORB::SubscriptionCallbackWorkItem _sensor_accel_sub{this, ORB_ID(sensor_accel)};        // subscription that schedules WorkItemExample when updated
+./examples/work_item/WorkItemExample.hpp:	uORB::SubscriptionInterval         _parameter_update_sub{ORB_ID(parameter_update), 1_s}; // subscription limited to 1 Hz updates
+./examples/work_item/WorkItemExample.hpp:	uORB::Subscription                 _vehicle_status_sub{ORB_ID(vehicle_status)};          // regular subscription for additional data
+./examples/uuv_example_app/uuv_example_app.cpp:	int sensor_sub_fd = orb_subscribe(ORB_ID(vehicle_acceleration));
+./examples/uuv_example_app/uuv_example_app.cpp:	int vehicle_attitude_sub_fd = orb_subscribe(ORB_ID(vehicle_attitude));
+./examples/uuv_example_app/uuv_example_app.cpp:	orb_advert_t act_pub = orb_advertise(ORB_ID(actuator_controls_0), &act);
+./examples/uuv_example_app/uuv_example_app.cpp:				orb_copy(ORB_ID(vehicle_acceleration), sensor_sub_fd, &sensor);
+./examples/uuv_example_app/uuv_example_app.cpp:				orb_copy(ORB_ID(vehicle_attitude), vehicle_attitude_sub_fd, &raw_ctrl_state);
+./examples/uuv_example_app/uuv_example_app.cpp:		orb_publish(ORB_ID(actuator_controls_0), act_pub, &act);
+./examples/px4_mavlink_debug/px4_mavlink_debug.cpp:	orb_advert_t pub_dbg_key = orb_advertise(ORB_ID(debug_key_value), &dbg_key);
+./examples/px4_mavlink_debug/px4_mavlink_debug.cpp:	orb_advert_t pub_dbg_ind = orb_advertise(ORB_ID(debug_value), &dbg_ind);
+./examples/px4_mavlink_debug/px4_mavlink_debug.cpp:	orb_advert_t pub_dbg_vect = orb_advertise(ORB_ID(debug_vect), &dbg_vect);
+./examples/px4_mavlink_debug/px4_mavlink_debug.cpp:	orb_advert_t pub_dbg_array = orb_advertise(ORB_ID(debug_array), &dbg_array);
+./examples/px4_mavlink_debug/px4_mavlink_debug.cpp:		orb_publish(ORB_ID(debug_key_value), pub_dbg_key, &dbg_key);
+./examples/px4_mavlink_debug/px4_mavlink_debug.cpp:		orb_publish(ORB_ID(debug_value), pub_dbg_ind, &dbg_ind);
+./examples/px4_mavlink_debug/px4_mavlink_debug.cpp:		orb_publish(ORB_ID(debug_vect), pub_dbg_vect, &dbg_vect);
+./examples/px4_mavlink_debug/px4_mavlink_debug.cpp:		orb_publish(ORB_ID(debug_array), pub_dbg_array, &dbg_array);
+./examples/px4_simple_app/px4_simple_app.c:	int sensor_sub_fd = orb_subscribe(ORB_ID(vehicle_acceleration));
+./examples/px4_simple_app/px4_simple_app.c:	orb_advert_t att_pub = orb_advertise(ORB_ID(vehicle_attitude), &att);
+./examples/px4_simple_app/px4_simple_app.c:				orb_copy(ORB_ID(vehicle_acceleration), sensor_sub_fd, &accel);
+./examples/px4_simple_app/px4_simple_app.c:				orb_publish(ORB_ID(vehicle_attitude), att_pub, &att);
+./examples/matlab_csv_serial/matlab_csv_serial.c:	int accel0_sub = orb_subscribe_multi(ORB_ID(sensor_accel), 0);
+./examples/matlab_csv_serial/matlab_csv_serial.c:	int accel1_sub = orb_subscribe_multi(ORB_ID(sensor_accel), 1);
+./examples/matlab_csv_serial/matlab_csv_serial.c:	int gyro0_sub = orb_subscribe_multi(ORB_ID(sensor_gyro), 0);
+./examples/matlab_csv_serial/matlab_csv_serial.c:	int gyro1_sub = orb_subscribe_multi(ORB_ID(sensor_gyro), 1);
+./examples/matlab_csv_serial/matlab_csv_serial.c:				orb_copy(ORB_ID(sensor_accel), accel0_sub, &accel0);
+./examples/matlab_csv_serial/matlab_csv_serial.c:				orb_copy(ORB_ID(sensor_accel), accel1_sub, &accel1);
+./examples/matlab_csv_serial/matlab_csv_serial.c:				orb_copy(ORB_ID(sensor_gyro), gyro0_sub, &gyro0);
+./examples/matlab_csv_serial/matlab_csv_serial.c:				orb_copy(ORB_ID(sensor_gyro), gyro1_sub, &gyro1);
+./examples/hwtest/hwtest.c:	orb_advert_t actuator_pub_ptr = orb_advertise(ORB_ID(actuator_controls_0), &actuators);
+./examples/hwtest/hwtest.c:	orb_advert_t arm_pub_ptr = orb_advertise(ORB_ID(actuator_armed), &arm);
+./examples/hwtest/hwtest.c:	orb_publish(ORB_ID(actuator_armed), arm_pub_ptr, &arm);
+./examples/hwtest/hwtest.c:	int arm_sub_fd = orb_subscribe(ORB_ID(actuator_armed));
+./examples/hwtest/hwtest.c:	orb_copy(ORB_ID(actuator_armed), arm_sub_fd, &arm);
+./examples/hwtest/hwtest.c:			orb_publish(ORB_ID(actuator_controls_0), actuator_pub_ptr, &actuators);
+./templates/template_module/template_module.cpp:	int sensor_combined_sub = orb_subscribe(ORB_ID(sensor_combined));
+./templates/template_module/template_module.cpp:			orb_copy(ORB_ID(sensor_combined), sensor_combined_sub, &sensor_combined);
+./templates/template_module/template_module.h:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./lib/collision_prevention/CollisionPrevention.hpp:	uORB::Publication<collision_constraints_s>	_constraints_pub{ORB_ID(collision_constraints)};		/**< constraints publication */
+./lib/collision_prevention/CollisionPrevention.hpp:	uORB::Publication<obstacle_distance_s>		_obstacle_distance_pub{ORB_ID(obstacle_distance_fused)};	/**< obstacle_distance publication */
+./lib/collision_prevention/CollisionPrevention.hpp:	uORB::Publication<vehicle_command_s>	_vehicle_command_pub{ORB_ID(vehicle_command)};			/**< vehicle command do publication */
+./lib/collision_prevention/CollisionPrevention.hpp:	uORB::SubscriptionData<obstacle_distance_s> _sub_obstacle_distance{ORB_ID(obstacle_distance)}; /**< obstacle distances received form a range sensor */
+./lib/collision_prevention/CollisionPrevention.hpp:	uORB::SubscriptionData<vehicle_attitude_s> _sub_vehicle_attitude{ORB_ID(vehicle_attitude)};
+./lib/collision_prevention/CollisionPreventionTest.cpp:	orb_advert_t obstacle_distance_pub = orb_advertise(ORB_ID(obstacle_distance), &message);
+./lib/collision_prevention/CollisionPreventionTest.cpp:	orb_advert_t vehicle_attitude_pub = orb_advertise(ORB_ID(vehicle_attitude), &attitude);
+./lib/collision_prevention/CollisionPreventionTest.cpp:	orb_publish(ORB_ID(obstacle_distance), obstacle_distance_pub, &message);
+./lib/collision_prevention/CollisionPreventionTest.cpp:	orb_publish(ORB_ID(vehicle_attitude), vehicle_attitude_pub, &attitude);
+./lib/collision_prevention/CollisionPreventionTest.cpp:	orb_advert_t distance_sensor_pub = orb_advertise(ORB_ID(distance_sensor), &message);
+./lib/collision_prevention/CollisionPreventionTest.cpp:	orb_advert_t vehicle_attitude_pub = orb_advertise(ORB_ID(vehicle_attitude), &attitude);
+./lib/collision_prevention/CollisionPreventionTest.cpp:	orb_publish(ORB_ID(distance_sensor), distance_sensor_pub, &message);
+./lib/collision_prevention/CollisionPreventionTest.cpp:	orb_publish(ORB_ID(vehicle_attitude), vehicle_attitude_pub, &attitude);
+./lib/collision_prevention/CollisionPreventionTest.cpp:	orb_advert_t obstacle_distance_pub = orb_advertise(ORB_ID(obstacle_distance), &message);
+./lib/collision_prevention/CollisionPreventionTest.cpp:	orb_advert_t vehicle_attitude_pub = orb_advertise(ORB_ID(vehicle_attitude), &attitude);
+./lib/collision_prevention/CollisionPreventionTest.cpp:	orb_publish(ORB_ID(obstacle_distance), obstacle_distance_pub, &message);
+./lib/collision_prevention/CollisionPreventionTest.cpp:	orb_publish(ORB_ID(vehicle_attitude), vehicle_attitude_pub, &attitude);
+./lib/collision_prevention/CollisionPreventionTest.cpp:		orb_publish(ORB_ID(obstacle_distance), obstacle_distance_pub, &message_lost_data);
+./lib/collision_prevention/CollisionPreventionTest.cpp:	orb_advert_t obstacle_distance_pub = orb_advertise(ORB_ID(obstacle_distance), &message);
+./lib/collision_prevention/CollisionPreventionTest.cpp:	orb_advert_t vehicle_attitude_pub = orb_advertise(ORB_ID(vehicle_attitude), &attitude);
+./lib/collision_prevention/CollisionPreventionTest.cpp:	orb_publish(ORB_ID(obstacle_distance), obstacle_distance_pub, &message);
+./lib/collision_prevention/CollisionPreventionTest.cpp:	orb_publish(ORB_ID(vehicle_attitude), vehicle_attitude_pub, &attitude);
+./lib/collision_prevention/CollisionPreventionTest.cpp:	orb_advert_t obstacle_distance_pub = orb_advertise(ORB_ID(obstacle_distance), &message);
+./lib/collision_prevention/CollisionPreventionTest.cpp:	orb_publish(ORB_ID(obstacle_distance), obstacle_distance_pub, &message);
+./lib/collision_prevention/CollisionPreventionTest.cpp:	orb_advert_t obstacle_distance_pub = orb_advertise(ORB_ID(obstacle_distance), &message);
+./lib/collision_prevention/CollisionPreventionTest.cpp:		orb_publish(ORB_ID(obstacle_distance), obstacle_distance_pub, &message);
+./lib/collision_prevention/CollisionPreventionTest.cpp:	orb_advert_t obstacle_distance_pub = orb_advertise(ORB_ID(obstacle_distance), &message);
+./lib/collision_prevention/CollisionPreventionTest.cpp:	orb_publish(ORB_ID(obstacle_distance), obstacle_distance_pub, &message);
+./lib/collision_prevention/CollisionPreventionTest.cpp:	orb_advert_t obstacle_distance_pub = orb_advertise(ORB_ID(obstacle_distance), &message);
+./lib/collision_prevention/CollisionPreventionTest.cpp:	orb_publish(ORB_ID(obstacle_distance), obstacle_distance_pub, &message);
+./lib/collision_prevention/CollisionPreventionTest.cpp:	orb_advert_t obstacle_distance_pub = orb_advertise(ORB_ID(obstacle_distance), &long_range_msg);
+./lib/collision_prevention/CollisionPreventionTest.cpp:	orb_advert_t vehicle_attitude_pub = orb_advertise(ORB_ID(vehicle_attitude), &attitude);
+./lib/collision_prevention/CollisionPreventionTest.cpp:	orb_publish(ORB_ID(obstacle_distance), obstacle_distance_pub, &long_range_msg);
+./lib/collision_prevention/CollisionPreventionTest.cpp:	orb_publish(ORB_ID(vehicle_attitude), vehicle_attitude_pub, &attitude);
+./lib/collision_prevention/CollisionPreventionTest.cpp:	orb_publish(ORB_ID(obstacle_distance), obstacle_distance_pub, &short_range_msg);
+./lib/collision_prevention/CollisionPreventionTest.cpp:	orb_publish(ORB_ID(obstacle_distance), obstacle_distance_pub, &long_range_msg);
+./lib/collision_prevention/CollisionPreventionTest.cpp:	orb_publish(ORB_ID(obstacle_distance), obstacle_distance_pub, &short_range_msg_no_obstacle);
+./lib/collision_prevention/CollisionPreventionTest.cpp:	orb_publish(ORB_ID(obstacle_distance), obstacle_distance_pub, &long_range_msg);
+./lib/systemlib/mavlink_log.cpp:		orb_publish(ORB_ID(mavlink_log), *mavlink_log_pub, &log_msg);
+./lib/systemlib/mavlink_log.cpp:		*mavlink_log_pub = orb_advertise_queue(ORB_ID(mavlink_log), &log_msg, mavlink_log_s::ORB_QUEUE_LENGTH);
+./lib/magnetometer_bias_estimator/MagnetometerBiasEstimator.hpp:	uORB::SubscriptionData<actuator_armed_s> _actuator_armed_sub{ORB_ID(actuator_armed)};
+./lib/sensor_calibration/Gyroscope.hpp:	uORB::Subscription _sensor_correction_sub{ORB_ID(sensor_correction)};
+./lib/sensor_calibration/Accelerometer.hpp:	uORB::Subscription _sensor_correction_sub{ORB_ID(sensor_correction)};
+./lib/battery/battery.h:	uORB::PublicationMulti<battery_status_s> _battery_status_pub{ORB_ID(battery_status)};
+./lib/led/led.h:	uORB::Subscription _led_control_sub{ORB_ID(led_control)}; ///< uorb subscription
+./lib/mixer_module/mixer_module.cpp:	{&interface, ORB_ID(actuator_controls_0)},
+./lib/mixer_module/mixer_module.cpp:	{&interface, ORB_ID(actuator_controls_1)},
+./lib/mixer_module/mixer_module.cpp:	{&interface, ORB_ID(actuator_controls_2)},
+./lib/mixer_module/mixer_module.cpp:	{&interface, ORB_ID(actuator_controls_3)},
+./lib/mixer_module/mixer_module.cpp:	{&interface, ORB_ID(actuator_controls_4)},
+./lib/mixer_module/mixer_module.cpp:	{&interface, ORB_ID(actuator_controls_5)},
+./lib/mixer_module/mixer_module.cpp:	uORB::Publication<test_motor_s> test_motor_pub{ORB_ID(test_motor)};
+./lib/mixer_module/mixer_module.hpp:	uORB::Subscription _armed_sub{ORB_ID(actuator_armed)};
+./lib/mixer_module/mixer_module.hpp:	uORB::PublicationMulti<actuator_outputs_s> _outputs_pub{ORB_ID(actuator_outputs)};
+./lib/mixer_module/mixer_module.hpp:	uORB::PublicationMulti<multirotor_motor_limits_s> _to_mixer_status{ORB_ID(multirotor_motor_limits)}; 	///< mixer status flags
+./lib/mixer_module/mixer_module.hpp:		uORB::Subscription test_motor_sub{ORB_ID(test_motor)};
+./lib/avoidance/ObstacleAvoidanceTest.cpp:	uORB::Publication<vehicle_trajectory_waypoint_s> vehicle_trajectory_waypoint_pub{ORB_ID(vehicle_trajectory_waypoint)};
+./lib/avoidance/ObstacleAvoidanceTest.cpp:	uORB::Publication<vehicle_status_s> vehicle_status_pub{ORB_ID(vehicle_status)};
+./lib/avoidance/ObstacleAvoidanceTest.cpp:	uORB::Publication<vehicle_trajectory_bezier_s> vehicle_trajectory_bezier_pub{ORB_ID(vehicle_trajectory_bezier)};
+./lib/avoidance/ObstacleAvoidanceTest.cpp:	uORB::Publication<vehicle_status_s> vehicle_status_pub{ORB_ID(vehicle_status)};
+./lib/avoidance/ObstacleAvoidanceTest.cpp:	uORB::Publication<vehicle_trajectory_waypoint_s> vehicle_trajectory_waypoint_pub{ORB_ID(vehicle_trajectory_waypoint)};
+./lib/avoidance/ObstacleAvoidanceTest.cpp:	uORB::Publication<vehicle_status_s> vehicle_status_pub{ORB_ID(vehicle_status)};
+./lib/avoidance/ObstacleAvoidanceTest.cpp:	uORB::SubscriptionData<vehicle_trajectory_waypoint_s> _sub_traj_wp_avoidance_desired{ORB_ID(vehicle_trajectory_waypoint_desired)};
+./lib/avoidance/ObstacleAvoidance.hpp:	uORB::SubscriptionData<vehicle_trajectory_bezier_s> _sub_vehicle_trajectory_bezier{ORB_ID(vehicle_trajectory_bezier)}; /**< vehicle trajectory waypoint subscription */
+./lib/avoidance/ObstacleAvoidance.hpp:	uORB::SubscriptionData<vehicle_trajectory_waypoint_s> _sub_vehicle_trajectory_waypoint{ORB_ID(vehicle_trajectory_waypoint)}; /**< vehicle trajectory waypoint subscription */
+./lib/avoidance/ObstacleAvoidance.hpp:	uORB::SubscriptionData<vehicle_status_s> _sub_vehicle_status{ORB_ID(vehicle_status)}; /**< vehicle status subscription */
+./lib/avoidance/ObstacleAvoidance.hpp:	uORB::Publication<vehicle_trajectory_waypoint_s> _pub_traj_wp_avoidance_desired{ORB_ID(vehicle_trajectory_waypoint_desired)};	/**< trajectory waypoint desired publication */
+./lib/avoidance/ObstacleAvoidance.hpp:	uORB::Publication<position_controller_status_s> _pub_pos_control_status{ORB_ID(position_controller_status)};	/**< position controller status publication */
+./lib/avoidance/ObstacleAvoidance.hpp:	uORB::Publication<vehicle_command_s> _pub_vehicle_command{ORB_ID(vehicle_command)};	/**< vehicle command do publication */
+./lib/drivers/airspeed/airspeed.h:	uORB::PublicationMulti<differential_pressure_s>	_airspeed_pub{ORB_ID(differential_pressure)};
+./lib/drivers/accelerometer/PX4Accelerometer.hpp:	uORB::PublicationMulti<sensor_accel_s> _sensor_pub{ORB_ID(sensor_accel)};
+./lib/drivers/accelerometer/PX4Accelerometer.hpp:	uORB::PublicationMulti<sensor_accel_fifo_s>  _sensor_fifo_pub{ORB_ID(sensor_accel_fifo)};
+./lib/drivers/barometer/PX4Barometer.hpp:	uORB::PublicationMultiData<sensor_baro_s> _sensor_baro_pub{ORB_ID(sensor_baro)};
+./lib/drivers/magnetometer/PX4Magnetometer.hpp:	uORB::PublicationMulti<sensor_mag_s> _sensor_pub{ORB_ID(sensor_mag)};
+./lib/drivers/rangefinder/PX4Rangefinder.hpp:	uORB::PublicationMultiData<distance_sensor_s> _distance_sensor_pub{ORB_ID(distance_sensor)};
+./lib/drivers/gyroscope/PX4Gyroscope.hpp:	uORB::PublicationMulti<sensor_gyro_s> _sensor_pub{ORB_ID(sensor_gyro)};
+./lib/drivers/gyroscope/PX4Gyroscope.hpp:	uORB::PublicationMulti<sensor_gyro_fifo_s>  _sensor_fifo_pub{ORB_ID(sensor_gyro_fifo)};
+./lib/parameters/parameters.cpp:		param_topic = orb_advertise(ORB_ID(parameter_update), &pup);
+./lib/parameters/parameters.cpp:		orb_publish(ORB_ID(parameter_update), param_topic, &pup);
+./lib/parameters/parameters.cpp:		uORB::SubscriptionData<actuator_armed_s> armed_sub{ORB_ID(actuator_armed)};
+./lib/parameters/parameters_shmem.cpp:		param_topic = orb_advertise(ORB_ID(parameter_update), &pup);
+./lib/parameters/parameters_shmem.cpp:		orb_publish(ORB_ID(parameter_update), param_topic, &pup);
+./lib/parameters/ParameterTest.cpp:	uORB::SubscriptionData<obstacle_distance_s> sub_obstacle_distance{ORB_ID(obstacle_distance)};
+./lib/parameters/ParameterTest.cpp:	orb_advert_t obstacle_distance_pub = orb_advertise(ORB_ID(obstacle_distance), &message);
+./systemcmds/failure/failure.cpp:	uORB::Subscription command_ack_sub{ORB_ID(vehicle_command_ack)};
+./systemcmds/failure/failure.cpp:	uORB::Publication<vehicle_command_s> command_pub{ORB_ID(vehicle_command)};
+./systemcmds/nshterm/nshterm.c:	int armed_fd = orb_subscribe(ORB_ID(actuator_armed));
+./systemcmds/nshterm/nshterm.c:			orb_copy(ORB_ID(actuator_armed), armed_fd, &armed);
+./systemcmds/led_control/led_control.cpp:	uORB::Publication<led_control_s> led_control_pub{ORB_ID(led_control)};
+./systemcmds/topic_listener/generate_listener.py:	print("\t\tlistener(listener_print_topic<%s_s>, ORB_ID(%s), num_msgs, topic_instance, topic_interval);" % (m, t))
+./systemcmds/motor_test/motor_test.cpp:	uORB::Publication<test_motor_s> test_motor_pub{ORB_ID(test_motor)};
+./systemcmds/tune_control/tune_control.cpp:	uORB::Publication<tune_control_s> tune_control_pub{ORB_ID(tune_control)};
+./systemcmds/tests/test_jig_voltages.cpp:	uORB::Subscription	_adc_sub{ORB_ID(adc_report)};
+./systemcmds/tests/test_rc.c:	int _rc_sub = orb_subscribe(ORB_ID(input_rc));
+./systemcmds/tests/test_rc.c:	orb_copy(ORB_ID(input_rc), _rc_sub, &rc_input);
+./systemcmds/tests/test_rc.c:					orb_copy(ORB_ID(input_rc), _rc_sub, &rc_input);
+./systemcmds/tests/test_ppm_loopback.c:	int _rc_sub = orb_subscribe(ORB_ID(input_rc));
+./systemcmds/tests/test_ppm_loopback.c:	orb_copy(ORB_ID(input_rc), _rc_sub, &rc_input);
+./systemcmds/tests/test_ppm_loopback.c:		orb_copy(ORB_ID(input_rc), _rc_sub, &rc_input);
+./systemcmds/tests/test_adc.cpp:	uORB::Subscription	_adc_sub{ORB_ID(adc_report)};
+./systemcmds/tests/test_microbench_uorb.cpp:	int fd_status = orb_subscribe(ORB_ID(vehicle_status));
+./systemcmds/tests/test_microbench_uorb.cpp:	int fd_lpos = orb_subscribe(ORB_ID(vehicle_local_position));
+./systemcmds/tests/test_microbench_uorb.cpp:	int fd_gyro = orb_subscribe(ORB_ID(sensor_gyro));
+./systemcmds/tests/test_microbench_uorb.cpp:	int fd_gyro_fifo = orb_subscribe(ORB_ID(sensor_gyro_fifo));
+./systemcmds/tests/test_microbench_uorb.cpp:	PERF("orb_copy vehicle_status", ret = orb_copy(ORB_ID(vehicle_status), fd_status, &status), 100);
+./systemcmds/tests/test_microbench_uorb.cpp:	PERF("orb_copy vehicle_local_position", ret = orb_copy(ORB_ID(vehicle_local_position), fd_lpos, &lpos), 100);
+./systemcmds/tests/test_microbench_uorb.cpp:	PERF("orb_copy sensor_gyro", ret = orb_copy(ORB_ID(sensor_gyro), fd_gyro, &gyro), 100);
+./systemcmds/tests/test_microbench_uorb.cpp:	PERF("orb_copy sensor_gyro_fifo", ret = orb_copy(ORB_ID(sensor_gyro_fifo), fd_gyro_fifo, &gyro_fifo), 100);
+./systemcmds/tests/test_microbench_uorb.cpp:	PERF("orb_exists sensor_accel 0", ret = orb_exists(ORB_ID(sensor_accel), 0), 100);
+./systemcmds/tests/test_microbench_uorb.cpp:	PERF("orb_exists sensor_accel 1", ret = orb_exists(ORB_ID(sensor_accel), 1), 100);
+./systemcmds/tests/test_microbench_uorb.cpp:	PERF("orb_exists sensor_accel 2", ret = orb_exists(ORB_ID(sensor_accel), 2), 100);
+./systemcmds/tests/test_microbench_uorb.cpp:	PERF("orb_exists sensor_accel 3", ret = orb_exists(ORB_ID(sensor_accel), 3), 100);
+./systemcmds/tests/test_microbench_uorb.cpp:	PERF("orb_exists sensor_accel 4", ret = orb_exists(ORB_ID(sensor_accel), 4), 100);
+./systemcmds/tests/test_microbench_uorb.cpp:	PERF("orb_exists sensor_accel 5", ret = orb_exists(ORB_ID(sensor_accel), 5), 100);
+./systemcmds/tests/test_microbench_uorb.cpp:	PERF("orb_exists sensor_accel 6", ret = orb_exists(ORB_ID(sensor_accel), 6), 100);
+./systemcmds/tests/test_microbench_uorb.cpp:	PERF("orb_exists sensor_accel 7", ret = orb_exists(ORB_ID(sensor_accel), 7), 100);
+./systemcmds/tests/test_microbench_uorb.cpp:	PERF("orb_exists sensor_accel 8", ret = orb_exists(ORB_ID(sensor_accel), 8), 100);
+./systemcmds/tests/test_microbench_uorb.cpp:	PERF("orb_exists sensor_accel 9", ret = orb_exists(ORB_ID(sensor_accel), 9), 100);
+./systemcmds/tests/test_microbench_uorb.cpp:	PERF("orb_exists sensor_accel 10", ret = orb_exists(ORB_ID(sensor_accel), 10), 100);
+./systemcmds/tests/test_microbench_uorb.cpp:	uORB::Subscription vstatus{ORB_ID(vehicle_status)};
+./systemcmds/tests/test_microbench_uorb.cpp:	uORB::Subscription local_pos{ORB_ID(vehicle_local_position)};
+./systemcmds/tests/test_microbench_uorb.cpp:		uORB::Subscription sens_gyro0{ORB_ID(sensor_gyro), 0};
+./systemcmds/tests/test_microbench_uorb.cpp:		uORB::Subscription sens_gyro1{ORB_ID(sensor_gyro), 1};
+./systemcmds/tests/test_microbench_uorb.cpp:		uORB::Subscription sens_gyro2{ORB_ID(sensor_gyro), 2};
+./systemcmds/tests/test_microbench_uorb.cpp:		uORB::Subscription sens_gyro3{ORB_ID(sensor_gyro), 3};
+./systemcmds/tests/test_microbench_uorb.cpp:		uORB::Subscription sens_gyro_fifo0{ORB_ID(sensor_gyro_fifo), 0};
+./drivers/distance_sensor/pga460/pga460.cpp:	_distance_sensor_topic = orb_advertise(ORB_ID(distance_sensor), &report);
+./drivers/distance_sensor/pga460/pga460.cpp:		orb_publish(ORB_ID(distance_sensor), _distance_sensor_topic, &report);
+./drivers/distance_sensor/ll40ls_pwm/LidarLitePWM.h:	uORB::Subscription _sub_pwm_input{ORB_ID(pwm_input)};
+./drivers/distance_sensor/mb12xx/mb12xx.cpp:	orb_publish_auto(ORB_ID(distance_sensor), &_distance_sensor_topic, &report, &instance_id);
+./drivers/distance_sensor/mappydot/MappyDot.cpp:		orb_publish_auto(ORB_ID(distance_sensor), &_distance_sensor_topic, &report, &instance_id);
+./drivers/pwm_out_sim/PWMSim.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./drivers/osd/atxxxx/atxxxx.h:	uORB::Subscription _battery_sub{ORB_ID(battery_status)};
+./drivers/osd/atxxxx/atxxxx.h:	uORB::Subscription _local_position_sub{ORB_ID(vehicle_local_position)};
+./drivers/osd/atxxxx/atxxxx.h:	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};
+./drivers/tone_alarm/ToneAlarm.cpp:	// ensure ORB_ID(tune_control) is advertised with correct queue depth
+./drivers/tone_alarm/ToneAlarm.cpp:	orb_advertise_queue(ORB_ID(tune_control), nullptr, tune_control_s::ORB_QUEUE_LENGTH);
+./drivers/tone_alarm/ToneAlarm.cpp:						uORB::Publication<tune_control_s> tune_control_pub{ORB_ID(tune_control)};
+./drivers/tone_alarm/ToneAlarm.h:	uORB::SubscriptionCallbackWorkItem _tune_control_sub{this, ORB_ID(tune_control)};
+./drivers/pca9685/pca9685.cpp:			_actuator_controls_sub = orb_subscribe(ORB_ID(actuator_controls_2));
+./drivers/pca9685/pca9685.cpp:			orb_copy(ORB_ID(actuator_controls_2), _actuator_controls_sub, &_actuator_controls);
+./drivers/uavcan_v1/Actuators/EscClient.hpp:	uORB::Subscription _armed_sub{ORB_ID(actuator_armed)};
+./drivers/uavcan_v1/Publishers/uORB/sensor_gps.hpp:	uORB::Subscription _sensor_gps_sub{ORB_ID(sensor_gps)};
+./drivers/uavcan_v1/Publishers/Gnss.hpp:	uORB::Subscription _gps_sub{ORB_ID(sensor_gps)};
+./drivers/uavcan_v1/Publishers/Readiness.hpp:	uORB::Subscription _actuator_armed_sub{ORB_ID(actuator_armed)};
+./drivers/uavcan_v1/Subscribers/uORB/sensor_gps.hpp:	uORB::PublicationMulti<sensor_gps_s> _sensor_gps_pub{ORB_ID(sensor_gps)};
+./drivers/uavcan_v1/Subscribers/Battery.hpp:	uORB::PublicationMulti<battery_status_s> _battery_status_pub{ORB_ID(battery_status)};
+./drivers/uavcan_v1/Subscribers/Esc.hpp:	// uORB::Publication<output_control_s> _output_pub{ORB_ID(output_control_mc)};
+./drivers/uavcan_v1/Subscribers/LegacyBatteryInfo.hpp:	uORB::PublicationMulti<battery_status_s> _battery_status_pub{ORB_ID(battery_status)};
+./drivers/uavcan_v1/Uavcan.hpp:	uORB::Subscription _parameter_update_sub{ORB_ID(parameter_update)};
+./drivers/roboclaw/RoboClaw.cpp:	_actuatorsSub = orb_subscribe(ORB_ID(actuator_controls_0));
+./drivers/roboclaw/RoboClaw.cpp:	_armedSub = orb_subscribe(ORB_ID(actuator_armed));
+./drivers/roboclaw/RoboClaw.cpp:	_paramSub = orb_subscribe(ORB_ID(parameter_update));
+./drivers/roboclaw/RoboClaw.cpp:			orb_copy(ORB_ID(parameter_update), _paramSub, &_paramUpdate);
+./drivers/roboclaw/RoboClaw.cpp:			orb_copy(ORB_ID(actuator_controls_0), _actuatorsSub, &_actuatorControls);
+./drivers/roboclaw/RoboClaw.cpp:			orb_copy(ORB_ID(actuator_armed), _armedSub, &_actuatorArmed);
+./drivers/roboclaw/RoboClaw.hpp:	uORB::PublicationMulti<wheel_encoders_s> _wheelEncodersAdv[2] { ORB_ID(wheel_encoders), ORB_ID(wheel_encoders)};
+./drivers/power_monitor/ina226/ina226.h:	uORB::Subscription  _actuators_sub{ORB_ID(actuator_controls_0)};
+./drivers/power_monitor/ina226/ina226.h:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./drivers/power_monitor/voxlpm/voxlpm.hpp: *     - ORB_ID(battery_status)
+./drivers/power_monitor/voxlpm/voxlpm.hpp: *     - ORB_ID(power_monitor)        - ORB_ID(power_monitor)
+./drivers/power_monitor/voxlpm/voxlpm.hpp:	uORB::PublicationMulti<power_monitor_s>		_pm_pub_topic{ORB_ID(power_monitor)};
+./drivers/power_monitor/voxlpm/voxlpm.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./drivers/power_monitor/voxlpm/voxlpm.hpp:	uORB::Subscription	_actuators_sub{ORB_ID(actuator_controls_0)};
+./drivers/pca9685_pwm_out/main.cpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./drivers/heater/heater.h:	uORB::Publication<heater_status_s> _heater_status_pub{ORB_ID(heater_status)};
+./drivers/heater/heater.h:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./drivers/heater/heater.h:	uORB::Subscription _sensor_accel_sub{ORB_ID(sensor_accel)};
+./drivers/heater/heater.cpp:		uORB::SubscriptionData<sensor_accel_s> sensor_accel_sub{ORB_ID(sensor_accel), i};
+./drivers/px4io/px4io.cpp:	uORB::Subscription	_t_actuator_controls_1{ORB_ID(actuator_controls_1)};	///< actuator controls group 1 topic
+./drivers/px4io/px4io.cpp:	uORB::Subscription	_t_actuator_controls_2{ORB_ID(actuator_controls_2)};;	///< actuator controls group 2 topic
+./drivers/px4io/px4io.cpp:	uORB::Subscription	_t_actuator_controls_3{ORB_ID(actuator_controls_3)};;	///< actuator controls group 3 topic
+./drivers/px4io/px4io.cpp:	uORB::Subscription	_t_actuator_armed{ORB_ID(actuator_armed)};		///< system armed control topic
+./drivers/px4io/px4io.cpp:	uORB::Subscription 	_t_vehicle_control_mode{ORB_ID(vehicle_control_mode)};	///< vehicle control mode topic
+./drivers/px4io/px4io.cpp:	uORB::Subscription	_t_vehicle_command{ORB_ID(vehicle_command)};		///< vehicle command topic
+./drivers/px4io/px4io.cpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./drivers/px4io/px4io.cpp:	uORB::PublicationMulti<input_rc_s>			_to_input_rc{ORB_ID(input_rc)};
+./drivers/px4io/px4io.cpp:	uORB::PublicationMulti<actuator_outputs_s>		_to_outputs{ORB_ID(actuator_outputs)};
+./drivers/px4io/px4io.cpp:	uORB::PublicationMulti<multirotor_motor_limits_s>	_to_mixer_status{ORB_ID(multirotor_motor_limits)};
+./drivers/px4io/px4io.cpp:	uORB::Publication<px4io_status_s>			_px4io_status_pub{ORB_ID(px4io_status)};
+./drivers/px4io/px4io.cpp:	uORB::Publication<safety_s>				_to_safety{ORB_ID(safety)};
+./drivers/px4io/px4io.cpp:		uORB::Subscription test_motor_sub{ORB_ID(test_motor)};
+./drivers/px4io/px4io.cpp:		uORB::Subscription actuator_armed_sub{ORB_ID(actuator_armed)};
+./drivers/px4io/px4io.cpp:			uORB::Publication<vehicle_command_s> vcmd_pub{ORB_ID(vehicle_command)};
+./drivers/px4io/px4io.cpp:		uORB::Publication<vehicle_command_s> vcmd_pub{ORB_ID(vehicle_command)};
+./drivers/px4io/px4io.cpp:	_t_actuator_controls_0 = orb_subscribe(ORB_ID(actuator_controls_0));
+./drivers/px4io/px4io.cpp:				orb_copy(ORB_ID(actuator_controls_0), _t_actuator_controls_0, &controls);
+./drivers/px4io/px4io.cpp:	uORB::Publication<vehicle_command_ack_s> vehicle_command_ack_pub{ORB_ID(vehicle_command_ack)};
+./drivers/px4io/px4io.cpp:	uORB::SubscriptionData<px4io_status_s> status_sub{ORB_ID(px4io_status)};
+./drivers/optical_flow/pmw3901/PMW3901.hpp:	uORB::PublicationMulti<optical_flow_s> _optical_flow_pub{ORB_ID(optical_flow)};
+./drivers/optical_flow/thoneflow/thoneflow.cpp:		_optical_flow_pub = orb_advertise(ORB_ID(optical_flow), &_report);
+./drivers/optical_flow/thoneflow/thoneflow.cpp:			orb_publish(ORB_ID(optical_flow), _optical_flow_pub, &_report);
+./drivers/optical_flow/paw3902/PAW3902.hpp:	uORB::PublicationMulti<optical_flow_s> _optical_flow_pub{ORB_ID(optical_flow)};
+./drivers/optical_flow/px4flow/px4flow.cpp:	uORB::PublicationMulti<optical_flow_s>		_px4flow_topic{ORB_ID(optical_flow)};
+./drivers/optical_flow/px4flow/px4flow.cpp:	uORB::PublicationMulti<distance_sensor_s>	_distance_sensor_topic{ORB_ID(distance_sensor)};
+./drivers/uavcan/beep.hpp:	uORB::Subscription _tune_control_sub{ORB_ID(tune_control)};
+./drivers/uavcan/uavcan_servers.hpp:	uORB::Publication<uavcan_parameter_value_s> _param_response_pub{ORB_ID(uavcan_parameter_value)};
+./drivers/uavcan/uavcan_servers.hpp:	uORB::Publication<vehicle_command_ack_s>	_command_ack_pub{ORB_ID(vehicle_command_ack)};
+./drivers/uavcan/safety_state.hpp:	uORB::Subscription _actuator_armed_sub{ORB_ID(actuator_armed)};
+./drivers/uavcan/sensors/gnss.cpp:	UavcanSensorBridgeBase("uavcan_gnss", ORB_ID(sensor_gps)),
+./drivers/uavcan/sensors/flow.cpp:	UavcanSensorBridgeBase("uavcan_flow", ORB_ID(optical_flow)),
+./drivers/uavcan/sensors/rangefinder.cpp:	UavcanSensorBridgeBase("uavcan_rangefinder", ORB_ID(distance_sensor)),
+./drivers/uavcan/sensors/gnss.hpp:	uORB::Subscription			_orb_inject_data_sub{ORB_ID(gps_inject_data)};
+./drivers/uavcan/sensors/accel.cpp:	UavcanSensorBridgeBase("uavcan_accel", ORB_ID(sensor_accel)),
+./drivers/uavcan/sensors/gyro.cpp:	UavcanSensorBridgeBase("uavcan_gyro", ORB_ID(sensor_gyro)),
+./drivers/uavcan/sensors/cbat.cpp:	UavcanSensorBridgeBase("uavcan_cbat", ORB_ID(battery_status)),
+./drivers/uavcan/sensors/baro.cpp:	UavcanSensorBridgeBase("uavcan_baro", ORB_ID(sensor_baro)),
+./drivers/uavcan/sensors/battery.cpp:	UavcanSensorBridgeBase("uavcan_battery", ORB_ID(battery_status)),
+./drivers/uavcan/sensors/airspeed.cpp:	UavcanSensorBridgeBase("uavcan_airspeed", ORB_ID(airspeed)),
+./drivers/uavcan/sensors/differential_pressure.cpp:	UavcanSensorBridgeBase("uavcan_differential_pressure", ORB_ID(differential_pressure)),
+./drivers/uavcan/sensors/safetybutton.hpp:	uORB::PublicationMulti<safety_s> _safety_pub{ORB_ID(safety)};
+./drivers/uavcan/sensors/mag.cpp:	UavcanSensorBridgeBase("uavcan_mag", ORB_ID(sensor_mag)),
+./drivers/uavcan/uavcan_servers.cpp:	uORB::Subscription armed_sub{ORB_ID(actuator_armed)};
+./drivers/uavcan/uavcan_servers.cpp:	uORB::Subscription vcmd_sub{ORB_ID(vehicle_command)};
+./drivers/uavcan/uavcan_servers.cpp:	uORB::Subscription param_request_sub{ORB_ID(uavcan_parameter_request)};
+./drivers/uavcan/actuators/esc.hpp:	uORB::PublicationMulti<esc_status_s> _esc_status_pub{ORB_ID(esc_status)};
+./drivers/uavcan/uavcan_main.hpp:	uORB::SubscriptionInterval	_parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./drivers/uavcan/rgbled.hpp:	uORB::Subscription _armed_sub{ORB_ID(actuator_armed)};
+./drivers/batt_smbus/batt_smbus.cpp:		orb_publish_auto(ORB_ID(battery_status), &_batt_topic, &new_report, &instance);
+./drivers/irlock/irlock.cpp:	uORB::Publication<irlock_report_s> _irlock_report_topic{ORB_ID(irlock_report)};
+./drivers/rc_input/crsf_telemetry.h:	uORB::Subscription _vehicle_gps_position_sub{ORB_ID(vehicle_gps_position)};
+./drivers/rc_input/crsf_telemetry.h:	uORB::Subscription _battery_status_sub{ORB_ID(battery_status)};
+./drivers/rc_input/crsf_telemetry.h:	uORB::Subscription _vehicle_attitude_sub{ORB_ID(vehicle_attitude)};
+./drivers/rc_input/crsf_telemetry.h:	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};
+./drivers/rc_input/RCInput.cpp:				uORB::Publication<vehicle_command_ack_s> vehicle_command_ack_pub{ORB_ID(vehicle_command_ack)};
+./drivers/rc_input/RCInput.cpp:		uORB::Publication<vehicle_command_s> vehicle_command_pub{ORB_ID(vehicle_command)};
+./drivers/rc_input/RCInput.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./drivers/rc_input/RCInput.hpp:	uORB::Subscription	_adc_report_sub{ORB_ID(adc_report)};
+./drivers/rc_input/RCInput.hpp:	uORB::Subscription	_vehicle_cmd_sub{ORB_ID(vehicle_command)};
+./drivers/rc_input/RCInput.hpp:	uORB::Subscription	_vehicle_status_sub{ORB_ID(vehicle_status)};
+./drivers/rc_input/RCInput.hpp:	uORB::PublicationMulti<input_rc_s>	_to_input_rc{ORB_ID(input_rc)};
+./drivers/rc_input/ghst_telemetry.hpp:	uORB::Subscription _battery_status_sub{ORB_ID(battery_status)};
+./drivers/camera_trigger/camera_trigger.cpp:	uORB::Subscription	_command_sub{ORB_ID(vehicle_command)};
+./drivers/camera_trigger/camera_trigger.cpp:	uORB::Subscription	_lpos_sub{ORB_ID(vehicle_local_position)};
+./drivers/camera_trigger/camera_trigger.cpp:	uORB::Publication<vehicle_command_ack_s>	_cmd_ack_pub{ORB_ID(vehicle_command_ack)};
+./drivers/camera_trigger/camera_trigger.cpp:		_trigger_pub = orb_advertise(ORB_ID(camera_trigger), &trigger);
+./drivers/camera_trigger/camera_trigger.cpp:		_trigger_pub = orb_advertise(ORB_ID(camera_trigger_secondary), &trigger);
+./drivers/camera_trigger/camera_trigger.cpp:	uORB::Publication<vehicle_command_s> vcmd_pub{ORB_ID(vehicle_command)};
+./drivers/camera_trigger/camera_trigger.cpp:	uORB::Publication<vehicle_command_s> vcmd_pub{ORB_ID(vehicle_command)};
+./drivers/camera_trigger/camera_trigger.cpp:		orb_publish(ORB_ID(camera_trigger), trig->_trigger_pub, &trigger);
+./drivers/camera_trigger/camera_trigger.cpp:		orb_publish(ORB_ID(camera_trigger_secondary), trig->_trigger_pub, &trigger);
+./drivers/qshell/posix/qshell.h:	uORB::Publication<qshell_req_s>	_qshell_req_pub{ORB_ID(qshell_req)};
+./drivers/qshell/posix/qshell.h:	uORB::Subscription		_qshell_retval_sub{ORB_ID(qshell_retval)};
+./drivers/qshell/qurt/qshell.h:	uORB::Publication<qshell_retval_s>	_qshell_retval_pub{ORB_ID(qshell_retval)};
+./drivers/qshell/qurt/qshell.cpp:	int sub_qshell_req = orb_subscribe(ORB_ID(qshell_req));
+./drivers/qshell/qurt/qshell.cpp:			orb_copy(ORB_ID(qshell_req), sub_qshell_req, &m_qshell_req);
+./drivers/uavcannode_gps_demo/uorb_converter.c:	uorb_sub_fd = orb_subscribe(ORB_ID(sensor_gps));
+./drivers/uavcannode_gps_demo/uorb_converter.c:			orb_copy(ORB_ID(sensor_gps), uorb_sub_fd, &raw);
+./drivers/safety_button/SafetyButton.hpp:	uORB::Subscription		_armed_sub{ORB_ID(actuator_armed)};
+./drivers/safety_button/SafetyButton.hpp:	uORB::Publication<safety_s>	_to_safety{ORB_ID(safety)};
+./drivers/safety_button/SafetyButton.hpp:	uORB::Publication<vehicle_command_s>	_to_command{ORB_ID(vehicle_command)};
+./drivers/safety_button/SafetyButton.hpp:	uORB::Publication<led_control_s> _to_led_control{ORB_ID(led_control)};
+./drivers/safety_button/SafetyButton.hpp:	uORB::Publication<tune_control_s> _to_tune_control{ORB_ID(tune_control)};
+./drivers/lights/rgbled/rgbled.cpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./drivers/lights/rgbled_ncp5623c/rgbled_ncp5623c.cpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./drivers/adc/board_adc/ADC.cpp:	uORB::Subscription	adc_sub_test{ORB_ID(adc_report)};
+./drivers/adc/board_adc/ADC.hpp:	uORB::Publication<adc_report_s>		_to_adc_report{ORB_ID(adc_report)};
+./drivers/adc/board_adc/ADC.hpp:	uORB::Publication<system_power_s>	_to_system_power{ORB_ID(system_power)};
+./drivers/adc/ads1115/ADS1115.h:	uORB::Publication<adc_report_s>		_to_adc_report{ORB_ID(adc_report)};
+./drivers/telemetry/hott/messages.cpp:	_battery_sub = orb_subscribe(ORB_ID(battery_status));
+./drivers/telemetry/hott/messages.cpp:	_gps_sub = orb_subscribe(ORB_ID(vehicle_gps_position));
+./drivers/telemetry/hott/messages.cpp:	_home_sub = orb_subscribe(ORB_ID(home_position));
+./drivers/telemetry/hott/messages.cpp:	_airdata_sub = orb_subscribe(ORB_ID(vehicle_air_data));
+./drivers/telemetry/hott/messages.cpp:	_airspeed_sub = orb_subscribe(ORB_ID(airspeed));
+./drivers/telemetry/hott/messages.cpp:	_esc_sub = orb_subscribe(ORB_ID(esc_status));
+./drivers/telemetry/hott/messages.cpp:		orb_publish(ORB_ID(esc_status), _esc_pub, &esc);
+./drivers/telemetry/hott/messages.cpp:		_esc_pub = orb_advertise(ORB_ID(esc_status), &esc);
+./drivers/telemetry/hott/messages.cpp:	orb_copy(ORB_ID(vehicle_air_data), _airdata_sub, &airdata);
+./drivers/telemetry/hott/messages.cpp:	orb_copy(ORB_ID(battery_status), _battery_sub, &battery);
+./drivers/telemetry/hott/messages.cpp:	orb_copy(ORB_ID(airspeed), _airspeed_sub, &airspeed);
+./drivers/telemetry/hott/messages.cpp:	orb_copy(ORB_ID(esc_status), _esc_sub, &esc);
+./drivers/telemetry/hott/messages.cpp:	orb_copy(ORB_ID(vehicle_gps_position), _gps_sub, &gps);
+./drivers/telemetry/hott/messages.cpp:			orb_copy(ORB_ID(home_position), _home_sub, &home);
+./drivers/telemetry/bst/bst.cpp:	uORB::Subscription	_gps_sub{ORB_ID(vehicle_gps_position)};
+./drivers/telemetry/bst/bst.cpp:	uORB::Subscription	_attitude_sub{ORB_ID(vehicle_attitude)};
+./drivers/telemetry/bst/bst.cpp:	uORB::Subscription	_battery_sub{ORB_ID(battery_status)};
+./drivers/telemetry/frsky_telemetry/frsky_telemetry.cpp:		int airdata_sub = orb_subscribe(ORB_ID(vehicle_air_data));
+./drivers/telemetry/frsky_telemetry/frsky_telemetry.cpp:				orb_copy(ORB_ID(vehicle_air_data), airdata_sub, &airdata);
+./drivers/telemetry/frsky_telemetry/sPort_data.cpp:	uORB::SubscriptionData<battery_status_s> battery_status_sub{ORB_ID(battery_status)};
+./drivers/telemetry/frsky_telemetry/sPort_data.cpp:	uORB::SubscriptionData<vehicle_acceleration_s> vehicle_acceleration_sub{ORB_ID(vehicle_acceleration)};
+./drivers/telemetry/frsky_telemetry/sPort_data.cpp:	uORB::SubscriptionData<vehicle_air_data_s> vehicle_air_data_sub{ORB_ID(vehicle_air_data)};
+./drivers/telemetry/frsky_telemetry/sPort_data.cpp:	uORB::SubscriptionData<vehicle_global_position_s> vehicle_global_position_sub{ORB_ID(vehicle_global_position)};
+./drivers/telemetry/frsky_telemetry/sPort_data.cpp:	uORB::SubscriptionData<vehicle_gps_position_s> vehicle_gps_position_sub{ORB_ID(vehicle_gps_position)};
+./drivers/telemetry/frsky_telemetry/sPort_data.cpp:	uORB::SubscriptionData<vehicle_local_position_s> vehicle_local_position_sub{ORB_ID(vehicle_local_position)};
+./drivers/telemetry/frsky_telemetry/sPort_data.cpp:	uORB::SubscriptionData<vehicle_status_s> vehicle_status_sub{ORB_ID(vehicle_status)};
+./drivers/telemetry/frsky_telemetry/frsky_data.cpp:	uORB::SubscriptionData<battery_status_s> battery_status_sub{ORB_ID(battery_status)};
+./drivers/telemetry/frsky_telemetry/frsky_data.cpp:	uORB::SubscriptionData<vehicle_acceleration_s> vehicle_acceleration_sub{ORB_ID(vehicle_acceleration)};
+./drivers/telemetry/frsky_telemetry/frsky_data.cpp:	uORB::SubscriptionData<vehicle_air_data_s> vehicle_air_data_sub{ORB_ID(vehicle_air_data)};
+./drivers/telemetry/frsky_telemetry/frsky_data.cpp:	uORB::SubscriptionData<vehicle_local_position_s> vehicle_local_position_sub{ORB_ID(vehicle_local_position)};
+./drivers/telemetry/frsky_telemetry/frsky_data.cpp:	uORB::SubscriptionData<vehicle_global_position_s> vehicle_global_position_sub{ORB_ID(vehicle_global_position)};
+./drivers/telemetry/frsky_telemetry/frsky_data.cpp:	uORB::SubscriptionData<vehicle_gps_position_s> vehicle_gps_position_sub{ORB_ID(vehicle_gps_position)};
+./drivers/telemetry/frsky_telemetry/frsky_data.cpp:	uORB::SubscriptionData<vehicle_status_s> vehicle_status_sub{ORB_ID(vehicle_status)};
+./drivers/telemetry/iridiumsbd/IridiumSBD.h:	uORB::Publication<iridiumsbd_status_s> _iridiumsbd_status_pub{ORB_ID(iridiumsbd_status)};
+./drivers/dshot/DShot.h:		uORB::PublicationData<esc_status_s> esc_status_pub{ORB_ID(esc_status)};
+./drivers/dshot/DShot.h:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./drivers/camera_capture/camera_capture.hpp:	uORB::Publication<vehicle_command_ack_s>	_command_ack_pub{ORB_ID(vehicle_command_ack)};
+./drivers/camera_capture/camera_capture.hpp:	uORB::Publication<camera_trigger_s>		_trigger_pub{ORB_ID(camera_trigger)};
+./drivers/camera_capture/camera_capture.hpp:	uORB::Subscription				_command_sub{ORB_ID(vehicle_command)};
+./drivers/rpm/pcf8583/PCF8583.hpp:	uORB::Publication<rpm_s> _rpm_pub{ORB_ID(rpm)};
+./drivers/rpm/rpm_simulator/rpm_simulator.cpp:	uORB::Publication<rpm_s> rpm_pub{ORB_ID(rpm)};
+./drivers/gps/gps.cpp:	uORB::PublicationMulti<sensor_gps_s>	_report_gps_pos_pub{ORB_ID(sensor_gps)};	///< uORB pub for gps position
+./drivers/gps/gps.cpp:	uORB::PublicationMulti<satellite_info_s>	_report_sat_info_pub{ORB_ID(satellite_info)};		///< uORB pub for satellite info
+./drivers/gps/gps.cpp:	uORB::Subscription		_orb_inject_data_sub{ORB_ID(gps_inject_data)};
+./drivers/gps/gps.cpp:	uORB::Publication<gps_dump_s>	_dump_communication_pub{ORB_ID(gps_dump)};
+./drivers/rpi_rc_in/rpi_rc_in.h:	uORB::PublicationMulti<input_rc_s>	_rcinput_pub{ORB_ID(input_rc)};
+./drivers/snapdragon_spektrum_rc/spektrum_rc.cpp:				rc_pub = orb_advertise(ORB_ID(input_rc), &input_rc);
+./drivers/snapdragon_spektrum_rc/spektrum_rc.cpp:				orb_publish(ORB_ID(input_rc), rc_pub, &input_rc);
+./drivers/pwm_input/pwm_input.h:	uORB::PublicationData<pwm_input_s> _pwm_input_pub{ORB_ID(pwm_input)};
+./drivers/pwm_out/PWMOut.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./drivers/uavcannode/UavcanNode.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
+./drivers/uavcannode/Publishers/RangeSensorMeasurement.hpp:		uORB::SubscriptionCallbackWorkItem(work_item, ORB_ID(distance_sensor), instance),
+./drivers/uavcannode/Publishers/BatteryInfo.hpp:		uORB::SubscriptionCallbackWorkItem(work_item, ORB_ID(battery_status)),
+./drivers/uavcannode/Publishers/StaticTemperature.hpp:		uORB::SubscriptionCallbackWorkItem(work_item, ORB_ID(sensor_baro)),
+./drivers/uavcannode/Publishers/StaticPressure.hpp:		uORB::SubscriptionCallbackWorkItem(work_item, ORB_ID(sensor_baro)),
+./drivers/uavcannode/Publishers/SafetyButton.hpp:		uORB::SubscriptionCallbackWorkItem(work_item, ORB_ID(safety)),
+./drivers/uavcannode/Publishers/MagneticFieldStrength2.hpp:		uORB::SubscriptionCallbackWorkItem(work_item, ORB_ID(sensor_mag)),
+./drivers/uavcannode/Publishers/FlowMeasurement.hpp:		uORB::SubscriptionCallbackWorkItem(work_item, ORB_ID(optical_flow)),
+./drivers/uavcannode/Publishers/RawAirData.hpp:		uORB::SubscriptionCallbackWorkItem(work_item, ORB_ID(differential_pressure)),
+./drivers/uavcannode/Publishers/GnssFix2.hpp:		uORB::SubscriptionCallbackWorkItem(work_item, ORB_ID(sensor_gps)),
+./drivers/uavcannode/Subscribers/LightsCommand.hpp:	uORB::Publication<led_control_s> _led_control_pub{ORB_ID(led_control)};
+./drivers/uavcannode/Subscribers/BeepCommand.hpp:	uORB::Publication<tune_control_s> _tune_control_pub{ORB_ID(tune_control)};
+./drivers/linux_pwm_out/linux_pwm_out.hpp:	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
