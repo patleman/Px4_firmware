@@ -43,6 +43,7 @@
 #include "FlightTaskAutoMapper.hpp"
 #include <motion_planning/VelocitySmoothing.hpp>
 
+
 class FlightTaskAutoLineSmoothVel : public FlightTaskAutoMapper
 {
 public:

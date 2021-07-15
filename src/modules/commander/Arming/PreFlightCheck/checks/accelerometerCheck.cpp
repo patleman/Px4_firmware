@@ -64,6 +64,7 @@ bool PreFlightCheck::accelerometerCheck(orb_advert_t *mavlink_log_pub, vehicle_s
 		}
 
 		device_id = accel.get().device_id;
+	//	printf("\n\ndevice_id for accelorometer %d \n\n",device_id);
 
 		if (status.hil_state == vehicle_status_s::HIL_STATE_ON) {
 			calibration_valid = true;

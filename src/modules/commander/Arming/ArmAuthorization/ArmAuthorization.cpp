@@ -80,6 +80,7 @@ void arm_auth_param_update()
 
 	int32_t auth_method = ARM_AUTH_METHOD_ARM_REQ;
 	param_get(param_find("COM_ARM_AUTH_MET"), &auth_method);
+	printf("\n\n requesting arm authorization 00 \n\n");
 
 	if (auth_method >= 0 && auth_method < ARM_AUTH_METHOD_LAST) {
 		_param_com_arm_auth_method = (arm_auth_methods)auth_method;
@@ -95,6 +96,7 @@ static void arm_auth_request_msg_send()
 {
 	vehicle_command_s vcmd{};
 	vcmd.timestamp = hrt_absolute_time();
+	printf("\n\n requesting arm authorization 11 \n\n");
 	vcmd.command = vehicle_command_s::VEHICLE_CMD_ARM_AUTHORIZATION_REQUEST;
 	vcmd.target_system = _param_com_arm_auth_id;
 

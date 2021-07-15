@@ -36,10 +36,8 @@
  */
 
 #include "PreFlightCheck.hpp"
-#include "MP_INT.hpp"
-#include "PA_EXTRACT.hpp"
-#include "Identifier.hpp"
-
+//#include "MP_INT.hpp"
+#include <motion_planning/main_utility.hpp>
 #include <drivers/drv_hrt.h>
 #include <HealthFlags.h>
 
@@ -90,11 +88,27 @@ bool PreFlightCheck::preflightCheck(orb_advert_t *mavlink_log_pub, vehicle_statu
 //management client (signed by key/pair_C), then from management client to Management server.
 //file informaton: 1)timestamp 2)Component's device id that didnt match.
 
+static int RPAS_identifier_check=0;
+
+if (RPAS_identifier_check==0){
 int identity_check= RPAS_identifier();
 
 if(identity_check==0){
-	printf("Hardware parts have been changed");
+
+	mavlink_log_critical(mavlink_log_pub, "Unautorized Hardware parts attached");
+
 	return false;
+}
+if(identity_check==2){
+	// this is the case when HArdwareInuse.tx fie is removed from the firmware
+	mavlink_log_critical(mavlink_log_pub, "Hardware refference file not found. Please update the firmware");
+        return false;
+}
+if(identity_check==1){
+        // all hardwares are authorized
+	RPAS_identifier_check=1;
+
+}
 }
 
 
@@ -106,23 +120,35 @@ if(identity_check==0){
 //DroneID.txt file generator function
 
 static int drone_id_generation=0;
-if(drone_id_generation==0){
+
+if(drone_id_generation==0)
+{
 //This has to be a function (taking in account all the unique things of the RPAS)
-char Drone_ID[40]="11dd44@@334499200";// truth value
+
 FILE *droneid;
-droneid=fopen("./log/Drone_ID.txt","r");
+droneid=fopen("./log/DroneID.txt","r");
 if(droneid==NULL){
   // the file is not there in the system, it has to be created
   // currently without signing, later has to be with signing support(Key_pair_C)
-droneid=fopen("./log/Drone_ID.txt","w");
-fprintf(droneid, "%s", Drone_ID);
-fclose(droneid);
+
+   call_DroneIDcreation( );
 drone_id_generation=1;
 }else{
 	//file is there in the system check if it was witten by RPAS or not.
 	// by checking for the signature
+	char DroneID_container[30];
+	char TAG_DRONE_ID[10]="DroneID";
+	char DRONE_ID_FILE[20]="./log/DroneID.txt";
+	int check_validity_DroneID=call_file_read(DRONE_ID_FILE,TAG_DRONE_ID,DroneID_container,0);
 	// if non tampered -->then continue
+	if (check_validity_DroneID==0){
+		remove("./log/DroneID.txt");
+		call_DroneIDcreation( );
+	}else{
+		printf("\n\nDRONEID.txt already made\n\n");
+	}
 	// if tampered --> then delete it and create a genuine one. with a valid signature
+drone_id_generation=1;
 }
 
 }
@@ -132,7 +158,7 @@ drone_id_generation=1;
 // Now its important to check that if the Drone has been registered or not
 // Algo for that:
 // Check for the UUID.txt file  : this file would be signed using MS key (Key/pair C)
-// and send by the MC at each power on. Thats how the integrity of the our RPAS and MC would be
+// and send by the MC at each power on. Thats how the integrity of  our RPAS and MC would be
 // maintained. In other way, we can say that our RPAS wont get ready to fly until our MC is not in use.
 //
 // It will contain following things: 1) Drone_ID 2)UUID 3) Signature(key/pair_C)
@@ -140,85 +166,523 @@ drone_id_generation=1;
 // the Key/pair_C
 // if Drone_ID comes out to be same as the one mentioned in the above two function and file
 // is non tampered(checked using Key/pair_C) then we can say that Registration has been done
-FILE *fptr_registration;
-char c_aux;
-fptr_registration=fopen("./log/UUID.txt","r");
-if(fptr_registration!=NULL){
-	while(1){
-		c_aux=fgetc(fptr_registration);
-		if (c_aux==EOF){
-			break;
+
+static int UUID_check=0;
+if (UUID_check==0)
+{
+	FILE *fptr_registration;
+	fptr_registration=fopen("./log/UUID.txt","r");
+	printf("\ninside UUID check\n");
+	if(fptr_registration!=NULL)
+	{//file is present
+		fclose(fptr_registration);
+		char DroneID_container_1[30];
+		char TAG_DRONE_ID_1[10]="DroneID";
+		char DRONE_ID_FILE_1[20]="./log/UUID.txt";
+		int check_validity_DroneID_1=call_file_read(DRONE_ID_FILE_1,TAG_DRONE_ID_1,DroneID_container_1,1);
+		// if non tampered -->then continue
+		if (check_validity_DroneID_1==0){
+			//UUID file is not valid, remove the invalid file
+			remove("./log/UUID.txt");
+			mavlink_log_critical(mavlink_log_pub, "Drone registration not done, Connect Management Client and Internet to begin registration");
+
+		}else{
+			//file is valid, check for strings
+			if(strcmp(DroneID_container_1,"ABBDDJEDNDJK")==0){
+				UUID_check++;//Drone is registered
+				printf("\n\nDrone is registered\n\n");
+			}else{
+				// UUID.txt file is for different drone
+				// not UUID.txt of this drone
+				remove("./log/UUID.txt");
+				mavlink_log_critical(mavlink_log_pub, "Drone registration not done, Connect Management Client and Internet to begin registration");
+			}
+
 		}
-		else{
-			fputc(c_aux,fptr_registration);
-		}
+
+
+
 	}
-	fclose(fptr_registration);
-
-
-}else{
+	else{
 	// registration has not been done, also recommend to connect to management client and
 	// internet
-	mavlink_log_critical(mavlink_log_pub, "Drone registration not done");
+	// UUID.txt file not present
+
+		mavlink_log_critical(mavlink_log_pub, "Drone registration not done, Connect Management Client and Internet to begin registration");
+		return false;
+	}
 }
 
-/// first priority is to check for permission artifact (is it present here or not) and its validation
-/// then verifying for geo coordinates and time period
-/// and then need for key rotation (separate app (decision at hold))
 
+
+
+// 3) Key rotation start, if needed
+
+static int checky=0;
+if(checky==0)
+{
+	FILE *fptr_key;
+	fptr_key=fopen("./log/KeyRotation.txt","r");
+
+	if(fptr_key!=NULL)
+	{// if present, then check for its validity
+
+
+		fclose(fptr_key);
+		char DroneID_container_2[30];
+		char FILE_ID_container[30];
+		char TAG_DRONE_ID_2[10]="DroneID";
+		char TAG_KEY_ROT_ID[20]="FILE_ID";
+		char DRONE_ID_FILE_2[30]="./log/KeyRotation.txt";
+		int check_validity_DroneID_2=call_file_read(DRONE_ID_FILE_2,TAG_DRONE_ID_2,DroneID_container_2,1);
+		// if non tampered -->then continue
+		check_validity_DroneID_2=call_file_read(DRONE_ID_FILE_2,TAG_KEY_ROT_ID,FILE_ID_container,1);
+
+		if (check_validity_DroneID_2==0){
+			//KeyRotation.txt file is not valid, remove the invalid file
+			remove("./log/KeyRotation.txt");
+
+
+		}else{
+			//file is valid, check for strings
+			if(strcmp(DroneID_container_2,"ABBDDJEDNDJK")==0){
+				//Checking for reusage of the file
+				int reusage_check=CHECK_REUSAGE(FILE_ID_container);
+				if (reusage_check==0){
+					//File_ID is new, first time used
+					//Update KeyLog.txt with the new File_ID
+					call_KeyLog_Regen(FILE_ID_container);
+					// start key rotation
+					Key_rotation_start(FILE_ID_container);
+					remove("./log/KeyRotation.txt");
+					checky=1;
+				}else{// The file for key rotation has already been used
+				      // key rotation will not take place
+					remove("./log/KeyRotation.txt");
+
+				}
+
+			}else{
+				// KeyRotation.txt file is for different drone
+				//
+				remove("./log/KeyRotation.txt");
+			}
+
+		}
+
+	}else{
+	//no need of key rotation as there is no keyRotation.txt file present.
+		//check for KeyChangePerm.txt
+		FILE *fptr_keychange;
+		char fname_keychange[40]="./log/KeyChangePerm.txt";
+
+		fptr_keychange=fopen(fname_keychange,"r");
+		if(fptr_keychange!=NULL){
+			fclose(fptr_keychange);
+			//file present, check fot its validity, drone_id, KEY_ID
+			//if all okay--> then make the change by calling the function
+			// if not okay-->reasons 1)File is for different drone
+			//			 2)File is not valid
+			//                       3)file KEY_ID doesnt match
+			//two files in play PublicKeyNew.txt and KeyChangePerm.txt
+			char DroneID_container_3[30];
+			char KEY_ID_container[30];
+			char TAG_DRONE_ID_2[10]="DroneID";
+			char TAG_KEY_ID[20]="KEY_ID";
+			char MODULUS_FILE[720];
+			char MODULUS_tag[20]="Modulus";
+			char DRONE_ID_FILE_2[30]="./log/KeyChangePerm.txt";
+			int check_validity_DroneID_3=call_file_read(DRONE_ID_FILE_2,TAG_DRONE_ID_2,DroneID_container_3,1);
+		// if non tampered -->then continue
+			check_validity_DroneID_3=call_file_read(DRONE_ID_FILE_2,TAG_KEY_ID,KEY_ID_container,1);
+
+			check_validity_DroneID_3=call_file_read(DRONE_ID_FILE_2,MODULUS_tag,MODULUS_FILE,1);
+			if(check_validity_DroneID_3==1){
+				//file is valid
+				//Now check for DroneID,KEY_ID and MODULUS
+				//taking above from PublicKeyNew.txt
+				char PKN_Modulus[720];
+				char PKN_DroneID[30];
+				char PKN_KEY_ID[30];
+				char PKN_file[30]="./log/PublicKeyNew.txt";
+				check_validity_DroneID_3=call_file_read(PKN_file,MODULUS_tag,PKN_Modulus,0);
+				check_validity_DroneID_3=call_file_read(PKN_file,TAG_DRONE_ID_2,PKN_DroneID,0);
+				check_validity_DroneID_3=call_file_read(PKN_file,TAG_KEY_ID,PKN_KEY_ID,0);
+				if(check_validity_DroneID_3==0){
+					//not valid PublicKeyNew.txt, remove it
+					remove("./log/PublicKeyNew.txt");
+				}else{
+					int valid_sum=0;
+					if(strcmp(PKN_Modulus,MODULUS_FILE)==0){
+						valid_sum++;
+					}
+					if(strcmp(PKN_DroneID,DroneID_container_3)==0){
+						valid_sum++;
+					}
+					if(strcmp(PKN_KEY_ID,KEY_ID_container)==0){
+						valid_sum++;
+					}
+					if(valid_sum==3){
+						// file is valid and belongs to this drone only
+						// begin the changes that are needed
+						KEY_CHANGE_INITIATION();
+						checky++;
+
+					}else{	//
+						//file is valid but does not belong to this drone.
+						remove("./log/KeyChangePerm.txt");
+					}
+				}
+
+			}else{
+				//file is not valid, remove the invalid file
+				remove("./log/KeyChangePerm.txt");
+			}
+
+		}else{//file is not present, no need to change keys
+
+		}
+
+	}
+}
+
+
+
+
+/// Some parameters are very crucial and therefore acess for the same is not given
+/// to the user to write over the same Parameter update and set
+static int para_set=0;
+if(para_set==0){
+	FILE *fptr_ParamChange;
+	fptr_ParamChange=fopen("./log/ParamChangePerm.txt","r");
+	if(fptr_ParamChange!=NULL)
+	{	fclose(fptr_ParamChange);
+		//a modified ParamInuse.txt is needed to be formed
+		//also check the presence of ParamInuse.txt
+		FILE *fptr_ParamInuse;
+		fptr_ParamInuse=fopen("./log/ParamInuse.txt","r");
+		if(fptr_ParamInuse!=NULL){
+			fclose(fptr_ParamInuse);
+			//both the files are present
+			// validate both of them
+			//ParamInuse.txt has to be validated with RFM public key
+			//ParamChangePerm.txt has to be validated with FMP public key
+			char DroneID_container_4[30];
+			char DroneID_container_5[30];
+			char TAG_DRONE_ID_4[10]="DroneID";
+			char PARAM_IN_FILE_2[30]="./log/ParamInuse.txt";
+			char PARAM_CHANGE_FILE_2[30]="./log/ParamChangePerm.txt";
+			int check_validity_DroneID_3=call_file_read(PARAM_IN_FILE_2,TAG_DRONE_ID_4,DroneID_container_4,0);
+			// if non tampered -->then continue
+			if(check_validity_DroneID_3==1){
+				if(strcmp(DroneID_container_4,"ABBDDJEDNDJK")==0){
+					//droneID is valid
+				}else{
+					//droneID is not of this drone, remove the file
+					remove("/log/ParamInuse.txt");
+					mavlink_log_critical(mavlink_log_pub, "Authentic Parameter file missing");
+
+					return false;
+				}
+			}else{
+				//remove the file
+				remove("/log/ParamInuse.txt");
+				mavlink_log_critical(mavlink_log_pub, "Authentic Parameter file missing");
+
+				return false;
+			}
+			int check_validity_DroneID_4=call_file_read(PARAM_CHANGE_FILE_2,TAG_DRONE_ID_4,DroneID_container_5,1);
+			if(check_validity_DroneID_4==1){
+				if(strcmp(DroneID_container_5,"ABBDDJEDNDJK")==0){
+					//droneID is valid
+					// At this point both the files have been validated ()
+					//Begin the modification of ParamInuse.txt
+					ParamInuseModify();
+					//Once the new ParamInuse.txt file is formed,set the params
+					//as specified by the file.
+					ParamSetfile();
+					para_set=1;
+				}else{
+					//droneID is not valid, remove the file
+					remove("./log/ParamChangePerm.txt");
+					goto ParamInuse_way;
+				}
+			}else{
+				//remove the file
+				remove("./log/ParamChangePerm.txt");
+				goto ParamInuse_way;
+			}
+
+		}else{
+			//Absence of ParamInuse.txt
+			//this is a serious issue, firmware update is required or
+			// a function needs to be made to generate ParamInuse.txt from initial
+			// important parameters
+			mavlink_log_critical(mavlink_log_pub, "Authentic Parameter file missing");
+			return false;
+
+		}
+	}else
+	{ParamInuse_way:
+		//use the already made ParamInuse.txt in the RFM to set parameters
+		//check the presence of ParamInuse.txt
+		FILE *fptr_ParamInuse;
+		fptr_ParamInuse=fopen("./log/ParamInuse.txt","r");
+		if(fptr_ParamInuse!=NULL){
+			// validate ParamInuse.txt
+			//and then set the param and values accordingly
+			char DroneID_container_4[30];
+			char TAG_DRONE_ID_4[10]="DroneID";
+			char PARAM_IN_FILE[30]="./log/ParamInuse.txt";
+			int check_validity_DroneID_3=call_file_read(PARAM_IN_FILE,TAG_DRONE_ID_4,DroneID_container_4,0);
+			// if non tampered -->then continue
+			if(check_validity_DroneID_3==1){
+				if(strcmp(DroneID_container_4,"ABBDDJEDNDJK")==0){
+					//droneID is valid
+					//Begin reading the file and start setting the parameters
+					ParamSetfile();
+					para_set=1;
+
+
+				}else{
+					//droneID is not valid, remove the file
+					//ParamInuse.txt is for another drone
+					remove("./log/ParamInuse.txt");
+					mavlink_log_critical(mavlink_log_pub, "Authentic Parameter file missing");
+
+
+				}
+			}else{
+				//ParamInuse.txt file is not valid, you need to remove it
+				remove("./log/ParamInuse.txt");
+				mavlink_log_critical(mavlink_log_pub, "Authentic Parameter file missing");
+
+			}
+
+
+		}else{   // this file has to be there inside the RFM, otherwise Drone wont fly.
+			// this is an issue which requires to be logged into the SystemLog.txt
+			//Drone will not get armed to fly before it does not receive the Param
+			mavlink_log_critical(mavlink_log_pub, "Authentic Parameter file missing");
+
+			return false;
+		}
+
+	}
+
+
+
+}
+
+
+
+
+/*
+
+//function 4 : recentPA.txt for flight log management.
+//check for recentPA.txt:::: this is for bundling purpose, do we need to start bundling or not
+//
+static int check_recent=0;
+static int recentPA_presence=0;
+static char PA_ID[100];
+if(check_recent==0){
+	FILE *fptr_recent;
+
+	fptr_recent=fopen("./log/recentPA.txt","r");
+	if(fptr_recent!=NULL){
+
+		//if file is present then there might be the possiblity upcoming PA to be the old one.
+
+		fclose(fptr_recent);
+		int action=check_recentPA(PA_ID);
+		//checks to be done :
+		//1)if the current time lies inside the time period of start time and end time
+		// this will initiate the flight logs bundling and then the drone will wait for fetched.txt file
+		//updated through a parameter in recentPA.txt
+
+		if(action==0 || action==1){
+			// start bundling and update recentPA.txt with fetchrequired=0;
+		//	Bundling_begins();//how to bundle part/modifying and updating recentPA.txt
+			char NO[20]="1";
+			update_recentPA(0,No);
+			recentPA_presence++;
+
+			check_recent=1;
+
+		}else if(action==3){
+			mavlink_log_critical(mavlink_log_pub, "Invalid pa handling file");
+			remove("./log/recentPA.txt");
+			return false;
+
+
+		}else{//no need to start bundling 2
+			check_recent=1;
+			//make sure upcoming PA has same pa_id. as in recentPA.txt
+			recentPA_presence++;
+
+		}
+
+	}else{
+		//file not present
+		// upcoming permission artefact is new, a fresh recentPA.txt file would be made.
+		check_recent=1;
+
+
+	}
+}
+*/
+
+/// to check for permission artifact (is it present here or not) and its validation
+/// then verifying for geo coordinates and time period
+///
+//Now first read recentPA.txt to know if  fetch of fetched.txt is required or not
+/*
+int check_status_fetch=0;
+int status_fetch=0;
+if(recentPA_presence){
+	// to know if we are supposed to look for fetched.txt
+	status_fetch=read_for_fetch();
+
+	if(status_fetch!=1){
+		//fetch is not required (no need to check for fetch.txt file_)
+	}else{
+		// fetch is required (need to check for fetch.txt file)
+		check_status_fetch=check_fetch();
+		//if check_status==0 : no file present, return false
+		//               ==1  : file is present but not valid return false(attempt to hack)
+		//               ==2  : file is present and valid, delete recentPA.txt and set recentPA_presence=0
+	}
+}
+*/
 
 // Tackling first thing : 1) Check for valid PA
-FILE *file;
-file = fopen("./log/permission_artifact_breach.xml", "r");// ./log/ for posix /log/ for nuttx
-if (file){
-fclose(file);
-static int checky0=0;
+//static int checky0=0;
+static int checky1=0;
+static int tampercheck=0;
+//int time_verification=0;
+//int drone_id_verification;
 int verification=0;
-if(!checky0)
+
+
+if(!checky1)
 {
-verification=Is_PA_VAlid();
-checky0=1;
-}
-if (verification==1){
-    printf("bale bale\n");
-    mavlink_log_info(mavlink_log_pub," Permission Artefact is non tampered");
-}
-/// 2) Now extracting date_time and geo_coordinates and checking for time and geofence breach.
-static int checky2=0;
-int time_verification;
-if(!checky2 && (time_since_boot>10))
+
+if((time_since_boot > 10_s))
 {
-time_verification=date_time_extract_and_check();
-if (time_verification==0){
-    printf("\nNot in time limit\n");
-    mavlink_log_critical(mavlink_log_pub, "Preflight Fail: Not allowed to fly, Time breach");
-    return false;
+	FILE *file;
+	file = fopen("./log/permission_artifact_breach.xml", "r");// ./log/ for posix /log/ for nuttx
+	if (file){
+
+		fclose(file);
+		if(tampercheck==0)
+		{
+
+			verification=Is_PA_VAlid();// if pa
+
+			if (verification==1)
+			{
+				//printf("bale bale\n");
+				mavlink_log_info(mavlink_log_pub," Permission Artefact is non tampered (valid)");
+				tampercheck=1;
+				checky1=1;
+				data_fetch_delete();
+				//checky0=1;
+			}else if(verification==2)
+			{
+				mavlink_log_critical(mavlink_log_pub, "Permission Artefact  has bad Sign");
+				//remove("./log/permission_artifact_breach.xml");
+				return false;
+
+			}
+			else{
+				//
+				mavlink_log_critical(mavlink_log_pub, "Permission Artefact  has been tampered(non valid)");
+				//remove("./log/permission_artifact_breach.xml");
+				return false;
+			}
+		}
+	 // 2) Now extracting date_time and geo_coordinates and checking for time and geofence breach.
+
+
+
+/*
+		time_verification=date_time_extract_and_check();
+		printf("\ntime verification ::::%d\n",time_verification);
+		if (time_verification==0){
+			printf("\nNot in time limit\n");
+			mavlink_log_critical(mavlink_log_pub, "Preflight Fail: Not allowed to fly, Time breach (bad time)");
+			return false;
+		}else if(time_verification==2)
+		{
+
+			printf("\nNot in correct place \n");
+			mavlink_log_critical(mavlink_log_pub, "Preflight Fail: Not allowed to fly, Geo breach (bad geo)");
+			return false;
+		}else{
+			printf("\n In time limit and permitted area. \n");
+		}
+		//if(recentPA_presence==0){
+		drone_id_verification=DroneIDverification();
+		//}else{
+		//	drone_id_verification=DroneIDverification(PA_ID);
+		//}
+		if(drone_id_verification==0){
+			printf("\nNot correct DroneID \n");
+			mavlink_log_critical(mavlink_log_pub, "Preflight Fail: Not valid DroneID");
+			return false;
+		}else if(drone_id_verification==2){
+			mavlink_log_critical(mavlink_log_pub, "Please upload the previous permission artefact in use, its end limit hasnt reached yet");
+			return false;
+		}
+		else{
+		//	if(recentPA_presence==0){
+
+				// data_fetch_delete will only run for new PAs(when recentPA.txt is not present)
+				// Now delete PA.xml and take its data inside recentPA.txt
+
+				data_fetch_delete();// at this point pa_data.msg will get published
+			// }else{
+				// this suggests that recentPA.txt has the information of time and area limit
+				// from recentPA.txt it would be published to pa_data.msg
+				//fetching_publish_padata();
+
+			//}
+		checky0=1;
+		checky1=1;
+		}
+*/
+
+
+
+	}else{
+		mavlink_log_critical(mavlink_log_pub, "Preflight Fail: no Permission artefact found. Please send Permission artefact from Management client.");
+		return false;
+	}
+
 }else{
-    printf("\nIn time limit\n");
-}
-        if(time_verification==1){
-          checky2=1;}
-}
-}else{
-	mavlink_log_critical(mavlink_log_pub, "Preflight Fail: no Permission artefact found. Please send Permission artefact from Management client.");
+	printf("\nwaiting for gps signals....\n");
 	return false;
 }
 
+}
 
-
+/*
+static int verification=1;
+if(verification==1){
+data_fetch_delete();
+verification=0;
+}*/
+//printf("%d",verification);
 //int in_fence = 0;
 //param_get(param_find("IN_FENCE"),&in_fence);
 //if (!in_fence) return false;
-
-// 3) Key rotation start, if needed
-int key_rot_done=0;
-param_get(param_find("KEY_ROT"),&key_rot_done);
-static int checky=0;
-if(!checky && key_rot_done!=1)
-{
-Key_rotation_start();
-checky=1;
-}
+/*
+char fi[40]="46790";
+static int chadd=0;
+if(chadd<=1){
+	Key_rotation_start(fi);
+	chadd++;
+}*/
 
 
 ////

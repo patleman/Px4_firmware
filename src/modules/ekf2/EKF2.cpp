@@ -33,12 +33,13 @@
 
 #include "EKF2.hpp"
 
+
 using namespace time_literals;
 using math::constrain;
 using matrix::Eulerf;
 using matrix::Quatf;
 using matrix::Vector3f;
-
+//static int first_pass_rtl=0;
 pthread_mutex_t ekf2_module_mutex = PTHREAD_MUTEX_INITIALIZER;
 static px4::atomic<EKF2 *> _objects[EKF2_MAX_INSTANCES] {};
 #if !defined(CONSTRAINED_FLASH)
@@ -423,6 +424,10 @@ void EKF2::Run()
 			vehicle_land_detected_s vehicle_land_detected;
 
 			if (_vehicle_land_detected_sub.copy(&vehicle_land_detected)) {
+			/*	if(vehicle_land_detected.landed && first_pass_rtl==1 ){
+					printf("\nsetting flag to 0\n");
+					first_pass_rtl=0;
+				}*/
 				_ekf.set_in_air_status(!vehicle_land_detected.landed);
 
 				if (_armed && (_param_ekf2_gnd_eff_dz.get() > 0.f)) {
@@ -1473,12 +1478,54 @@ bool EKF2::UpdateFlowSample(ekf2_timestamps_s &ekf2_timestamps, optical_flow_s &
 }
 
 void EKF2::UpdateGpsSample(ekf2_timestamps_s &ekf2_timestamps)
-{
+
+{	/*struct vehicle_acceleration_s accel;//defining local buffer
+
+	orb_copy(ORB_ID(vehicle_acceleration), sensor_sub_fd, &accel);
+				PX4_INFO("Accelerometer:\t%8.4f\t%8.4f\t%8.4f",
+					 (double)accel.xyz[0],
+					 (double)accel.xyz[1],
+					 (double)accel.xyz[2]);*/
 	// EKF GPS message
+	/*takeoff_status_s to_status_o{};
+	orb_copy(ORB_ID(takeoff_status), takeoff_status_sub, &to_status_o);
+	printf("\n\ntakeoff status: %d\n\n",to_status_o.takeoff_state);
+
+	vehicle_land_detected_s  vl_land{};
+	orb_copy(ORB_ID(vehicle_land_detected), vehicle_land_detected_sub, &vl_land);
+	printf("\n\n landing status: %d\n\n",vl_land.landed);*/
+
+
 	if (_param_ekf2_aid_mask.get() & MASK_USE_GPS) {
 		vehicle_gps_position_s vehicle_gps_position;
 
+
 		if (_vehicle_gps_position_sub.update(&vehicle_gps_position)) {
+
+
+		/*	if(vehicle_gps_position.alt>490000 && (first_pass_rtl==0)){
+				vehicle_command_s vcmd{};
+				printf("\nstarting custom RTL :: %d\n",vehicle_gps_position.alt);
+
+				//vcmd.command = vehicle_command_s::VEHICLE_CMD_NAV_RETURN_TO_LAUNCH;
+				vcmd.command =vehicle_command_s::VEHICLE_CMD_DO_SET_MODE;
+				vcmd.param1 = 1;
+				vcmd.param2 = 4;
+				vcmd.param3 = 5;
+
+
+				uORB::SubscriptionData<vehicle_status_s> vehicle_status_sub{ORB_ID(vehicle_status)};
+				vcmd.source_system = vehicle_status_sub.get().system_id;
+				vcmd.target_system = vehicle_status_sub.get().system_id;
+				vcmd.source_component = vehicle_status_sub.get().component_id;
+				vcmd.target_component = vehicle_status_sub.get().component_id;
+
+				uORB::Publication<vehicle_command_s> vcmd_pub{ORB_ID(vehicle_command)};
+				vcmd.timestamp = hrt_absolute_time();
+				first_pass_rtl=1;
+				vcmd_pub.publish(vcmd);
+
+			}*/
 			gps_message gps_msg{
 				.time_usec = vehicle_gps_position.timestamp,
 				.lat = vehicle_gps_position.lat,

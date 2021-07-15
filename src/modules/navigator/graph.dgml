@@ -1,0 +1,7 @@
+<DirectedGraph xmlns="http://schemas.microsoft.com/vs/2009/dgml">
+<Nodes>
+<Node Id="None" File="NavigatorMode::on_active" Category="Class"/>
+</Nodes>
+<Links>
+</Links>
+</DirectedGraph>

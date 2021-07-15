@@ -1,777 +1,4 @@
-/* steps for key generation
-
-1) generation of two prime numbers  p,q (024)
-
-2) multiplication of two primes, modulus,  n=p*q
-
-3) phi(n) = (p-1)*(q-1)
-
-4)  e=65537 public exponent
-
-5) d=(1/e) mod phi(n)
-
-6) Private key = (d,n)
-   Public Key = (e,n)
-
-*/
-#pragma once
-
-#include<limits.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <stdbool.h>
-#include<stdlib.h>
-#include<stdio.h>
-#include<inttypes.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <unistd.h>
-#include<time.h>
-#include<stdarg.h>
-
-/////////
-
-
-
-#   define MP_2EXPT_C
-#   define MP_ABS_C
-#   define MP_ADD_C
-#   define MP_ADD_D_C
-#   define MP_ADDMOD_C
-#   define MP_AND_C
-#   define MP_CLAMP_C
-#   define MP_CLEAR_C
-#   define MP_CLEAR_MULTI_C
-#   define MP_CMP_C
-#   define MP_CMP_D_C
-#   define MP_CMP_MAG_C
-#   define MP_CNT_LSB_C
-#   define MP_COMPLEMENT_C
-#   define MP_COPY_C
-#   define MP_COUNT_BITS_C
-#   define MP_CUTOFFS_C
-#   define MP_DIV_C
-#   define MP_DIV_2_C
-#   define MP_DIV_2D_C
-#   define MP_DIV_D_C
-#   define MP_DR_IS_MODULUS_C
-#   define MP_DR_REDUCE_C
-#   define MP_DR_SETUP_C
-#   define MP_ERROR_TO_STRING_C
-#   define MP_EXCH_C
-#   define MP_EXPT_N_C
-#   define MP_EXPTMOD_C
-#   define MP_EXTEUCLID_C
-#   define MP_FREAD_C
-#   define MP_FROM_SBIN_C
-#   define MP_FROM_UBIN_C
-#   define MP_FWRITE_C
-#   define MP_GCD_C
-#   define MP_GET_DOUBLE_C
-#   define MP_GET_I32_C
-#   define MP_GET_I64_C
-#   define MP_GET_L_C
-#   define MP_GET_MAG_U32_C
-#   define MP_GET_MAG_U64_C
-#   define MP_GET_MAG_UL_C
-#   define MP_GROW_C
-#   define MP_INIT_C
-#   define MP_INIT_COPY_C
-#   define MP_INIT_I32_C
-#   define MP_INIT_I64_C
-#   define MP_INIT_L_C
-#   define MP_INIT_MULTI_C
-#   define MP_INIT_SET_C
-#   define MP_INIT_SIZE_C
-#   define MP_INIT_U32_C
-#   define MP_INIT_U64_C
-#   define MP_INIT_UL_C
-#   define MP_INVMOD_C
-#   define MP_IS_SQUARE_C
-#   define MP_KRONECKER_C
-#   define MP_LCM_C
-#   define MP_LOG_N_C
-#   define MP_LSHD_C
-#   define MP_MOD_C
-#   define MP_MOD_2D_C
-#   define MP_MONTGOMERY_CALC_NORMALIZATION_C
-#   define MP_MONTGOMERY_REDUCE_C
-#   define MP_MONTGOMERY_SETUP_C
-#   define MP_MUL_C
-#   define MP_MUL_2_C
-#   define MP_MUL_2D_C
-#   define MP_MUL_D_C
-#   define MP_MULMOD_C
-#   define MP_NEG_C
-#   define MP_OR_C
-#   define MP_PACK_C
-#   define MP_PACK_COUNT_C
-#   define MP_PRIME_FERMAT_C
-#   define MP_PRIME_FROBENIUS_UNDERWOOD_C
-#   define MP_PRIME_IS_PRIME_C
-#   define MP_PRIME_MILLER_RABIN_C
-#   define MP_PRIME_NEXT_PRIME_C
-#   define MP_PRIME_RABIN_MILLER_TRIALS_C
-#   define MP_PRIME_RAND_C
-#   define MP_PRIME_STRONG_LUCAS_SELFRIDGE_C
-#   define MP_RADIX_SIZE_C
-#   define MP_RADIX_SIZE_OVERESTIMATE_C
-#   define MP_RAND_C
-#   define MP_RAND_SOURCE_C
-#   define MP_READ_RADIX_C
-#   define MP_REDUCE_C
-#   define MP_REDUCE_2K_C
-#   define MP_REDUCE_2K_L_C
-#   define MP_REDUCE_2K_SETUP_C
-#   define MP_REDUCE_2K_SETUP_L_C
-#   define MP_REDUCE_IS_2K_C
-#   define MP_REDUCE_IS_2K_L_C
-#   define MP_REDUCE_SETUP_C
-#   define MP_ROOT_N_C
-#   define MP_RSHD_C
-#   define MP_SBIN_SIZE_C
-#   define MP_SET_C
-#   define MP_SET_DOUBLE_C
-#   define MP_SET_I32_C
-#   define MP_SET_I64_C
-#   define MP_SET_L_C
-#   define MP_SET_U32_C
-#   define MP_SET_U64_C
-#   define MP_SET_UL_C
-#   define MP_SHRINK_C
-#   define MP_SIGNED_RSH_C
-#   define MP_SQRMOD_C
-#   define MP_SQRT_C
-#   define MP_SQRTMOD_PRIME_C
-#   define MP_SUB_C
-#   define MP_SUB_D_C
-#   define MP_SUBMOD_C
-#   define MP_TO_RADIX_C
-#   define MP_TO_SBIN_C
-#   define MP_TO_UBIN_C
-#   define MP_UBIN_SIZE_C
-#   define MP_UNPACK_C
-#   define MP_XOR_C
-#   define MP_ZERO_C
-#   define S_MP_ADD_C
-#   define S_MP_COPY_DIGS_C
-#   define S_MP_DIV_3_C
-#   define S_MP_DIV_RECURSIVE_C
-#   define S_MP_DIV_SCHOOL_C
-#   define S_MP_DIV_SMALL_C
-#   define S_MP_EXPTMOD_C
-#   define S_MP_EXPTMOD_FAST_C
-#   define S_MP_GET_BIT_C
-#   define S_MP_INVMOD_C
-#   define S_MP_INVMOD_ODD_C
-#   define S_MP_LOG_C
-#   define S_MP_LOG_2EXPT_C
-#   define S_MP_LOG_D_C
-#   define S_MP_MONTGOMERY_REDUCE_COMBA_C
-#   define S_MP_MUL_C
-#   define S_MP_MUL_BALANCE_C
-#   define S_MP_MUL_COMBA_C
-#   define S_MP_MUL_HIGH_C
-#   define S_MP_MUL_HIGH_COMBA_C
-#   define S_MP_MUL_KARATSUBA_C
-#   define S_MP_MUL_TOOM_C
-#   define S_MP_PRIME_IS_DIVISIBLE_C
-#   define S_MP_PRIME_TAB_C
-#   define S_MP_RADIX_MAP_C
-#   define S_MP_RADIX_SIZE_OVERESTIMATE_C
-#   define S_MP_RAND_PLATFORM_C
-#   define S_MP_SQR_C
-#   define S_MP_SQR_COMBA_C
-#   define S_MP_SQR_KARATSUBA_C
-#   define S_MP_SQR_TOOM_C
-#   define S_MP_SUB_C
-#   define S_MP_ZERO_BUF_C
-#   define S_MP_ZERO_DIGS_C
-
-
-
-///////////
-using namespace std;
-typedef uint32_t             mp_digit;
-typedef uint64_t mp_word;
-
-typedef struct{
-   int used,alloc,sign;
-   mp_digit *dp;
-}mp_int;
-
-#define MP_DIGIT_BIT 28
-
-#define MP_MASK          ((((mp_digit)1)<<((mp_digit)MP_DIGIT_BIT))-((mp_digit)1))
-#define MP_DIGIT_MAX     MP_MASK
-
-int MP_MUL_KARATSUBA_CUTOFF = 80;
-int MP_SQR_KARATSUBA_CUTOFF = 120;
-int MP_MUL_TOOM_CUTOFF = 350;
-int MP_SQR_TOOM_CUTOFF = 400;
-
-
-
-
-/* Primality generation flags */
-#define MP_PRIME_BBS      0x0001 /* BBS style prime */
-#define MP_PRIME_SAFE     0x0002 /* Safe prime (p-1)/2 == prime */
-#define MP_PRIME_2MSB_ON  0x0008 /* force 2nd MSB to 1 */
-#define MP_MALLOC(size)                   malloc(size)
-#define MP_REALLOC(mem, oldsize, newsize) realloc((mem), (newsize))
-#define MP_CALLOC(nmemb, size)            calloc((nmemb), (size))
-#define MP_FREE(mem, size)                free(mem)
-#define MP_DEV_URANDOM "/dev/urandom"
-#define mp_iszero(a) ((a)->used == 0)
-#define mp_isneg(a)  ((a)->sign == MP_NEG)
-#define mp_iseven(a) (((a)->used == 0) || (((a)->dp[0] & 1u) == 0u))
-#define mp_isodd(a)  (!mp_iseven(a))
-
-
-//#  define MP_FREE_BUF(mem, size)   MP_FREE((mem), (size))
-#define MP_STRINGIZE(x)  MP__STRINGIZE(x)
-#define MP__STRINGIZE(x) ""#x""
-#define MP_HAS(x)        (sizeof(MP_STRINGIZE(x##_C)) == 1u)
-
-#define MP_MIN(x, y) (((x) < (y)) ? (x) : (y))
-#define MP_MAX(x, y) (((x) > (y)) ? (x) : (y))
-#define MP_EXCH(t, a, b) do { t _c = a; a = b; b = _c; } while (0)
-//#define CHAR_BIT 8;
-#define MP_SIZEOF_BITS(type)    ((size_t)CHAR_BIT * sizeof(type))
-
-#define MP_MAX_COMBA            (int)(1uL << (MP_SIZEOF_BITS(mp_word) - (2u * (size_t)MP_DIGIT_BIT)))
-#define MP_WARRAY               (int)(1uL << ((MP_SIZEOF_BITS(mp_word) - (2u * (size_t)MP_DIGIT_BIT)) + 1u))
-
-#define MP_TOUPPER(c) ((((c) >= 'a') && ((c) <= 'z')) ? (((c) + 'A') - 'a') : (c))
-
-
-void s_mp_zero_digs(mp_digit *d, int digits)
-{
-   while (digits-- > 0) {
-      *d++ = 0;
-   }
-}
-
-#  define MP_FREE_BUF(mem, size)                        \
-do {                                                    \
-   size_t fs_ = (size);                                 \
-   void* fm_ = (mem);                                   \
-   if (fm_ != NULL) {                                   \
-      s_mp_zero_buf(fm_, fs_);                          \
-      MP_FREE(fm_, fs_);                                \
-   }                                                    \
-} while (0)
-#  define MP_FREE_DIGS(mem, digits)                     \
-do {                                                    \
-   int fd_ = (digits);                                  \
-   mp_digit* fm_ = (mem);                               \
-   if (fm_ != NULL) {                                   \
-      s_mp_zero_digs(fm_, fd_);                         \
-      MP_FREE(fm_, sizeof (mp_digit) * (size_t)fd_);    \
-   }                                                    \
-} while (0)
-
-
-
-
-
-
-
-//#define MP_EXCH(t, a, b) do { t _c = a; a = b; b = _c; } while (0)
-
-#define MP_IS_2EXPT(x) (((x) != 0u) && (((x) & ((x) - 1u)) == 0u))
-/* b = a*a  */
-#define mp_sqr(a, b) mp_mul((a), (a), (b))
-#define MP_MAX_DIGIT_COUNT ((INT_MAX - 2) / MP_DIGIT_BIT)
-#define MP_MIN_DIGIT_COUNT MP_MAX(3, (((int)MP_SIZEOF_BITS(uint64_t) + MP_DIGIT_BIT) - 1) / MP_DIGIT_BIT)
-#   define TAB_SIZE 256
-#   define MAX_WINSIZE 0
-
-#define MP_DEFAULT_DIGIT_COUNT 32
-
-#define MP_RADIX_MAP_REVERSE_SIZE 80u
-
-#define MP_SET_SIGNED(name, uname, type, utype)          \
-    void name(mp_int * a, type b)                        \
-    {                                                    \
-        uname(a, (b < 0) ? -(utype)b : (utype)b);        \
-        if (b < 0) { a->sign = MP_NEG; }                 \
-    }
-
-
-
-/* code-generating macros */
-#define MP_SET_UNSIGNED(name, type)                                                    \
-    void name(mp_int * a, type b)                                                      \
-    {                                                                                  \
-        int i = 0;                                                                     \
-        while (b != 0u) {                                                              \
-            a->dp[i++] = ((mp_digit)b & MP_MASK);                                      \
-            if (MP_SIZEOF_BITS(type) <= MP_DIGIT_BIT) { break; }                       \
-            b >>= ((MP_SIZEOF_BITS(type) <= MP_DIGIT_BIT) ? 0 : MP_DIGIT_BIT);         \
-        }                                                                              \
-        a->used = i;                                                                   \
-        a->sign = MP_ZPOS;                                                             \
-        s_mp_zero_digs(a->dp + a->used, a->alloc - a->used);                         \
-    }
-
-typedef enum {
-   MP_ZPOS = 0,   /* positive */
-   MP_NEG = 1     /* negative */
-} mp_sign;
-
-typedef enum {
-   MP_LT = -1,    /* less than */
-   MP_EQ = 0,     /* equal */
-   MP_GT = 1      /* greater than */
-} mp_ord;
-
-typedef enum {
-   MP_OKAY  = 0,   /* no error */
-   MP_ERR   = -1,  /* unknown error */
-   MP_MEM   = -2,  /* out of mem */
-   MP_VAL   = -3,  /* invalid input */
-   MP_ITER  = -4,  /* maximum iterations reached */
-   MP_BUF   = -5,  /* buffer overflow, supplied buffer too small */
-   MP_OVF   = -6   /* mp_int overflow, too many digits */
-} mp_err;
-
-//////////////////////////////////////////
-
-
-
-/* ---> init and deinit bignum functions <--- */
-/* init a bignum */
-mp_err mp_init(mp_int *a) ;
-
-/* free a bignum */
-void mp_clear(mp_int *a);
-
-/* init a null terminated series of arguments */
-mp_err mp_init_multi(mp_int *mp, ...) ;
-
-/* clear a null terminated series of arguments */
-void mp_clear_multi(mp_int *mp, ...) ;
-
-/* exchange two ints */
-void mp_exch(mp_int *a, mp_int *b);
-
-/* shrink ram required for a bignum */
-mp_err mp_shrink(mp_int *a) ;
-
-/* grow an int to a given size */
-mp_err mp_grow(mp_int *a, int size) ;
-
-/* init to a given number of digits */
-mp_err mp_init_size(mp_int *a, int size);
-
-/* ---> Basic Manipulations <--- */
-#define mp_iszero(a) ((a)->used == 0)
-#define mp_isneg(a)  ((a)->sign == MP_NEG)
-#define mp_iseven(a) (((a)->used == 0) || (((a)->dp[0] & 1u) == 0u))
-#define mp_isodd(a)  (!mp_iseven(a))
-
-/* set to zero */
-void mp_zero(mp_int *a);
-
-
-
-/* get integer, set integer and init with integer (int32_t) */
-int32_t mp_get_i32(const mp_int *a) ;
-void mp_set_i32(mp_int *a, int32_t b);
-mp_err mp_init_i32(mp_int *a, int32_t b) ;
-
-/* get integer, set integer and init with integer, behaves like two complement for negative numbers (uint32_t) */
-#define mp_get_u32(a) ((uint32_t)mp_get_i32(a))
-void mp_set_u32(mp_int *a, uint32_t b);
-mp_err mp_init_u32(mp_int *a, uint32_t b);
-
-/* get integer, set integer and init with integer (int64_t) */
-int64_t mp_get_i64(const mp_int *a) ;
-void mp_set_i64(mp_int *a, int64_t b);
-mp_err mp_init_i64(mp_int *a, int64_t b) ;
-
-/* get integer, set integer and init with integer, behaves like two complement for negative numbers (uint64_t) */
-#define mp_get_u64(a) ((uint64_t)mp_get_i64(a))
-void mp_set_u64(mp_int *a, uint64_t b);
-mp_err mp_init_u64(mp_int *a, uint64_t b) ;
-
-/* get magnitude */
-uint32_t mp_get_mag_u32(const mp_int *a) ;
-uint64_t mp_get_mag_u64(const mp_int *a) ;
-unsigned long mp_get_mag_ul(const mp_int *a) ;
-
-/* get integer, set integer (long) */
-long mp_get_l(const mp_int *a) ;
-void mp_set_l(mp_int *a, long b);
-mp_err mp_init_l(mp_int *a, long b) ;
-
-/* get integer, set integer (unsigned long) */
-#define mp_get_ul(a) ((unsigned long)mp_get_l(a))
-void mp_set_ul(mp_int *a, unsigned long b);
-mp_err mp_init_ul(mp_int *a, unsigned long b) ;
-
-/* set to single unsigned digit, up to MP_DIGIT_MAX */
-void mp_set(mp_int *a, mp_digit b);
-mp_err mp_init_set(mp_int *a, mp_digit b) ;
-
-/* copy, b = a */
-mp_err mp_copy(const mp_int *a, mp_int *b) ;
-
-/* inits and copies, a = b */
-mp_err mp_init_copy(mp_int *a, const mp_int *b) ;
-
-/* trim unused digits */
-void mp_clamp(mp_int *a);
-
-
-
-/* pack binary data */
-size_t mp_pack_count(const mp_int *a, size_t nails, size_t size) ;
-
-
-/* ---> digit manipulation <--- */
-
-/* right shift by "b" digits */
-void mp_rshd(mp_int *a, int b);
-
-/* left shift by "b" digits */
-mp_err mp_lshd(mp_int *a, int b) ;
-
-/* c = a / 2**b, implemented as c = a >> b */
-mp_err mp_div_2d(const mp_int *a, int b, mp_int *c, mp_int *d) ;
-
-/* b = a/2 */
-mp_err mp_div_2(const mp_int *a, mp_int *b) ;
-
-/* c = a * 2**b, implemented as c = a << b */
-mp_err mp_mul_2d(const mp_int *a, int b, mp_int *c) ;
-
-/* b = a*2 */
-mp_err mp_mul_2(const mp_int *a, mp_int *b) ;
-
-/* c = a mod 2**b */
-mp_err mp_mod_2d(const mp_int *a, int b, mp_int *c) ;
-
-/* computes a = 2**b */
-mp_err mp_2expt(mp_int *a, int b) ;
-
-/* Counts the number of lsbs which are zero before the first zero bit */
-int mp_cnt_lsb(const mp_int *a) ;
-
-/* I Love Earth! */
-
-/* makes a pseudo-random mp_int of a given size */
-mp_err mp_rand(mp_int *a, int digits) ;
-/* use custom random data source instead of source provided the platform */
-void mp_rand_source(mp_err(*source)(void *out, size_t size));
-
-/* ---> binary operations <--- */
-
-/* c = a XOR b (two complement) */
-mp_err mp_xor(const mp_int *a, const mp_int *b, mp_int *c) ;
-
-/* c = a OR b (two complement) */
-mp_err mp_or(const mp_int *a, const mp_int *b, mp_int *c) ;
-
-/* c = a AND b (two complement) */
-mp_err mp_and(const mp_int *a, const mp_int *b, mp_int *c) ;
-
-/* b = ~a (bitwise not, two complement) */
-mp_err mp_complement(const mp_int *a, mp_int *b) ;
-
-/* right shift with sign extension */
-mp_err mp_signed_rsh(const mp_int *a, int b, mp_int *c) ;
-
-/* ---> Basic arithmetic <--- */
-
-/* b = -a */
-mp_err mp_neg(const mp_int *a, mp_int *b) ;
-
-/* b = |a| */
-mp_err mp_abs(const mp_int *a, mp_int *b) ;
-
-/* compare a to b */
-mp_ord mp_cmp(const mp_int *a, const mp_int *b) ;
-
-/* compare |a| to |b| */
-mp_ord mp_cmp_mag(const mp_int *a, const mp_int *b) ;
-
-/* c = a + b */
-mp_err mp_add(const mp_int *a, const mp_int *b, mp_int *c) ;
-
-/* c = a - b */
-mp_err mp_sub(const mp_int *a, const mp_int *b, mp_int *c) ;
-/* c = a * b */
-mp_err mp_mul(const mp_int *a, const mp_int *b, mp_int *c) ;
-
-/* b = a*a  */
-#define mp_sqr(a, b) mp_mul((a), (a), (b))
-
-/* a/b => cb + d == a */
-mp_err mp_div(const mp_int *a, const mp_int *b, mp_int *c, mp_int *d) ;
-
-/* c = a mod b, 0 <= c < b  */
-mp_err mp_mod(const mp_int *a, const mp_int *b, mp_int *c) ;
-
-/* Increment "a" by one like "a++". Changes input! */
-#define mp_incr(a) mp_add_d((a), 1u, (a))
-
-/* Decrement "a" by one like "a--". Changes input! */
-#define mp_decr(a) mp_sub_d((a), 1u, (a))
-
-/* ---> single digit functions <--- */
-
-/* compare against a single digit */
-mp_ord mp_cmp_d(const mp_int *a, mp_digit b);
-
-/* c = a + b */
-mp_err mp_add_d(const mp_int *a, mp_digit b, mp_int *c) ;
-
-/* c = a - b */
-mp_err mp_sub_d(const mp_int *a, mp_digit b, mp_int *c) ;
-
-/* c = a * b */
-mp_err mp_mul_d(const mp_int *a, mp_digit b, mp_int *c) ;
-
-/* a/b => cb + d == a */
-mp_err mp_div_d(const mp_int *a, mp_digit b, mp_int *c, mp_digit *d) ;
-
-/* c = a mod b, 0 <= c < b  */
-#define mp_mod_d(a, b, c) mp_div_d((a), (b), NULL, (c))
-
-/* ---> number theory <--- */
-
-/* d = a + b (mod c) */
-mp_err mp_addmod(const mp_int *a, const mp_int *b, const mp_int *c, mp_int *d) ;
-
-/* d = a - b (mod c) */
-mp_err mp_submod(const mp_int *a, const mp_int *b, const mp_int *c, mp_int *d) ;
-
-/* d = a * b (mod c) */
-mp_err mp_mulmod(const mp_int *a, const mp_int *b, const mp_int *c, mp_int *d) ;
-
-/* c = a * a (mod b) */
-mp_err mp_sqrmod(const mp_int *a, const mp_int *b, mp_int *c) ;
-
-/* c = 1/a (mod b) */
-mp_err mp_invmod(const mp_int *a, const mp_int *b, mp_int *c) ;
-
-/* c = (a, b) */
-mp_err mp_gcd(const mp_int *a, const mp_int *b, mp_int *c) ;
-
-/* produces value such that U1*a + U2*b = U3 */
-mp_err mp_exteuclid(const mp_int *a, const mp_int *b, mp_int *U1, mp_int *U2, mp_int *U3) ;
-
-/* c = [a, b] or (a*b)/(a, b) */
-mp_err mp_lcm(const mp_int *a, const mp_int *b, mp_int *c) ;
-
-/* Integer logarithm to integer base */
-mp_err mp_log_n(const mp_int *a, int base, int *c) ;
-
-/* c = a**b */
-mp_err mp_expt_n(const mp_int *a, int b, mp_int *c) ;
-
-/* finds one of the b'th root of a, such that |c|**b <= |a|
- *
- * returns error if a < 0 and b is even
- */
-mp_err mp_root_n(const mp_int *a, int b, mp_int *c) ;
-
-/* special sqrt algo */
-mp_err mp_sqrt(const mp_int *arg, mp_int *ret) ;
-
-/* special sqrt (mod prime) */
-mp_err mp_sqrtmod_prime(const mp_int *n, const mp_int *prime, mp_int *ret) ;
-
-/* is number a square? */
-mp_err mp_is_square(const mp_int *arg, bool *ret) ;
-
-/* computes the Kronecker symbol c = (a | p) (like jacobi() but with {a,p} in Z */
-mp_err mp_kronecker(const mp_int *a, const mp_int *p, int *c) ;
-
-/* used to setup the Barrett reduction for a given modulus b */
-mp_err mp_reduce_setup(mp_int *a, const mp_int *b) ;
-
-/* Barrett Reduction, computes a (mod b) with a precomputed value c
- *
- * Assumes that 0 < x <= m*m, note if 0 > x > -(m*m) then you can merely
- * compute the reduction as -1 * mp_reduce(mp_abs(x)) [pseudo code].
- */
-mp_err mp_reduce(mp_int *x, const mp_int *m, const mp_int *mu) ;
-
-/* setups the montgomery reduction */
-mp_err mp_montgomery_setup(const mp_int *n, mp_digit *rho) ;
-
-/* computes a = B**n mod b without division or multiplication useful for
- * normalizing numbers in a Montgomery system.
- */
-mp_err mp_montgomery_calc_normalization(mp_int *a, const mp_int *b) ;
-
-/* computes x/R == x (mod N) via Montgomery Reduction */
-mp_err mp_montgomery_reduce(mp_int *x, const mp_int *n, mp_digit rho) ;
-
-/* returns 1 if a is a valid DR modulus */
-bool mp_dr_is_modulus(const mp_int *a) ;
-
-/* sets the value of "d" required for mp_dr_reduce */
-void mp_dr_setup(const mp_int *a, mp_digit *d);
-
-/* reduces a modulo n using the Diminished Radix method */
-mp_err mp_dr_reduce(mp_int *x, const mp_int *n, mp_digit k) ;
-
-/* returns true if a can be reduced with mp_reduce_2k */
-bool mp_reduce_is_2k(const mp_int *a) ;
-
-/* determines k value for 2k reduction */
-mp_err mp_reduce_2k_setup(const mp_int *a, mp_digit *d) ;
-
-/* reduces a modulo b where b is of the form 2**p - k [0 <= a] */
-mp_err mp_reduce_2k(mp_int *a, const mp_int *n, mp_digit d) ;
-
-/* returns true if a can be reduced with mp_reduce_2k_l */
-bool mp_reduce_is_2k_l(const mp_int *a) ;
-
-/* determines k value for 2k reduction */
-mp_err mp_reduce_2k_setup_l(const mp_int *a, mp_int *d) ;
-
-/* reduces a modulo b where b is of the form 2**p - k [0 <= a] */
-mp_err mp_reduce_2k_l(mp_int *a, const mp_int *n, const mp_int *d) ;
-
-/* Y = G**X (mod P) */
-mp_err mp_exptmod(const mp_int *G, const mp_int *X, const mp_int *P, mp_int *Y) ;
-
-/* ---> Primes <--- */
-
-/* performs one Fermat test of "a" using base "b".
- * Sets result to 0 if composite or 1 if probable prime
- */
-mp_err mp_prime_fermat(const mp_int *a, const mp_int *b, bool *result) ;
-
-/* performs one Miller-Rabin test of "a" using base "b".
- * Sets result to 0 if composite or 1 if probable prime
- */
-mp_err mp_prime_miller_rabin(const mp_int *a, const mp_int *b, bool *result) ;
-
-/* This gives [for a given bit size] the number of trials required
- * such that Miller-Rabin gives a prob of failure lower than 2^-96
- */
-int mp_prime_rabin_miller_trials(int size);
-
-/* performs one strong Lucas-Selfridge test of "a".
- * Sets result to 0 if composite or 1 if probable prime
- */
-mp_err mp_prime_strong_lucas_selfridge(const mp_int *a, bool *result) ;
-
-/* performs one Frobenius test of "a" as described by Paul Underwood.
- * Sets result to 0 if composite or 1 if probable prime
- */
-mp_err mp_prime_frobenius_underwood(const mp_int *N, bool *result) ;
-
-/* performs t random rounds of Miller-Rabin on "a" additional to
- * bases 2 and 3.  Also performs an initial sieve of trial
- * division.  Determines if "a" is prime with probability
- * of error no more than (1/4)**t.
- * Both a strong Lucas-Selfridge to complete the BPSW test
- * and a separate Frobenius test are available at compile time.
- * With t<0 a deterministic test is run for primes up to
- * 318665857834031151167461. With t<13 (abs(t)-13) additional
- * tests with sequential small primes are run starting at 43.
- * Is Fips 186.4 compliant if called with t as computed by
- * mp_prime_rabin_miller_trials();
- *
- * Sets result to 1 if probably prime, 0 otherwise
- */
-mp_err mp_prime_is_prime(const mp_int *a, int t, bool *result) ;
-
-/* finds the next prime after the number "a" using "t" trials
- * of Miller-Rabin.
- *
- * bbs_style = true means the prime must be congruent to 3 mod 4
- */
-mp_err mp_prime_next_prime(mp_int *a, int t, bool bbs_style) ;
-
-/* makes a truly random prime of a given size (bits),
- *
- * Flags are as follows:
- *
- *   MP_PRIME_BBS      - make prime congruent to 3 mod 4
- *   MP_PRIME_SAFE     - make sure (p-1)/2 is prime as well (implies MP_PRIME_BBS)
- *   MP_PRIME_2MSB_ON  - make the 2nd highest bit one
- *
- * You have to supply a callback which fills in a buffer with random bytes.  "dat" is a parameter you can
- * have passed to the callback (e.g. a state or something).  This function doesn't use "dat" itself
- * so it can be NULL
- *
- */
-mp_err mp_prime_rand(mp_int *a, int t, int size, int flags) ;
-
-/* ---> radix conversion <--- */
-int mp_count_bits(const mp_int *a) ;
-
-size_t mp_ubin_size(const mp_int *a) ;
-mp_err mp_from_ubin(mp_int *a, const uint8_t *buf, size_t size) ;
-mp_err mp_to_ubin(const mp_int *a, uint8_t *buf, size_t maxlen, size_t *written) ;
-
-size_t mp_sbin_size(const mp_int *a) ;
-mp_err mp_from_sbin(mp_int *a, const uint8_t *buf, size_t size) ;
-mp_err mp_to_sbin(const mp_int *a, uint8_t *buf, size_t maxlen, size_t *written) ;
-
-mp_err mp_read_radix(mp_int *a, const char *str, int radix) ;
-mp_err mp_to_radix(const mp_int *a, char *str, size_t maxlen, size_t *written, int radix) ;
-
-mp_err mp_radix_size(const mp_int *a, int radix, size_t *size) ;
-mp_err mp_radix_size_overestimate(const mp_int *a, const int radix, size_t *size) ;
-
-#ifndef MP_NO_FILE
-mp_err mp_fread(mp_int *a, int radix, FILE *stream) ;
-mp_err mp_fwrite(const mp_int *a, int radix, FILE *stream) ;
-#endif
-
-#define mp_to_binary(M, S, N)  mp_to_radix((M), (S), (N), NULL, 2)
-#define mp_to_octal(M, S, N)   mp_to_radix((M), (S), (N), NULL, 8)
-#define mp_to_decimal(M, S, N) mp_to_radix((M), (S), (N), NULL, 10)
-#define mp_to_hex(M, S, N)     mp_to_radix((M), (S), (N), NULL, 16)
-
-
-/* lowlevel functions, do not call! */
- bool s_mp_get_bit(const mp_int *a, int b) ;
- int s_mp_log_2expt(const mp_int *a, mp_digit base) ;
- int s_mp_log_d(mp_digit base, mp_digit n) ;
- mp_err s_mp_add(const mp_int *a, const mp_int *b, mp_int *c) ;
- mp_err s_mp_div_3(const mp_int *a, mp_int *c, mp_digit *d) ;
- mp_err s_mp_div_recursive(const mp_int *a, const mp_int *b, mp_int *q, mp_int *r) ;
-mp_err s_mp_div_school(const mp_int *a, const mp_int *b, mp_int *c, mp_int *d) ;
- mp_err s_mp_div_small(const mp_int *a, const mp_int *b, mp_int *c, mp_int *d) ;
- mp_err s_mp_exptmod(const mp_int *G, const mp_int *X, const mp_int *P, mp_int *Y, int redmode) ;
- mp_err s_mp_exptmod_fast(const mp_int *G, const mp_int *X, const mp_int *P, mp_int *Y, int redmode) ;
- mp_err s_mp_invmod(const mp_int *a, const mp_int *b, mp_int *c) ;
- mp_err s_mp_invmod_odd(const mp_int *a, const mp_int *b, mp_int *c) ;
- mp_err s_mp_log(const mp_int *a, mp_digit base, int *c) ;
- mp_err s_mp_montgomery_reduce_comba(mp_int *x, const mp_int *n, mp_digit rho) ;
- mp_err s_mp_mul(const mp_int *a, const mp_int *b, mp_int *c, int digs) ;
- mp_err s_mp_mul_balance(const mp_int *a, const mp_int *b, mp_int *c) ;
- mp_err s_mp_mul_comba(const mp_int *a, const mp_int *b, mp_int *c, int digs) ;
- mp_err s_mp_mul_high(const mp_int *a, const mp_int *b, mp_int *c, int digs) ;
- mp_err s_mp_mul_high_comba(const mp_int *a, const mp_int *b, mp_int *c, int digs) ;
- mp_err s_mp_mul_karatsuba(const mp_int *a, const mp_int *b, mp_int *c) ;
- mp_err s_mp_mul_toom(const mp_int *a, const mp_int *b, mp_int *c) ;
- mp_err s_mp_prime_is_divisible(const mp_int *a, bool *result) ;
- mp_err s_mp_rand_platform(void *p, size_t n) ;
- mp_err s_mp_sqr(const mp_int *a, mp_int *b) ;
- mp_err s_mp_sqr_comba(const mp_int *a, mp_int *b) ;
- mp_err s_mp_sqr_karatsuba(const mp_int *a, mp_int *b) ;
- mp_err s_mp_sqr_toom(const mp_int *a, mp_int *b) ;
- mp_err s_mp_sub(const mp_int *a, const mp_int *b, mp_int *c) ;
- void s_mp_copy_digs(mp_digit *d, const mp_digit *s, int digits);
- void s_mp_zero_buf(void *mem, size_t size);
- void s_mp_zero_digs(mp_digit *d, int digits);
- mp_err s_mp_radix_size_overestimate(const mp_int *a, const int radix, size_t *size);
-
-
-//////////////////////////////////////////
-
-
+#include "main_utility.hpp"
 /* reverse an array, used for radix code */
 static void s_reverse(char *s, size_t len)
 {
@@ -6513,59 +5740,6 @@ LBL_ERR:
 
 
 
-/*
-Class for SHA256 implementation
-*/
-///////////////////////////////////////////
-
-static const char *const BASE64_DIGITS ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
-static const char *const HEX_DIGITS = "0123456789abcdef";
-
-class SHA256 {
-
-public:
-	SHA256();
-	void update(uint8_t * data, size_t length);
-	uint8_t * digest();
-
-
-private:
-	uint8_t  m_data[64];
-	uint32_t m_blocklen;
-	uint64_t m_bitlen;
-	uint32_t m_state[8]; //A, B, C, D, E, F, G, H
-
-    uint32_t K[64] = {
-		0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,
-		0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
-		0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,
-		0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
-		0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,
-		0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
-		0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,
-		0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
-		0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,
-		0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
-		0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,
-		0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
-		0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,
-		0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
-		0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,
-		0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2
-	};
-
-	static uint32_t rotr(uint32_t x, uint32_t n);
-	static uint32_t choose(uint32_t e, uint32_t f, uint32_t g);
-	static uint32_t majority(uint32_t a, uint32_t b, uint32_t c);
-	static uint32_t sig0(uint32_t x);
-	static uint32_t sig1(uint32_t x);
-	void transform();
-	void pad();
-	void revert(uint8_t * hash);
-
-};
-
 SHA256::SHA256(): m_blocklen(0), m_bitlen(0) {
 	m_state[0] = 0x6a09e667;
 	m_state[1] = 0xbb67ae85;
@@ -6723,7 +5897,4132 @@ void SHA256::revert(uint8_t * hash) {
 
 
 
-///////////////////////////////////////////
+
+////////////////////// file_operations.h
 
 
 
+
+int isSubstring(char *s1, char *s2)///s1 is the sub string ; s2 is the larger string
+{
+    int M = strlen(s1);
+ //  printf("11 %s jkl\n",s1);
+    int N = strlen(s2);
+  // printf("22 %s jkl\n",s2);
+
+    for (int i = 0; i <= N - M; i++) {
+        int j;
+
+        for (j = 0; j < M; j++)
+            if (s2[i + j] != s1[j])
+                break;
+
+        if (j == M)
+            return i;
+    }
+    return -1;
+}
+
+int find_int_hex(char ptr){
+    char char_set16[]="0123456789ABCDEF";
+    int i=0;
+    while(1){
+        if(char_set16[i]==ptr){
+            return i;
+        }
+        i++;
+    }
+
+}
+void base64Encoder(char input_str[], int len_str, char *result)
+{
+
+    //character set of base 64 encoding scheme
+    char char_set[]="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+
+  //  char *res_str=(char *) malloc(1000 * sizeof(char));//chr *res_str =new char(1000*1)
+
+    if(len_str%2!=0){
+        printf("the hex string is not valid for having conversion to base64 digits");
+        char aux[1000]="000";
+        strcat(aux,input_str);
+        strcpy(input_str,aux);
+       // exit(1);
+    }
+
+    int i=len_str;
+
+    /* basic agenda
+    an initial check that number of char in string are even or not (gouping of bytes(8 bits= 2 hex char) is done)
+    first check if 6 continous hex digits could be taken or not
+    if yes:
+    1)  Take 6 hex digits :24 bits
+    2)  24/6=4 then write 4 base64 characters
+    if no:
+    1)check how many hex char are available(<6)
+    2)possible cases 2,4
+    if 2 hex char available:
+        -add 4 bits(valued 0) to make the bit length divisible by 6
+    if 4 hex char available
+        - add 2 bits(valued 0) to make the bit length divisible by 6
+    */
+    int j=0;
+    int res_count=0;
+    while(1){
+        if(i>=6){//if yes code starts here
+
+            int aux=0;
+           // printf("%d\n",res_count);
+            for(int index=j ; index<j+6;index++){
+                aux=(aux<<4);
+              //  printf("%d ",find_int_hex(input_str[index]));
+                aux=aux|find_int_hex(input_str[index]);
+              //  printf(" %08x ",aux);
+            }
+            j=j+6;
+           // printf("\n");
+            int aux1=0;
+            for(int o=3;o>=0;o--){
+                aux1=aux & 0x3f;
+                result[res_count+o]=char_set[aux1];
+                aux=aux>>6;
+                //res_count--;
+            }
+            res_count=res_count+4;
+            i=i-6;
+        }else{
+
+                if(i==0){
+               //     printf("Done...");
+                 //   printf("\n");
+                    break;
+                }
+                if(i==2){
+                    int aux=0;
+                    for(int index=j ; index<j+2;index++){
+                            aux=(aux<<4);
+                        //  printf("%d ",find_int_hex(input_str[index]));
+                            aux=aux|find_int_hex(input_str[index]);
+                            //  printf(" %08x ",aux);
+                        }
+                        aux=aux<<4;
+                    int aux1=0;
+                    for(int o=1;o>=0;o--){
+                        aux1=aux & 0x3f;
+                        result[res_count+o]=char_set[aux1];
+                        aux=aux>>6;
+                    //res_count--;
+                    }
+                    res_count=res_count+2;
+                    result[res_count]='=';
+                    res_count++;
+                    result[res_count]='=';
+                    res_count++;
+                    result[res_count]='\0';
+                    break;
+
+                }else{
+
+                    int aux=0;
+                    for(int index=j ; index<j+4;index++){
+                            aux=(aux<<4);
+                        //  printf("%d ",find_int_hex(input_str[index]));
+                            aux=aux|find_int_hex(input_str[index]);
+                            //  printf(" %08x ",aux);
+                        }
+                        aux=aux<<2;
+                    int aux1=0;
+                    for(int o=2;o>=0;o--){
+                        aux1=aux & 0x3f;
+                        result[res_count+o]=char_set[aux1];
+                        aux=aux>>6;
+                    //res_count--;
+                    }
+                    res_count=res_count+3;
+                    result[res_count]='=';
+                    res_count++;
+                    result[res_count]='\0';
+                    break;
+
+
+                }
+
+        }
+
+
+    }
+
+
+}
+
+
+// signs the content with signKey(a key) and puts the result inside result
+void signing_support(key signKey,char *content,char*result){
+    printf("\n\n%s\n\n",content);
+    char ch;
+    unsigned char *st=new unsigned char[3000];
+    unsigned int i_sha=0;
+    //// assigning char to unsigned char, this has to be done to implement sha256
+    int i_sha_a=0;
+    while(1){
+
+	   ch=content[i_sha_a];
+      // printf("%c",ch);
+	   if(ch=='\0'){
+		   break;
+	   }
+       if(ch!='\n'){
+        *(st+i_sha)=ch;
+	//	printf("%c",*(st+i_sha));
+		i_sha++;}
+        i_sha_a++;
+
+    }
+
+    printf("ooooLLL\n\n%s\n\n",st);
+
+    SHA256 sha;
+
+	sha.update(st,i_sha);
+
+	uint8_t * digest = sha.digest();
+    //int it=0;//just an iterator
+
+    char HEX_format_Digest[65];
+
+    // code for making hex string
+    int hex_count=0;
+    for(int yui=0;yui<32;yui++){
+     //    printf("%d ",*(digest+yui)>>4||0x0f);
+         HEX_format_Digest[hex_count]=HEX_ele[*(digest+yui)>>4 & 0x0f];
+         hex_count++;
+         HEX_format_Digest[hex_count]=HEX_ele[*(digest+yui) & 0x0f];
+         hex_count++;
+      }
+   // delete[] digest;
+    //digest=NULL;
+    HEX_format_Digest[hex_count]='\0';
+static int pass=0;
+pass++;
+    printf("\nhere is the string %d:%s\n\n",pass,HEX_format_Digest);
+
+    //At this point we have got the string format for the digest
+
+
+    delete []st;
+    st=NULL;
+    ////////////////////
+
+    // modulus in public key
+
+    mp_int modulus;
+    mp_init(&modulus);
+    mp_read_radix(&modulus,signKey.modulus,10);
+
+    //private key exponent
+    mp_int Private_key;
+    mp_init(&Private_key);
+    mp_read_radix(&Private_key,signKey.private_exponent,10);
+
+   //making the signing process pkcs.1.15 compatible
+   char padding_SHA256[446]="1ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff003031300d060960864801650304020105000420";
+   strcat(padding_SHA256,HEX_format_Digest);
+   //printf("\npadded sha digest :%s\n",padding_SHA256);
+   mp_int hash_to_sign;
+   mp_init(&hash_to_sign);
+   mp_read_radix(&hash_to_sign,padding_SHA256,16);
+   char aux_hash_ex[514];
+   mp_to_hex(&hash_to_sign,aux_hash_ex,sizeof(aux_hash_ex));
+   printf("\n   hash to sign ===\n%s\n\n",aux_hash_ex);
+
+   ////Signing begins
+
+   mp_int cipher;
+   mp_init(&cipher);
+
+   mp_exptmod(&hash_to_sign,&Private_key,&modulus,&cipher);
+
+   char cipher_string_hex[513];
+   mp_to_hex(&cipher,cipher_string_hex,sizeof(cipher_string_hex));
+   printf("\n%s\n",cipher_string_hex);//this is the encrypted message
+
+
+    base64Encoder(cipher_string_hex,strlen(cipher_string_hex),result);
+
+
+mp_clear(&hash_to_sign);
+mp_clear(&modulus);
+mp_clear(&cipher);
+mp_clear(&Private_key);
+
+}
+
+void pair_file_write(pair_set *ptr,int ptr_quant ,char *file_name , key Skey){
+
+
+    char content[6000];//=(char*) malloc(sizeof(char)*6000);
+    strcpy(content,"<content>\n");
+
+    int i=0;
+    while(i<ptr_quant){
+
+    strcat(content,"<");
+    strcat(content,ptr[i].tag);
+    strcat(content,"=");
+    strcat(content,ptr[i].value);
+    strcat(content,">\n");
+    i++;
+    }
+    strcat(content,"</content>\n");
+
+    strcat(content,"\0");
+
+    printf("\nINside pair_file_write %s \n",content);
+
+    // now signing takes place
+    char signature[2000];//=(char*) malloc(sizeof(char)*2000);
+    signing_support( Skey,content,signature);
+    content[int(strlen(content))-1]='\n';
+    strcat(content,"<Sign>\n");
+    strcat(content,"<Signature=");
+    strcat(content,signature);
+    strcat(content,">\n");
+    strcat(content,"</Sign>");
+    strcat(content,"\0");
+
+
+
+
+    ////////////////////
+
+    FILE *fptr;
+    fptr=fopen(file_name,"w");
+    fprintf(fptr, "%s", content);
+    fclose(fptr);
+    //free(content);
+  //  free(signature);
+}
+
+//this function is for validating the txt file wrt  the given key
+
+int inBase64(char *d){
+    for(int i=0;i<64;i++){
+        if(*d==BASE64_DIGITS[i]){
+            return i;
+        }
+    }
+    return 0;
+}
+
+
+void base64decoder(char *base64_ptr,char *hex){
+
+
+
+    int ik=0;
+
+
+
+    int aux1,aux2,aux3,num_bits;
+
+    for(int i=0;base64_ptr[i]!='\0';i=i+4){
+        aux1=0;num_bits=0;
+
+        for(int j=0;j<4;j++){
+
+        if(base64_ptr[i+j]!='='){
+        aux1=aux1<<6;
+        num_bits=num_bits+6;
+
+        aux2=inBase64(&base64_ptr[i+j]);
+
+
+        aux1=aux1|aux2;
+
+
+        }else{
+            aux1=aux1>>2;
+            num_bits=num_bits-2;
+        }
+
+        }
+
+      //  int count_bit=num_bits;
+        while(num_bits!=0){
+            num_bits=num_bits-4;
+            aux3=(aux1>>num_bits) & 15;
+
+
+           // printf("aux3:: %d ",aux3);
+            hex[ik]=HEX_DIGITS[aux3];
+
+          // printf("%c |",hex[ik]);
+            ik++;
+        }
+
+       // printf("\n");
+
+
+    }
+    hex[ik]='\0';
+
+    printf("length %d\n",ik);
+   // printf("\n");
+    int i=0;
+    while(hex[i]!='\0'){
+        printf("%c",hex[i]);
+        i++;
+    }
+
+   // printf("\n");
+
+}
+
+char small_letter(char a){
+   char uset[]="0123456789";
+   for(int i=0;i<10;i++){
+      if(uset[i]==a){
+         return a;
+      }
+   }
+   return a+32;
+}
+
+int Validating_File(char *file , key key){
+
+    char tag1[30]="</content>";
+    char tag2[30]="Signature";
+    FILE *fptr;
+    fptr=fopen(file,"r");
+    char ch;
+    char file_content[3000];//=(char*) malloc(sizeof(char)*3000);
+    int i=0;
+
+    while((ch=fgetc(fptr))!=EOF)
+    {
+        file_content[i]=ch;
+        i++;
+    }
+
+    file_content[i]='\0';
+
+    int index=isSubstring(tag1,file_content);
+    index=index+int(strlen(tag1));
+
+
+
+    unsigned char *st=new unsigned char[2000];
+    unsigned int i_sha=0;
+    //// assigning char to unsigned char, this has to be done to implement sha256
+    int i_sha_a=0;
+    while(i_sha_a<index+1)
+    {
+
+	   ch=file_content[i_sha_a];
+      // printf("%c",ch);
+
+       if(ch!='\n'){
+        *(st+i_sha)=ch;
+	//	printf("%c",*(st+i_sha));
+		i_sha++;}
+        i_sha_a++;
+
+    }
+
+
+
+    SHA256 sha;
+
+	sha.update(st,i_sha);
+
+	uint8_t * digest = sha.digest();
+   // int it=0;//just an iterator
+
+    char HEX_format_Digest[65];
+
+    // code for making hex string
+    int hex_count=0;
+    for(int yui=0;yui<32;yui++)
+    {
+        // printf("%d ",*(digest+yui)>>4||0x0f);
+         HEX_format_Digest[hex_count]=HEX_ele[*(digest+yui)>>4 & 0x0f];
+         hex_count++;
+         HEX_format_Digest[hex_count]=HEX_ele[*(digest+yui) & 0x0f];
+         hex_count++;
+    }
+    HEX_format_Digest[hex_count]='\0';
+    static int pass=0;
+    pass++;
+    printf("\nhere is the     string %d: %s\n\n",pass,HEX_format_Digest);
+   // delete []st;
+    //st=NULL;
+
+    char signature[500];//=(char*) malloc(sizeof(char)*500);
+
+    fetch_tag(file_content,tag2,signature);
+   // free(file_content);
+
+    printf("signature\n%s\n",signature);
+
+    // base64 decoder
+
+
+   char hex[1000];//=(char*) malloc(sizeof(char)*(1000));
+
+    base64decoder(&signature[0],hex);
+
+
+
+   // printf("\n%s\n",hex);
+
+    mp_int HEX1;
+    mp_init(&HEX1);
+    //mp_read_radix(&HEX1,"6676CB59FC89868EB6F2EF269CEF076E265C963779DE44B9E2E234A3391043B10E7667892400753214A9B1FD51AB7F48A429BD6AE73B0EC894785CCE3E0EFD735C4BBD54D2B9F7709629BC6C5A635F1AF52BBEBA1352D876154EDFA8EF4F1C58D4EFF9ADAB3EB81AF329B35595BA94B98505B67EBB814963B71C35312CA2904BA56CC2A4DDBD53D161BB900A74B5CF647531476A343293895433F70A0A35E7110EC220299A9F685BF6A98685925C3DA603BFC11EE0BF6E2216F47873DEF58EDB0CFB4CAE158F70E60E6233B09542CAA1F21722CAC5F24A8C09E4A32AFD34B879C8CA68E0DBD4CBE65F30A793333D5983B006EB91CC5FD86549939D526EBB3CE6",16);
+    mp_read_radix(&HEX1,hex,16);
+    //free(hex);
+    //free(signature);
+    mp_int modulus;
+    mp_init(&modulus);
+    mp_read_radix(&modulus,key.modulus,10);
+
+    mp_int public_key;
+    mp_init(&public_key);
+    mp_read_radix(&public_key,"65537",10);
+
+    mp_int decrypted;
+    mp_init(&decrypted);
+    mp_exptmod(&HEX1,&public_key,&modulus,&decrypted);
+
+    char decrypted_hex[1000];//=(char*) malloc(sizeof(char)*1000);
+
+    mp_to_hex(&decrypted,decrypted_hex,sizeof(decrypted_hex));
+
+    printf("\n%s\n",decrypted_hex);//this is the encrypted message
+
+    char useful_decrypted_hex[400];//=(char*) malloc(sizeof(char)*400);
+
+    i=445;
+    int i_counter=0;
+    while(i<int(strlen(decrypted_hex))){
+        useful_decrypted_hex[i_counter]=small_letter(decrypted_hex[i]);
+        i++;
+        i_counter++;
+    }
+    useful_decrypted_hex[i_counter]='\0';
+
+  //  printf("heloo\n\n%s\n\n %s\n\n",useful_decrypted_hex,HEX_format_Digest);
+
+  //  free(decrypted_hex);
+   // free(useful_decrypted_hex);
+   mp_clear(&HEX1);
+   mp_clear(&modulus);
+   mp_clear(&public_key);
+   mp_clear(&decrypted);
+
+   if (strcmp(useful_decrypted_hex,HEX_format_Digest)==0){
+       return 1;// valid
+   }else{
+
+    return 0;// not valid
+   }
+
+
+}
+
+
+// this function is for encrypting files that has to be remained inside the RFM
+void encrypting_File(char *content, key key, char *fname)
+{
+
+
+int i=0;
+char buf[50];
+int aux;
+mp_int public_key,private_key,modulus,aux_int,aux_int_result;
+mp_init_multi(&public_key,&private_key,&modulus,&aux_int,&aux_int_result,NULL);
+mp_read_radix(&public_key,"65537",10);//
+//mp_int ;
+//mp_init(&private_key);
+mp_read_radix(&private_key,key.private_exponent,10);//
+//mp_int modulus;
+//mp_init(&modulus);
+mp_read_radix(&modulus,key.modulus,10);//
+
+char encrypted_content[30000];//=(char*) malloc(sizeof(char)*20000);
+//mp_int aux_int;
+//mp_init(&aux_int);
+//mp_int aux_int_result;
+//mp_init(&aux_int_result);
+char snum[10];
+while(content[i]!='\0'){
+    aux=int(content[i]);
+    sprintf(snum, "%d",aux );
+    mp_read_radix(&aux_int, snum,10);
+  // printf("\n %c  %d \n",content[i],aux);
+    mp_exptmod(&aux_int,&private_key,&modulus,&aux_int_result);
+
+    mp_to_decimal(&aux_int_result,buf,sizeof(buf));
+  //  printf("\n modulus product==\n%s\n\n",buf);
+  //  break;
+
+    if(i==0){
+    strcpy(encrypted_content,buf);
+    strcat(encrypted_content,";");
+    }else{
+        strcat(encrypted_content,buf);
+        strcat(encrypted_content,";");
+    }
+
+
+
+    i=i+1;
+
+
+}
+strcat(encrypted_content,"\0");
+mp_clear_multi(&public_key,&private_key,&modulus,&aux_int,&aux_int_result,NULL);
+FILE *fptr_encrypted;
+
+fptr_encrypted=fopen(fname,"w");
+fprintf(fptr_encrypted,"%s",encrypted_content);
+fclose(fptr_encrypted);
+
+//mp_clear(&aux_int_result);
+//mp_clear(&modulus);
+//mp_clear(&public_key);
+//mp_clear(&private_key);
+
+}
+
+// this function is for decrypting files that has to be remained inside the RFM
+void decrypting_File(char *file , key key, char *result){
+    FILE *fptr;
+    fptr=fopen(file,"r");
+
+    char buf[50];
+
+    mp_int public_key;
+    mp_init(&public_key);
+    mp_read_radix(&public_key,"65537",10);//
+    mp_int private_key;
+    mp_init(&private_key);
+    mp_read_radix(&private_key,key.private_exponent,10);//
+    mp_int modulus;
+    mp_init(&modulus);
+    mp_read_radix(&modulus,key.modulus,10);//
+    mp_int aux_int;
+    mp_init(&aux_int);
+    mp_int aux_int_result;
+    mp_init(&aux_int_result);
+
+    char tao;
+    char decrypt;
+    char buff2[30];
+    int k=0,di=0;
+
+    while((tao=fgetc(fptr))!=EOF){
+
+        if(tao!=';'){
+            buff2[k]=tao;
+            k++;
+        }else{
+            buff2[k]='\0';
+            mp_read_radix(&aux_int, buff2,10);
+            mp_exptmod(&aux_int,&public_key,&modulus,&aux_int_result);
+            mp_to_decimal(&aux_int_result,buf,sizeof(buf));
+      // printf("\n modulus product==\n%s\n\n",buf);
+            decrypt = atoi(buf);
+            result[di]=decrypt;
+            di++;
+            memset(buff2, 0, sizeof(buff2));
+            k=0;
+        }
+
+    }
+    result[di]='\0';
+mp_clear(&aux_int);
+mp_clear(&aux_int_result);
+mp_clear(&modulus);
+mp_clear(&public_key);
+mp_clear(&private_key);
+
+}
+
+
+
+// this function is for fetching value of a particular tag in the given string
+void fetch_tag(char *content, char *target, char *result){
+    char TAG[30];
+    strcpy(TAG,"<");
+    strcat(TAG,target);
+
+    int index=isSubstring(TAG,content);
+
+    index=index+int(strlen(TAG))+1;
+    int i=0;
+    while(content[index]!='>'){
+        result[i]=content[index];
+        i++;
+        index++;
+
+    }
+    result[i]='\0';
+
+
+}
+
+
+//function to generate DroneID.txt
+void DroneIDcreation( ){
+
+    char DroneID[]="ABBDDJEDNDJK";//any string
+    char RFM_version[2]="0";
+    char RPAS_category[10]="Small";
+
+
+ // RFM_public_key: needs to be fetched from PublicPrivateInuse.txt(which is kept encrypted)
+ // inside the rfm, decrypted using decrypting key.
+    key RFM_private_key;
+    char fname[60]="./log/PublicPrivateInuse.txt";
+    key Inside_RFM;
+    strcpy(Inside_RFM.modulus,"180919775566931");
+    strcpy(Inside_RFM.private_exponent,"32102716896161");
+
+    char content[5000];//=(char*) malloc(sizeof(char)*5000);
+
+    decrypting_File(fname , Inside_RFM, content);
+   // printf("\n\nThe content of decrypted file is :\n\n%s\n",content);
+
+    char target0[30]="Modulus";
+    char target1[30]="PrivateKey";
+
+    char value_modulus[2000];//=(char*) malloc(sizeof(char)*2000);
+    char value_private[800];//=(char*) malloc(sizeof(char)*800);
+
+    fetch_tag(content,target0,value_modulus);
+    fetch_tag(content,target1,value_private);
+    strcpy(RFM_private_key.private_exponent,value_private);
+    strcpy(RFM_private_key.modulus,value_modulus);
+
+
+
+
+    //printf("vadd %s",value_modulus);
+   // free(content);
+
+    char rfm_key0[30]="RFM_public_key_modulus";
+    char rfm_key1[30]="RFM_public_key_exponent";
+
+
+
+ //    this value is just for writing into the file
+    char DigitalSky_public_key[1020]="MIIC8TCCAdmgAwIBAgIJAJRDnqfLydHvMA0GCSqGSIb3DQEBCwUAMA8xDTALBgNVBAMMBHRlc3QwHhcNMTkwMzI2MDcxMTQzWhcNMjkwMzIzMDcxMTQzWjAPMQ0wCwYDVQQDDAR0ZXN0MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq51cjR/mcgd0nWO33O3SM84yu3DRdaG8OMYSqzPixY5R+D8niOTVLZvOtaFROSneP1JmUAcaBn5sFhsFxgpJX8O6ee0m9PqLL+LKjexEs5dZ85IG8GqF+UJABaKfBeTPOgI5NAwoyZPBphzxsra1fH2OV2roaCf4ErMnYluuyey/VfFlHTVgC5+VX2wvO+o6pYUuzdNqCvgYwZrMEDCXm+08iZk/qpLgqgUCQTs8qGu/Y0d/EqwGmv9xN8tyxX+IbaeQM7uztN8PbMf8wY40OqdgNmgaVmMR4mfAO2XJiryR5Y8JACDGf3dhmcDrdtfmNjaHR109o2/wUPhSdWB/3QIDAQABo1AwTjAdBgNVHQ4EFgQUR4p2KJJXG5cZ8STI66RG6l2o7yowHwYDVR0jBBgwFoAUR4p2KJJXG5cZ8STI66RG6l2o7yowDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAV3uurlHMtyopefBpdGj59eLWCrpRYJLKbDtLFCj+tY1/uiwogUMNsEEHEBeEdwM+PIPuzWZ4tSYQ+SvdCCt4/6e9x+c2/1mZKhnRzL/s9o70RyWZXQO+Dz43B5aIIy/qARUhLxU2NVL42q90pInIh/ltT02IVkcibwDnsM4XJhsSyvQlRyYXdPzDeBjEOVYFpafLbC/7a5FBuNwfNKEMWhOj6AELnC8fWb3maNevhjSH5amGU2XrUp6yIdWUL2HuW7ReSer93Lg6iYujd/aaqk+pWE5bQsC+r2kHpNcpntHJLsd9E1cwzWCJiEM9zK4GXqKV/QDUdPC6FYfEf+ti9A==";
+
+    char Firmware_version[4]="1.0";
+
+    pair_set pairset[7];
+
+    strcpy(pairset[0].tag,"DroneID");
+    strcpy(pairset[0].value,DroneID);
+
+
+    strcpy(pairset[1].tag,"RFM_version");
+    strcpy(pairset[1].value,RFM_version);
+
+    strcpy(pairset[2].tag,"RPAS_category");
+    strcpy(pairset[2].value,RPAS_category);
+
+    strcpy(pairset[3].tag,"Firmware_version");
+    strcpy(pairset[3].value,Firmware_version);
+
+    strcpy(pairset[4].tag,"DigitalSky_public_key");
+    strcpy(pairset[4].value,DigitalSky_public_key);
+
+    strcpy(pairset[5].tag,rfm_key0);
+    strcpy(pairset[5].value,value_modulus);
+
+    strcpy(pairset[6].tag,rfm_key1);
+    strcpy(pairset[6].value,"65537");
+
+    char fileName[20]="./log/DroneID.txt";
+
+
+
+  //  free(value_modulus);
+
+    pair_file_write(pairset,7,fileName,RFM_private_key);
+
+
+
+
+
+}
+
+
+// this function  creates .txt file when an amendment takes
+// place in the hardware(currently only gps)
+void HardwareInuseCreation(int gps){
+    char DroneID[]="ABBDDJEDNDJK";//any string
+    char RFM_version[2]="0";
+    char RPAS_category[10]="Small";
+    char GPS_ID[20];
+    sprintf(GPS_ID, "%d",gps);
+ // RFM_public_key: needs to be fetched from PublicPrivateInuse.txt(which is kept encrypted)
+ // inside the rfm, decrypted using decrypting key.
+    key RFM_private_key;
+    char fname[60]="./log/PublicPrivateInuse.txt";
+    key Inside_RFM;
+    strcpy(Inside_RFM.modulus,"180919775566931");
+    strcpy(Inside_RFM.private_exponent,"32102716896161");
+
+    char content[5000];//=(char*) malloc(sizeof(char)*5000);
+
+    decrypting_File(fname , Inside_RFM, content);
+    //printf("\n\nThe content of decrypted file is :\n\n%s\n",content);
+
+    char target0[30]="Modulus";
+    char target1[30]="PrivateKey";
+
+    char value_modulus[2000];//=(char*) malloc(sizeof(char)*2000);
+    char value_private[800];//=(char*) malloc(sizeof(char)*800);
+
+    fetch_tag(content,target0,value_modulus);
+    fetch_tag(content,target1,value_private);
+    strcpy(RFM_private_key.private_exponent,value_private);
+    strcpy(RFM_private_key.modulus,value_modulus);
+   /// RFM private key fetched
+
+
+
+   // printf("vadd %s",value_modulus);
+  //  free(content);
+
+
+
+
+    pair_set pairset[4];
+
+    strcpy(pairset[0].tag,"DroneID");
+    strcpy(pairset[0].value,DroneID);
+
+
+    strcpy(pairset[1].tag,"RFM_version");
+    strcpy(pairset[1].value,RFM_version);
+
+    strcpy(pairset[2].tag,"RPAS_category");
+    strcpy(pairset[2].value,RPAS_category);
+
+
+
+    strcpy(pairset[3].tag,"GPS_ID");
+    strcpy(pairset[3].value,GPS_ID);
+
+
+
+    char fileName[40]="./log/HardwareInuse.txt";
+
+
+
+   // free(value_modulus);
+
+    pair_file_write(pairset,4,fileName,RFM_private_key);
+}
+
+
+
+void get_RFM_Key(key *key1){
+    char fname[60]="./log/PublicPrivateInuse.txt";
+    key Inside_RFM;
+    strcpy(Inside_RFM.modulus,"180919775566931");
+    strcpy(Inside_RFM.private_exponent,"32102716896161");
+
+    char content[5000];//=(char*) malloc(sizeof(char)*5000);
+
+    decrypting_File(fname , Inside_RFM, content);
+   // printf("\n\nThe content of decrypted file is :\n\n%s\n",content);
+
+    char target0[30]="Modulus";
+    char target1[30]="PrivateKey";
+
+    char value_modulus[2000];//=(char*) malloc(sizeof(char)*2000);
+    char value_private[800];//=(char*) malloc(sizeof(char)*800);
+
+    fetch_tag(content,target0,value_modulus);
+    fetch_tag(content,target1,value_private);
+    strcpy(key1->private_exponent,value_private);
+    strcpy(key1->modulus,value_modulus);
+
+}
+
+/// this function combines validation and fetching of tag values of files
+// coming from MC/MS  or staying inside RFM
+int file_read(char *fname,char *tag,char *result,int file_type){
+    // return types
+    //if 1 : file is genuine
+    //if 0 : file is not genuine
+    key *RFM_key;
+    key RFM_KEY;
+    RFM_key=&RFM_KEY;
+
+    get_RFM_Key(RFM_key);
+
+    //file_type 0,1
+    //0 = this is for file needing RFM key pair to get validated
+    //1= this for file needing FMP key pair to get validated
+    if (file_type==0){
+        // RFM key pair needed to validate
+        int validation_stats=Validating_File(fname,RFM_KEY);
+        if (validation_stats==1){
+            FILE *fptr;
+            char ch;
+            fptr=fopen(fname,"r");
+            char *content=(char*) malloc(sizeof(char)*3000);
+            int i=0;
+            while((ch=fgetc(fptr))!=EOF){
+                content[i]=ch;
+                i++;
+            }
+            content[i]='\0';
+            // Now fetch the tag value
+            fetch_tag(content,tag,result);
+            free(content);
+            return 1;
+        }
+        else{
+            return 0;
+        }
+
+
+    }
+
+    else{
+        //FMP_key defined here
+        key FMP_key;
+        strcpy(FMP_key.modulus,"26730675313584941186560749178137844398391258151106035922104564996357015594451047759599219270560135549941477603738118115764757775734508251718265058999430985835716076462248377819064664881403774398289832625702128624297432579628718638031709818597981265137629684514491781630727683626461964227525538709626953674033997874387729484132040534464656945770393501502839625253132645954405219070308408708085422661840555555025926057125687490593846474404214169083806088065122913843606434120163765097852620800693096123077396800135201599717234897499796697020907623367339541602816939734869450634288165688491010942289888232437040231818827");
+        strcpy(FMP_key.private_exponent,"9531141503697955439637938672730292016747896920442587354131856429724746943118117766243718142643838557319261617775490854466802870185757493113087536791411008697514583743073684985212980285161716284529911482024006922693782207314400981636708958923930393575173268043008437266686673344571206800262703336536043051327018493439267232775893284980747319937113655022770270510978884647411012877253041625079190653496682971178532563034737589582352362760267741512014615969164270535601279273456871641667043609413678452331175640797803872310658739384463477457294633079275692433997764390282891429002147156439862257036670607929361882536897");
+        int validation_stats=Validating_File(fname,FMP_key);
+         if (validation_stats==1){
+            FILE *fptr;
+            char ch;
+            fptr=fopen(fname,"r");
+            char *content=(char*) malloc(sizeof(char)*3000);
+            int i=0;
+            while((ch=fgetc(fptr))!=EOF){
+                content[i]=ch;
+                i++;
+            }
+            content[i]='\0';
+            // Now fetch the tag value
+            fetch_tag(content,tag,result);
+            free(content);
+            return 1;
+        }
+        else{
+            return 0;
+        }
+
+    }
+}
+
+
+
+//amendment in KeyLog.txt with fileID of a file
+void KeyLog_Regen(char *fileID){
+    FILE *fptr;
+    fptr = fopen("./log/KeyLog.txt","r");
+    char ch;
+    char *content=(char*) malloc(sizeof(char)*3000);
+    int i=0;
+    while((ch=fgetc(fptr))!=EOF){
+        content[i]=ch;
+        i++;
+    }
+    content[i]='\0';
+    printf("\n\n%s\n\n",content);
+    char Number_Keyrotation[4];
+    char tag_changes[20]="No_Changes";
+    char tag_changes1[20]="<No_Changes=";
+    fetch_tag(content,tag_changes,Number_Keyrotation);
+
+    int change_aux=atoi(Number_Keyrotation);
+    printf("\n%d\n",change_aux);
+    change_aux++;
+
+    char changeAux[3];
+    sprintf(changeAux,"%d",change_aux);
+    printf("\n\n%s\n\n",changeAux);
+    // number of new lines char
+    int index= isSubstring(tag_changes1,content);
+    printf("\n\n\n%d\n\n\n",index);
+    char* content2=(char*) malloc(3000*sizeof(char));
+
+    int i_count=0;
+    while(i_count<index+int(strlen(tag_changes1)))
+    {
+        content2[i_count]=content[i_count];
+        i_count++;
+    }
+    int i_count_separate=i_count;
+
+
+    strcat(content2,changeAux);
+
+    i_count_separate=i_count_separate+int(strlen(changeAux));
+    while(1){
+        if(content[i_count]!='>'){
+            printf("\n\nsign :%c\n\n",content[i_count]);
+        i_count++;}
+        else{
+            break;
+        }
+    }
+
+    content2[i_count_separate]=content[i_count];
+    i_count++;
+    i_count_separate++;
+    content2[i_count_separate]=content[i_count];
+    i_count++;
+    i_count_separate++;
+   // content2[i_count_separate]=content[i_count];
+   //     i_count++;
+    //    i_count_separate++;
+    int new_line_count=0;
+    while(1){
+        if(content[i_count]=='\n'){
+            new_line_count++;
+        }
+        if(new_line_count>=(change_aux-1)){
+            break;
+        }
+        content2[i_count_separate]=content[i_count];
+        i_count++;
+        i_count_separate++;
+    }
+    free(content);
+    if((change_aux-1)==0){
+    printf("\n\n\n%s\n\n\n",content2);
+    strcat(content2,"<");
+    strcat(content2,fileID);
+    strcat(content2,">\n");
+    strcat(content2,"</content>\0");
+    printf("\n\n\n%s\n\n\n",content2);}
+    else{
+        printf("\n\n\n%s\n\n\n",content2);
+    strcat(content2,"\n<");
+    strcat(content2,fileID);
+    strcat(content2,">\n");
+    strcat(content2,"</content>\0");
+    printf("\n\n\n%s\n\n\n",content2);
+
+    }
+
+    char *signature=(char*) malloc(sizeof(char)*3000);
+    key RFM_key;
+   // char dd[]="1ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff003031300d060960864801650304020105000420";
+  //  strcpy(RFM_key.modulus,"26495127767604337655831691918113833077956334480395285962585476150242592943334533493300410596845191511956515492348526447864429111984398076478393159921716146324008099192785429713391158778980470576914436564260777828713503499078118282954851831718742193757807790192236071369965695862117529898068098551948463482032984966019192036825055149445334134853954472696975028748893285534653718791714099153590644093991103487859923770318942338310035808291238607889065040628342091199251953687656515817829870399170890472577591915379199888970387732102895345522222635522973211224211091186930411354449072698100145010326153546937615803429429");
+  //  strcpy(RFM_key.private_exponent,"24021354375322558781058142276736617999389802434596138079632937453577588041977071136990155131350955784632074057774459381406055342415566243621056270140966629267130220147961070276489248399064064585487617556117107847879807603464052857723291974564966716033712609329726458163489658005940146657360121454440603066594695330718634482791509166056105316975123379501455703860598165895993179884232993174716442550760635024519308123321406513256918808853580242186763289628649427009957647963922327454796638500088631677702805825426368000585849292006901367973110968487920147218164610608698409129440488923014780703396073978252084600942649");
+    get_RFM_Key(&RFM_key);
+    signing_support(RFM_key,content2,signature);
+    //content2[int(strlen(content2))-1]='\n';
+    strcat(content2,"\n<Sign>\n");
+    strcat(content2,"<Signature=");
+    strcat(content2,signature);
+    strcat(content2,">\n");
+    strcat(content2,"</Sign>");
+    strcat(content2,"\0");
+
+    fclose(fptr);
+    remove("./log/KeyLog.txt");
+
+    printf("\n\n%s\n\n",content2);
+    char aux_copy[3000];
+    strcpy(aux_copy,content2);
+    free(content2);
+    FILE *fptr2;
+    fptr2=fopen("./log/KeyLog.txt","w");
+    fprintf(fptr2,"%s",aux_copy);
+
+    fclose(fptr2);
+
+
+
+
+}
+
+
+
+// this function will tell if the current time lies inside the start and end
+bool In_Time(Date_time current, Date_time start, Date_time end)
+{
+
+	// full check
+   // printf("/n/n Inside In_Time function /n/n");
+	if(start.Year<=current.Year && current.Year<=end.Year)
+    {
+        printf("\n year is ok \n ");
+		if(start.Month<=current.Month && current.Month<=end.Month)
+        {
+            printf("\n Month is ok \n");
+            if(start.date<=current.date && current.date<=end.date)
+            {
+                printf("\n Date is ok \n");
+            }
+		    else{
+                printf("%\nThis is when date is out of limits d \n",current.Year);
+			    return 0;
+		    }
+		}else{
+			return 0;
+		}
+	}
+	else{
+        	return 0;
+	}
+	//time check
+	if(start.Hours<=current.Hours || current.Hours<=end.Hours)//||
+    {
+        printf(" \n Hours is ok \n");
+        if(start.Hours==current.Hours||current.Hours==end.Hours){
+            printf("both the hours are equal");
+            if(start.Hours==current.Hours)
+            {
+                printf("\nstart hours are equal");
+                if(start.Minutes<=current.Minutes)
+                {
+                    printf(" minutes are ok");
+                    if(start.Minutes==current.Minutes)
+                    {
+                        printf("miutes are equal");
+                        if(start.Seconds<=current.Seconds){
+                            return 1;
+                        }else
+                        {   return 0;
+                        }
+                    }else
+                    {
+                        return 1;}
+                }else
+                {
+                    return 0;
+                }
+            }
+            else{
+                if(end.Minutes>=current.Minutes)
+                {
+                    if(end.Minutes==current.Minutes){
+                        if(end.Seconds>current.Seconds){
+                            return 1;
+                        }else{
+                            return 0;
+                        }
+                    }else{return 1;}
+                }else
+                {
+                    return 0;
+                }
+            }
+        }
+    }else
+    {
+        return 0;
+    }
+return 0;
+}
+
+
+
+// this function will convert string format of time to Date_time struct
+void conversion_to_dateTime(Date_time *dt,char *str){
+    char aux_buf1[60];
+    int length_str=0;
+    int i_iter=0;
+        while(length_str<(int)strlen(str))
+        {
+                if (str[i_iter]=='.')
+                {
+                    break;
+                }
+
+                if ( str[i_iter]!='T' && str[i_iter]!='-' && str[i_iter]!=':')
+                {
+                    aux_buf1[length_str]=str[i_iter];
+
+                    if(i_iter==3)
+                    {
+                        aux_buf1[length_str+1]='\0';
+                       // printf(" %s ",aux_buf1);
+                        dt->Year=strtol(aux_buf1,NULL,10);
+                      //  printf("year: %d ",dt->Year);
+                        memset(aux_buf1,'0',4);
+
+                    }
+                    if(i_iter==6){
+                        aux_buf1[length_str+1]='\0';
+                        printf(" %s ",aux_buf1);
+                        dt->Month=strtol(aux_buf1,NULL,10);
+                       // printf("month: %d ",dt->Month);
+                        memset(aux_buf1,'0',7);
+                    }
+                    if(i_iter==9){
+                        aux_buf1[length_str+1]='\0';
+                        printf(" %s ",aux_buf1);
+                        dt->date=strtol(aux_buf1,NULL,10);
+                       // printf("date: %d ",dt->date);
+                        memset(aux_buf1,'0',10);
+                    }
+                    if(i_iter==12){
+                        aux_buf1[length_str+1]='\0';
+                        printf(" %s ",aux_buf1);
+                        dt->Hours=strtol(aux_buf1,NULL,10);
+                      //  printf("Hours: %d ",Rv.start.Hours);
+                        memset(aux_buf1,'0',10);
+                    }
+                    if(i_iter==15){
+                        aux_buf1[length_str+1]='\0';
+                        printf(" %s ",aux_buf1);
+                        dt->Minutes=strtol(aux_buf1,NULL,10);
+                      //  printf("Minutes: %d ",Rv.start.Minutes);
+                        memset(aux_buf1,'0',12);
+                    }
+                    if(i_iter==18)
+                    {
+                        aux_buf1[length_str+1]='\0';
+                        printf(" %s ",aux_buf1);
+                        dt->Seconds=strtol(aux_buf1,NULL,10);
+                     //   printf("Seconds: %d ",Rv.start.Seconds);
+                        memset(aux_buf1,'0',12);
+                    }
+
+                        length_str++;
+                }
+                i_iter++;
+
+        }
+        //printf("\n\n");
+        memset(aux_buf1,'0',60);
+
+
+}
+
+//this function will tell if current time lies inside the start and end time
+int check_time(char *start,char *end){
+    // getting current time
+    int vehi_gps_pos=orb_subscribe(ORB_ID(vehicle_gps_position));
+    time_t timestamp;
+    struct vehicle_gps_position_s raw;
+    orb_copy(ORB_ID(vehicle_gps_position),vehi_gps_pos,&raw);
+    timestamp=(raw.time_utc_usec)/1000000;//microsecond to seconds
+	printf("\ntimestamp is seconds: %u\n",timestamp);
+    struct tm  ts;
+    Date_time DT;//current time
+    ts = *localtime(&timestamp);
+    DT.Year=ts.tm_year+1900;
+    DT.Month=ts.tm_mon+1;
+    DT.date=ts.tm_mday;
+	DT.Hours=ts.tm_hour;
+	DT.Minutes=ts.tm_min;
+	DT.Seconds=ts.tm_sec;
+    // converting start and end to the struct format of Date_time
+    Date_time startTime;
+    Date_time endTime;
+
+    conversion_to_dateTime(&startTime,start);
+    conversion_to_dateTime(&endTime,end);
+
+    int intime_status=In_Time(DT,startTime,endTime);
+    if(intime_status==1){
+        return 1;// in time
+    }
+
+    return 0;// not in time
+
+}
+
+
+// Check_recentPA() function
+/*
+check the validity of the recentPA.txt
+if the current time lies outside the start time and end time, then start the bundling
+if it lies inside then check for number of flights done and number of permissible flights
+when landing or free fall instance is noted down, at the same time regenerate recentPA.txt
+with the number of updated flights done
+
+return : 0 :: (not in time)start bundling and wait for fetched file from MC.
+return : 1 :: (frequency complete)start bundling and wait for fetched file from MC
+return : 2 :: no need to start bundling
+return : 3 :: invalid recentPA.txt file, someone is trying to hack
+
+
+retunr
+*/
+int check_recentPA(char *paID){
+    char filename[50]="./log/recentPA.txt";
+    key RFM_key;
+    get_RFM_Key(&RFM_key);
+    int valid_status= Validating_File(filename , RFM_key);
+    if(valid_status!=1){
+        //file is not valid
+        return 3;
+    }
+    // file is valid and can be further used
+    FILE *fptr;
+    fptr=fopen("./log/recentPA.txt","r");
+    int i=0;
+    char aux;
+    char content[5000];
+    while((aux=fgetc(fptr))!=EOF){
+        content[i]=aux;
+        i++;
+    }
+    content[i]='\0';
+    //tags to be fetched are:
+    //1) start time and end time
+    //2) allowable frequency
+    //3) frequency of done flights
+
+    //fetching start time and end time
+    char start_time_tag[50]="Start_time";
+    char start_time_content[70];
+    char end_time_tag[40]="End_time";
+    char end_time_content[70];
+    char PA_ID_tag[50]="permissionArtifactId";
+
+    fetch_tag(content,start_time_tag,start_time_content);
+    fetch_tag(content,end_time_tag,end_time_content);
+    fetch_tag(content,PA_ID_tag,paID);
+
+    // now, checking if current time lies inside the limits
+    int check_status=check_time(start_time_content,end_time_content);
+    if(check_status!=1){
+         // not in time :: start bundling
+        return 0;
+    }
+    // at this point it is sure that current time is in limits
+
+    // now check for frequency
+    // two frequencies need to be fetched :1) allowable 2)done_flights
+    char allow_frequency_tag[50]="allowable_frequency";
+    char done_frequency_tag[50]="done_frequency";
+
+    char allow_freq_content[60];
+    char done_freq_content[60];
+
+    fetch_tag(content,allow_frequency_tag,allow_freq_content);
+    fetch_tag(content,done_frequency_tag,done_freq_content);
+
+    if(strcmp(allow_freq_content,done_freq_content)==0){
+        return 1;
+    }
+
+
+
+    //in time and in_limit_frequency :: no need to start bundle
+
+    return 2;
+}
+
+
+
+////////////////////////////  PA_EXTRACT.cpp
+
+ParsedData parse_artifact()
+{
+
+
+    ParsedData result{};
+
+    char file_name[100]="./log/permission_artifact_breach.xml"; // read mode
+
+    char  start_time[200], end_time[200];//,long_lat_coords[20][20];
+
+    char Reference_canonilized[5000];// variable to hold canonicalized reference section
+
+    char xmlExeclusive[5000];
+    char outputih[5000];
+        // This function will extract the reference section out of the xml file (PA)
+	    //and willl perform canonicalization step over it
+    Reference_canon(file_name,Reference_canonilized);
+    xmlExeclusiveCanon(Reference_canonilized,outputih);
+    cleanerXML(outputih,xmlExeclusive);
+
+    char tag_flight_start[100]="flightStartTime=";
+
+    char tag_flight_end[100]="flightEndTime=";
+    printf("\ncanon part %s\n",xmlExeclusive);
+    int index_start_flight=isSubstring(tag_flight_start,xmlExeclusive);
+    printf("\nindex start %d\n",index_start_flight);
+    index_start_flight=index_start_flight+int(strlen(tag_flight_start))+1;
+    printf("\nstart char %c\n",xmlExeclusive[index_start_flight]);
+    int aux_fetch1=0;
+    while(xmlExeclusive[index_start_flight]!='\"'){
+
+
+        start_time[aux_fetch1]=xmlExeclusive[index_start_flight];
+        index_start_flight++;
+        aux_fetch1++;
+
+    }
+    start_time[aux_fetch1]='\0';
+    printf("\n\nstart time is :%s\n\n",start_time);
+
+
+    int index_end_flight=isSubstring(tag_flight_end,xmlExeclusive);
+       printf("\nindex start %d\n",index_end_flight);
+    index_end_flight=index_end_flight+int(strlen(tag_flight_end))+1;
+    aux_fetch1=0;
+    while(xmlExeclusive[index_end_flight]!='\"'){
+
+
+        end_time[aux_fetch1]=xmlExeclusive[index_end_flight];
+        aux_fetch1++;
+        index_end_flight++;
+    }
+    end_time[aux_fetch1]='\0';
+    printf("\n\nend time is :%s\n\n",end_time);
+
+
+    strcpy(result.start_time,start_time);
+    printf("\nstart time inside parseartifact:%s\n",start_time);
+    strcpy(result.end_time , end_time);
+
+    char tag_coordinates[60]="<Coordinates>";
+
+    char tag_coordinates_end[60]="</Coordinates>";
+
+    int index_coordinates_start=isSubstring(tag_coordinates,xmlExeclusive);
+
+    int index_coordinates_end=isSubstring(tag_coordinates_end,xmlExeclusive);
+
+    index_coordinates_start=index_coordinates_start+int(strlen(tag_coordinates));
+
+    int co_ind= index_coordinates_start;
+    tag_value geo_coordinate[10];
+    int number_of_tags=0;
+    int start1=0;
+    int start2=0;
+    int end1=0;
+    int end2=0;
+    char aux_tag[100];
+    char aux_value[100];
+     printf("\nhelllloooo\n");
+    while(co_ind<index_coordinates_end){
+
+        if(xmlExeclusive[co_ind]==' ')
+        {
+            //space arrived
+            while(xmlExeclusive[co_ind]!='>')
+            {
+                start1=co_ind+1;
+                while(xmlExeclusive[co_ind]!='='){
+                    co_ind++;
+                }
+                end1=co_ind-1;
+                start2=co_ind+2;
+                co_ind=co_ind+2;
+
+                while(xmlExeclusive[co_ind]!='\"'){
+                    co_ind++;
+                }
+                end2=co_ind-1;
+                co_ind++;
+
+
+                formPairstrings(aux_tag,aux_value,start1,start2,end1,end2,xmlExeclusive);
+
+
+                strcpy(geo_coordinate[number_of_tags].tag,aux_tag);
+                strcpy(geo_coordinate[number_of_tags].value,aux_value);
+                memset(aux_tag, ' ', (end1-start1)*sizeof(char));
+                memset(aux_value, ' ', (end2-start2)*sizeof(char));
+
+
+
+                //printf("%s %s\n",value_aux,tag_aux);
+                // add to tag value array
+
+
+                number_of_tags++;
+            }
+
+        }
+        co_ind++;
+    }
+/*
+    for(int i=0;i<number_of_tags;i++){
+        printf("\n%s\n",geo_coordinate[i].tag);
+        printf("\n%s\n",geo_coordinate[i].value);
+          printf("\n\n");
+    }
+
+*/
+    for(int i = 1; i<=4;i++)
+        {
+            result.long_lat_coords[i-1][0] = atof(geo_coordinate[2*i-2].value);
+            result.long_lat_coords[i-1][1] = atof(geo_coordinate[2*i-1].value);
+        }
+
+
+
+
+    return result;
+}
+
+
+
+bool In_Place(ParsedData geo,int latti, int longi){
+
+    double max_lat=-700;
+    double min_lat=700;
+    for(int i=0;i<4;i++)
+    {
+        if(geo.long_lat_coords[i][0]<=min_lat){
+            min_lat=geo.long_lat_coords[i][0];
+        }
+        if(geo.long_lat_coords[i][0]>=max_lat){
+            max_lat=geo.long_lat_coords[i][0];
+        }
+    }
+    double max_lon=-700;
+    double min_lon=700;
+    for(int i=0;i<4;i++)
+    {
+        if(geo.long_lat_coords[i][0]<=min_lon){
+            min_lon=geo.long_lat_coords[i][1];
+        }
+        if(geo.long_lat_coords[i][0]>=max_lon){
+            max_lon=geo.long_lat_coords[i][1];
+        }
+    }
+
+    if(double(latti)>=min_lat && double(latti)<=max_lat ){
+        if(double(longi)>=min_lon && double(longi)<=max_lon ){
+            return 1;
+        }else{
+            return 0;
+        }
+
+    }else{
+        return 0;
+    }
+
+}
+
+
+
+bool In_Time(Date_time current, GEO_DATE_TIME_XML Xml)
+{
+
+	// full check
+   // printf("/n/n Inside In_Time function /n/n");
+	if(Xml.start.Year<=current.Year && current.Year<=Xml.end.Year)
+    {
+        printf("\n year is ok \n ");
+		if(Xml.start.Month<=current.Month && current.Month<=Xml.end.Month)
+        {
+            printf("\n Month is ok \n");
+            if(Xml.start.date<=current.date && current.date<=Xml.end.date)
+            {
+                printf("\n Date is ok \n");
+            }
+		    else{
+                printf("%\nThis is when date is out of limits d \n",current.Year);
+			    return 0;
+		    }
+		}else{
+			return 0;
+		}
+	}
+	else{
+        	return 0;
+	}
+	//time check
+	if(Xml.start.Hours<=current.Hours || current.Hours<=Xml.end.Hours)//||
+    {
+        printf(" \n Hours is ok \n");
+        if(Xml.start.Hours==current.Hours||current.Hours==Xml.end.Hours){
+            printf("both the hours are equal");
+            if(Xml.start.Hours==current.Hours)
+            {
+                printf("\nstart hours are equal");
+                if(Xml.start.Minutes<=current.Minutes)
+                {
+                    printf(" minutes are ok");
+                    if(Xml.start.Minutes==current.Minutes)
+                    {
+                        printf("miutes are equal");
+                        if(Xml.start.Seconds<=current.Seconds){
+                            return 1;
+                        }else
+                        {   return 0;
+                        }
+                    }else
+                    {
+                        return 1;}
+                }else
+                {
+                    return 0;
+                }
+            }
+            else{
+                if(Xml.end.Minutes>=current.Minutes)
+                {
+                    if(Xml.end.Minutes==current.Minutes){
+                        if(Xml.end.Seconds>current.Seconds){
+                            return 1;
+                        }else{
+                            return 0;
+                        }
+                    }else{return 1;}
+                }else
+                {
+                    return 0;
+                }
+            }
+        }
+    }else
+    {
+        return 0;
+    }
+return 0;
+}
+
+
+void data_fetch_delete(){
+    // this function is called when pa has been validated for time, place, sign and drone ID
+    // data that needs to be entered in recentPA.txt
+    // 1)time : start time and end time
+    // 2)location: gps coordinates (4)
+    // 3)frequency upto which drone can make flights
+    // 4)pa_id
+    // 5)maximum altitude
+    // 6) number of flghts done
+    // 7)previous log hash
+
+    ParsedData data= parse_artifact();
+    FILE *fptr;
+    fptr=fopen("./log/permission_artifact_breach.xml","r");
+    char content[5000];
+    char ch;
+    int i=0;
+    while((ch=fgetc(fptr))!=EOF){
+        content[i]=ch;
+        i++;
+    }
+    content[i]='\0';
+
+   // printf("\ndata fetch delete:::%s\n",content);
+    // fetching frequency
+    char tag_frequency[30]="frequency=";
+    char tag_freq[30]="frequency_allowable";
+    int index_frequency=isSubstring(tag_frequency,content);
+
+    index_frequency=index_frequency+int(strlen(tag_frequency))+1;
+
+    char tag_content_freq[30];
+
+    i=0;
+    while(content[index_frequency]!='\"'){
+        tag_content_freq[i]=content[index_frequency];
+        index_frequency++;
+        i++;
+    }
+    tag_content_freq[i]='\0';//frequencies fetched.
+
+
+
+    // fetching maximum altitude
+    char tag_maxalt[30]="maxAltitude=";
+    char tag_max[30]="maxAltitude";
+    int index_maxalt=isSubstring(tag_maxalt,content);
+
+    index_maxalt=index_maxalt+int(strlen(tag_maxalt))+1;
+
+    char tag_content_maxalt[30];
+
+    i=0;
+    while(content[index_maxalt]!='\"'){
+        tag_content_maxalt[i]=content[index_maxalt];
+        index_maxalt++;
+        i++;
+    }
+    tag_content_maxalt[i]='\0';//frequencies fetched.
+
+
+    // fetching PA ID
+    char tag_paID[70]="permissionArtifactId=";
+    char tag_PAid[70]="permissionArtifactId";
+    int index_paID=isSubstring(tag_paID,content);
+
+    index_paID=index_paID+int(strlen(tag_paID))+1;
+
+    char tag_content_paID[70];
+
+    i=0;
+    while(content[index_paID]!='\"'){
+        tag_content_paID[i]=content[index_paID];
+        index_paID++;
+        i++;
+    }
+    tag_content_paID[i]='\0';//frequencies fetched.
+    printf("\n\ntag_content_paID::::%s\n\n",tag_content_paID);
+    pair_set pairset[14];
+
+    strcpy(pairset[0].tag,tag_PAid);
+    strcpy(pairset[0].value,tag_content_paID);
+
+
+    strcpy(pairset[1].tag,tag_freq);
+    strcpy(pairset[1].value,tag_content_freq);
+
+    strcpy(pairset[2].tag,tag_max);
+    strcpy(pairset[2].value,tag_content_maxalt);
+
+
+   // int fetch_i=0;
+   // char start_time[60];
+    //char end_time[60];
+    char aux_float[40];
+   // sprintf(aux_float,"%f",data.start_time);
+
+
+    //// start time
+
+    strcpy(pairset[3].tag,"Start_time");
+    strcpy(pairset[3].value,data.start_time);
+
+    //// end time
+    strcpy(pairset[4].tag,"End_time");
+    strcpy(pairset[4].value,data.end_time);
+
+    //sprintf(aux_float,"%d",int((10^7)*data.long_lat_coords[0][0]));
+    char *f1=gcvt(data.long_lat_coords[0][0], 8, aux_float);
+    printf("\n%s\n",f1);
+    printf("\n mainnf %s\n",aux_float);
+    //lattitude1
+    strcpy(pairset[5].tag,"lattitude1");
+    strcpy(pairset[5].value,aux_float);
+    memset(aux_float,' ',sizeof(aux_float));
+
+    //longitude1
+    //sprintf(aux_float,"%d",int((10^7)*data.long_lat_coords[0][1]));
+   f1=gcvt(data.long_lat_coords[0][1], 8, aux_float);
+    printf("\n%s\n",f1);
+    printf("\n mainnf %s\n",aux_float);
+    strcpy(pairset[6].tag,"longitude1");
+    strcpy(pairset[6].value,aux_float);
+    memset(aux_float,' ',sizeof(aux_float));
+
+    //lattitude2
+   // sprintf(aux_float,"%d",int((10^7)*data.long_lat_coords[1][0]));
+    f1=gcvt(data.long_lat_coords[1][0], 8, aux_float);
+    printf("\n%s\n",f1);
+    printf("\n mainnf %s\n",aux_float);
+    strcpy(pairset[7].tag,"lattitude2");
+    strcpy(pairset[7].value,aux_float);
+    memset(aux_float,' ',12*sizeof(char));
+
+    //longitude2
+   // printf("printitng %d",int((10^7)*data.long_lat_coords[2][1]));
+   // sprintf(aux_float,"%d",int((10^7)*data.long_lat_coords[2][1]));
+    f1=gcvt(data.long_lat_coords[2][1], 8, aux_float);
+    printf("\n mainnf %f %s\n",data.long_lat_coords[2][1],aux_float);
+   // printf("\n%s\n",f1);
+    strcpy(pairset[8].tag,"longitude2");
+    strcpy(pairset[8].value,aux_float);
+    memset(aux_float,' ',sizeof(aux_float));
+
+    strcpy(pairset[9].tag,"frequencies_done");
+    strcpy(pairset[9].value,"0");
+
+
+    strcpy(pairset[10].tag,"fetch_required");
+    strcpy(pairset[10].value,"0");
+
+
+   strcpy(pairset[11].tag,"previous_log_hash");
+   strcpy(pairset[11].value,"None");
+
+
+
+
+    char fileName[20]="./log/recentPA.txt";
+
+    key RFM_private_key;
+
+    get_RFM_Key(&RFM_private_key);
+
+  //  free(value_modulus);
+
+    pair_file_write(pairset,12,fileName,RFM_private_key);
+
+
+
+
+   // remove("./log/permission_artifact_breach.xml");
+
+}
+
+int date_time_extract_and_check()
+{
+
+	FILE * file;
+	int vehi_gps_pos=orb_subscribe(ORB_ID(vehicle_gps_position));
+    time_t timestamp;
+    struct vehicle_gps_position_s raw;
+    orb_copy(ORB_ID(vehicle_gps_position),vehi_gps_pos,&raw);
+    int lattitude=raw.lat;
+    int longitude=raw.lon;
+    int alttitude=raw.alt_ellipsoid;
+    printf("\n\ncurrent lattitude: %d \ncurrent longitude: %d \ncurrent height: %d ",lattitude,longitude,alttitude);
+    timestamp=(raw.time_utc_usec)/1000000;//microsecond to seconds
+	printf("\ntimestamp is seconds: %u\n",timestamp);
+    struct tm  ts;
+    Date_time DT;//current time
+    ts = *localtime(&timestamp);
+    DT.Year=ts.tm_year+1900;
+    DT.Month=ts.tm_mon+1;
+    DT.date=ts.tm_mday;
+	DT.Hours=ts.tm_hour;
+	DT.Minutes=ts.tm_min;
+	DT.Seconds=ts.tm_sec;
+	printf("\n%d/%d/%d current date and time from GPS %d:%d:%d \n",DT.Year,DT.Month,DT.date,DT.Hours,DT.Minutes,DT.Seconds);
+
+	file = fopen("./log/permission_artifact_breach.xml", "r");// ./log/ for posix /log/ for nuttx
+	if (file)
+    {
+        fclose(file);
+        GEO_DATE_TIME_XML Rv;
+        ParsedData data= parse_artifact();
+            printf("\n  %s    from parse_artifact function      %s \n ",data.start_time,data.end_time);
+            char aux_buf1[60];
+            // extracting start year
+        printf("\n");
+        int length_str=0;
+        int i_iter=0;
+        while(length_str<(int)strlen(data.start_time))
+        {
+                if (data.start_time[i_iter]=='.')
+                {
+                    break;
+                }
+
+                if ( data.start_time[i_iter]!='T' && data.start_time[i_iter]!='-' && data.start_time[i_iter]!=':')
+                {
+                    aux_buf1[length_str]=data.start_time[i_iter];
+
+                    if(i_iter==3)
+                    {
+                        aux_buf1[length_str+1]='\0';
+                        printf(" %s ",aux_buf1);
+                        Rv.start.Year=strtol(aux_buf1,NULL,10);
+                        printf("year: %d ",Rv.start.Year);
+                        memset(aux_buf1,'0',4);
+
+                    }
+                    if(i_iter==6){
+                        aux_buf1[length_str+1]='\0';
+                        printf(" %s ",aux_buf1);
+                        Rv.start.Month=strtol(aux_buf1,NULL,10);
+                        printf("month: %d ",Rv.start.Month);
+                        memset(aux_buf1,'0',7);
+                    }
+                    if(i_iter==9){
+                        aux_buf1[length_str+1]='\0';
+                        printf(" %s ",aux_buf1);
+                        Rv.start.date=strtol(aux_buf1,NULL,10);
+                        printf("date: %d ",Rv.start.date);
+                        memset(aux_buf1,'0',10);
+                    }
+                    if(i_iter==12){
+                        aux_buf1[length_str+1]='\0';
+                        printf(" %s ",aux_buf1);
+                        Rv.start.Hours=strtol(aux_buf1,NULL,10);
+                        printf("Hours: %d ",Rv.start.Hours);
+                        memset(aux_buf1,'0',10);
+                    }
+                    if(i_iter==15){
+                        aux_buf1[length_str+1]='\0';
+                        printf(" %s ",aux_buf1);
+                        Rv.start.Minutes=strtol(aux_buf1,NULL,10);
+                        printf("Minutes: %d ",Rv.start.Minutes);
+                        memset(aux_buf1,'0',12);
+                    }
+                    if(i_iter==18)
+                    {
+                        aux_buf1[length_str+1]='\0';
+                        printf(" %s ",aux_buf1);
+                        Rv.start.Seconds=strtol(aux_buf1,NULL,10);
+                        printf("Seconds: %d ",Rv.start.Seconds);
+                        memset(aux_buf1,'0',12);
+                    }
+
+                        length_str++;
+                }
+                i_iter++;
+
+        }
+        printf("\n\n");
+        memset(aux_buf1,'0',60);
+        // extracting end year
+        printf("\n");
+        length_str=0;
+        i_iter=0;
+        while(length_str<(int)strlen(data.end_time)){
+            if (data.end_time[i_iter]=='.'){
+                break;
+            }
+
+            if ( data.end_time[i_iter]!='T' && data.end_time[i_iter]!='-' && data.end_time[i_iter]!=':'){
+
+
+            aux_buf1[length_str]=data.end_time[i_iter];
+
+            if(i_iter==3){
+                aux_buf1[length_str+1]='\0';
+                printf(" %s ",aux_buf1);
+                Rv.end.Year=strtol(aux_buf1,NULL,10);
+                printf("year: %d ",Rv.end.Year);
+                memset(aux_buf1,'0',4);
+
+            }
+            if(i_iter==6){
+                aux_buf1[length_str+1]='\0';
+                printf(" %s ",aux_buf1);
+                Rv.end.Month=strtol(aux_buf1,NULL,10);
+                printf("month: %d ",Rv.end.Month);
+                memset(aux_buf1,'0',7);
+            }
+            if(i_iter==9){
+                aux_buf1[length_str+1]='\0';
+                printf(" %s ",aux_buf1);
+                Rv.end.date=strtol(aux_buf1,NULL,10);
+                printf("date: %d ",Rv.start.date);
+                memset(aux_buf1,'0',10);
+            }
+            if(i_iter==12){
+                aux_buf1[length_str+1]='\0';
+                printf(" %s ",aux_buf1);
+                Rv.end.Hours=strtol(aux_buf1,NULL,10);
+                printf("Hours: %d ",Rv.end.Hours);
+                memset(aux_buf1,'0',10);
+            }
+            if(i_iter==15){
+                aux_buf1[length_str+1]='\0';
+                printf(" %s ",aux_buf1);
+                Rv.end.Minutes=strtol(aux_buf1,NULL,10);
+                printf("Minutes: %d ",Rv.end.Minutes);
+                memset(aux_buf1,'0',12);
+            }
+            if(i_iter==18){
+                aux_buf1[length_str+1]='\0';
+                printf(" %s ",aux_buf1);
+                Rv.end.Seconds=strtol(aux_buf1,NULL,10);
+                printf("Seconds: %d ",Rv.end.Seconds);
+                memset(aux_buf1,'0',12);
+            }
+
+                length_str++;
+            }
+            i_iter++;
+
+        }
+
+
+        printf("\n\n");
+        printf("\nfrom xml end date and time:: %d/%d/%d and  %d:%d:%d",Rv.end.Year,Rv.end.Month,Rv.end.date,Rv.end.Hours,Rv.end.Minutes,Rv.end.Seconds);
+        printf("\n\n");
+        printf("\nfrom xml start date and time:: %d/%d/%d and  %d:%d:%d",Rv.start.Year,Rv.start.Month,Rv.start.date,Rv.start.Hours,Rv.start.Minutes,Rv.start.Seconds);
+
+
+            //int has_artifact = 1;
+            //param_set(param_find("PERM_ARTIFACT"),&has_artifact);
+            //printf("Permission Artifact Found \n");
+
+        bool in_place=In_Place(data,lattitude,longitude);
+
+        bool in_time=In_Time(DT,Rv);
+        if (in_time!=1){
+            printf("\n permission denied\n");
+            return 0;
+        }else{
+            if(in_place!=1){
+              return 2;
+            }
+            return 1;
+
+        }
+
+	}
+	else
+    {
+   	//file doesn't exists or cannot be opened (es. you don't have access permission)
+	//int has_artifact = 0;
+	//param_set(param_find("PERM_ARTIFACT"),&has_artifact);
+	return 0;
+	}
+}
+
+int DroneIDverification(char *paID){
+    char file_name[60]="./log/permission_artifact_breach.xml";
+    char Reference_canonilized[5000];// variable to hold canonicalized reference section
+
+    char content[5000];
+    char outputih[5000];
+        // This function will extract the reference section out of the xml file (PA)
+	    //and willl perform canonicalization step over it
+    Reference_canon(file_name,Reference_canonilized);
+    xmlExeclusiveCanon(Reference_canonilized,outputih);
+    cleanerXML(outputih,content);
+
+    char paID_tag[70]="permissionArtifactId";
+    char paID_contains[100];
+    fetch_tag(content,paID_tag,paID_contains);
+    if(strcmp(paID_contains,paID)!=0){
+        return 2;
+    }
+    char tag[30]="UUID=";
+    char tag_content[50];
+    int index=isSubstring(tag,content);
+    int i=index;
+    while(content[i]!='='){
+        i++;
+    }
+    i=i+2;
+    int k=0;
+    while(content[i]!='\"'){
+        tag_content[k]=content[i];
+        i++;
+        k++;
+    }
+    tag_content[k]='\0';
+    printf("\n%s\n",content);
+    printf("\n%s\n",tag_content);
+    char dro[40]="ABBDDJEDNDJK";
+    if(strcmp(tag_content,dro)==0){
+        return 1;
+    }else{
+        return 0;
+    }
+
+
+}
+
+
+int DroneIDverification(){
+    char file_name[60]="./log/permission_artifact_breach.xml";
+    char Reference_canonilized[5000];// variable to hold canonicalized reference section
+
+    char content[5000];
+    char outputih[5000];
+        // This function will extract the reference section out of the xml file (PA)
+	    //and willl perform canonicalization step over it
+    Reference_canon(file_name,Reference_canonilized);
+    xmlExeclusiveCanon(Reference_canonilized,outputih);
+    cleanerXML(outputih,content);
+
+    /*char paID_tag[70]="permissionArtifactId";
+    char paID_contains[100];
+    fetch_tag(content,paID_tag,paID_contains);
+    if(strcmp(paID_contains,paID)!=0){
+        return 2;
+    }*/
+    char tag[30]="UUID=";
+    char tag_content[50];
+    int index=isSubstring(tag,content);
+    int i=index;
+    while(content[i]!='='){
+        i++;
+    }
+    i=i+2;
+    int k=0;
+    while(content[i]!='\"'){
+        tag_content[k]=content[i];
+        i++;
+        k++;
+    }
+    tag_content[k]='\0';
+    printf("\n%s\n",content);
+    printf("\n%s\n",tag_content);
+    char dro[40]="ABBDDJEDNDJK";
+    if(strcmp(tag_content,dro)==0){
+        return 1;
+    }else{
+        return 0;
+    }
+
+
+}
+
+void formPairstrings(char *tag,char *value,int st1,int st2,int end1,int end2,char *sample){
+    int count=0;
+    for(int i=st1;i<=end1;i++){
+        tag[count]=sample[i];
+        count++;
+    }
+    tag[count]='\0';
+    count =0;
+    for(int i=st2;i<=end2;i++){
+        value[count]=sample[i];
+        count++;
+    }
+    value[count]='\0';
+
+
+}
+
+int min(int a,int b){
+    if(a<b){
+        return a;
+    }
+    else{
+        return b;
+    }
+
+}
+
+void sortAndmake(tag_value *aux,int number_of_tags,char *result){
+   // tag_value res[10];
+   //for(int i=0;i<number_of_tags;i++){
+        //printf("\n%s\n",aux[i].tag);
+       // printf("\n%s\n",aux[i].value);
+     //   printf("\n\n");
+   // }
+
+    char aux_tag[100];
+    char aux_value[100];
+
+   // int mini=10000;
+    int k=0;
+
+    for(int i=0;i<number_of_tags;i++)
+    {
+       for(int j=i+1;j<number_of_tags;j++)
+       {
+
+           k=min(int(strlen(aux[i].tag)),int(strlen(aux[j].tag)));
+
+           for(int v=0;v<k;v++)
+           {
+
+               if(int(aux[i].tag[v])> int(aux[j].tag[v])){
+                   //swapping needed
+                   strcpy(aux_tag,aux[i].tag);
+                   strcpy(aux_value,aux[i].value);
+
+                   strcpy(aux[i].tag,aux[j].tag);
+                   strcpy(aux[i].value,aux[j].value);
+
+                   strcpy(aux[j].tag,aux_tag);
+                   strcpy(aux[j].value,aux_value);
+
+
+
+               }else if(int(aux[i].tag[v])< int(aux[j].tag[v])){
+                   break;
+               }else {
+                   continue;
+               }
+           }
+
+
+       }
+
+    }
+    for(int i=0;i<number_of_tags;i++){
+        printf("\n%s\n",aux[i].tag);
+        printf("\n%s\n",aux[i].value);
+        printf("\n\n");
+       if(i==0){
+        strcpy(result,aux[i].tag);
+       }else{
+           strcat(result," ");
+           strcat(result,aux[i].tag);
+       }
+       strcat(result,"=");
+        strcat(result,"\"");
+        strcat(result,aux[i].value);
+
+        strcat(result,"\"");
+    }
+    strcat(result,">\0");
+    printf("\n%s\n",result);
+
+
+}
+
+
+void xmlExeclusiveCanon(char *sample,char *result){
+    int i=0;
+    int r=0;
+    int start1=0,start2=0;
+    int end1=0,end2=0;
+    int element_head_set=0;
+    int check_element=0;
+
+    char aux_buff[1000];
+     char tag_aux[100];
+    char value_aux[100];
+
+
+    while(sample[i]!='\0')
+    {
+        if(sample[i]=='<'){
+            check_element=1;
+           // element_head_set=1;
+           result[r]=sample[i];
+            r++;
+            i++;
+            continue;
+
+
+        }
+
+        if(check_element==1 && sample[i]=='>' && element_head_set==0){
+            //type <xxxx> </xxx>
+            //just passby
+            check_element=0;
+            result[r]=sample[i];
+            r++;
+            i++;
+
+
+            continue;
+
+        }
+        else if (check_element==1 && sample[i]==' ')
+        {
+            //type <xxx > this has tag and values
+           // element_head_set==1;
+            int number_of_tags=0;
+            result[r]=sample[i];
+            r++;
+            tag_value *aux=(tag_value*) malloc(10*sizeof(tag_value));
+
+            //create an element
+            while(sample[i]!='>')
+            {
+
+                start1=i+1;
+                while(sample[i]!='=')
+                {
+                    i++;
+               //     printf("%c",sample[i]);
+                }
+              //  printf("%c\n",sample[i]);
+                end1=i-1;
+                start2=i+2;
+
+                i=i+2;
+               // printf("\n%c",sample[i]);
+                while(sample[i]!='\"')
+                {
+                    i++;
+                }
+                end2=i-1;
+                i++;//coming at space or >
+
+                // form tag and value strings
+             /*   printf(" %c ",sample[start2]);
+
+                printf(" %c \n",sample[end2]);
+
+                printf(" %c ",sample[start1]);
+                printf(" %c \n",sample[end1]);*/
+                formPairstrings(tag_aux,value_aux,start1,start2,end1,end2,sample);
+
+                strcpy(aux[number_of_tags].tag,tag_aux);
+                strcpy(aux[number_of_tags].value,value_aux);
+                memset(tag_aux, ' ', (end1-start1)*sizeof(char));
+                if(sample[start2]!='\"'){
+                    //no value for tag;
+                    memset(value_aux, ' ', (end2-start2)*sizeof(char));
+                }
+
+
+                //printf("%s %s\n",value_aux,tag_aux);
+                // add to tag value array
+
+
+                number_of_tags++;
+
+            }
+             // send array to the sort and make function
+            sortAndmake(aux,number_of_tags,aux_buff);
+            // function sends a sorted string which is catenated at the end
+            printf("\n on return \n %s \n",aux_buff);
+           // strcat(result,aux_buff);
+           // strcat(result,"\0");
+           // r=r+int(strlen(aux_buff));
+           int y=0;
+           while(aux_buff[y]!='\0'){
+               result[r]=aux_buff[y];
+               r++;
+               y++;
+           }
+
+             memset(aux_buff, ' ', (int(strlen(aux_buff)))*sizeof(char));
+
+                // of the result array
+           // element_head_set=0;
+            check_element=0;
+            free(aux);
+            i++;
+            continue;
+        }
+
+        result[r]=sample[i];
+        r++;
+        i++;
+
+    }
+
+    result[r]='\0';
+
+
+}
+
+
+int Is_PA_VAlid(){
+	char Tag_Digest_value0[12]="DigestValue";
+        char Digest_Value0[100];// in base 64
+        char Digest_Value_in_hex[100];// in hex
+
+        char Tag_Signed_Value0[17]="SignatureValue";
+        char Signature_Value0[550];// in base 64
+        char Signature_Value_in_hex[500];// in hex
+        char  Extracted_sha_from_Signature_value[100];
+
+        char file_name[48]="./log/permission_artifact_breach.xml";//"permission_artifact_1.xml";
+
+
+
+        char Sha_of_Reference[300];
+
+        char Sha_of_SignedInfo[300];
+
+        char SignedInfo_canonilized[4000];
+
+        char Reference_canonilized[5000];// variable to hold canonicalized reference section
+
+        char xmlExeclusive[5000];
+        char output[5000];
+        char outputS[3000];
+        // This function will extract the reference section out of the xml file (PA)
+	    //and willl perform canonicalization step over it
+        Reference_canon(file_name,Reference_canonilized);
+        cleanerXML(Reference_canonilized,output);
+        printf("\noutput:::::::::::::: %s\n",output);
+        xmlExeclusiveCanon(output,xmlExeclusive);
+
+        printf("\n\nexe xml  :%s\n\n",xmlExeclusive);
+
+
+	    //This section will extract the signed info section out of the xml file (PA)
+	    //and will perform canonicalization step over it
+	    SignedInfo_canon(file_name,SignedInfo_canonilized);
+        cleanerXML(SignedInfo_canonilized,outputS);
+        printf("\nSigned Info :%s\n",SignedInfo_canonilized);
+
+        printf("\n");
+
+
+	    // SHA value calculated for extracted canonicalized SIgned info and reference section
+	    //start
+        char ch;
+        unsigned char st_arr[3000];
+	    unsigned char *st=&st_arr[0];
+        unsigned int iff=0;
+        // assigning char to unsigned char (this is done to have asci value in 8 bits rather than 7 bits)
+        while(1){
+	      ch=xmlExeclusive[iff];
+	     if(ch=='\0'){
+		   break;
+	     }
+         *(st+iff)=ch;
+	//	printf("%c",*(st+iff));
+		iff++;
+        }
+
+
+	printf("\n");
+	printf("\n");
+
+        SHA256 sha;
+
+	sha.update(st,iff);
+
+	uint8_t * digest = sha.digest();
+        int it=0;//just an iterator
+	//printing digest
+	printf("\n");
+
+        while(it<32){
+		printf("%02x",*(digest+it));
+		it++;
+	}
+       int aux0;
+       int count_digest=0;
+       it=0;
+       while(it<32)
+          {
+
+            aux0=(*(digest+it)<<24)|(*(digest+it+1)<<16)|(*(digest+it+2)<<8)|*(digest+it+3);
+
+            for(int h=28;h>=0;h=h-4){
+               Sha_of_Reference[count_digest] =HEX_DIGITS[(aux0>>h)&0xf];
+               count_digest++;
+            }
+
+		    it=it+4;
+	   }
+
+      Sha_of_Reference[count_digest]='\0';
+   printf("\nSha of reference section that has been canonicalized :%s\n",Sha_of_Reference);
+
+   //   printf("\n");
+
+
+   char ch1;
+   unsigned char st1_arr[3000];
+   unsigned char *st1=&st1_arr[0];
+   unsigned int i1=0;
+    //// assigning char to unsigned char
+    while(1){
+	   ch1=outputS[i1];
+	   if(ch1=='\0'){
+		   break;
+	   }
+        *(st1+i1)=ch1;
+	//	printf("%c",*(st1+i1));
+		i1++;
+
+    }
+
+
+	printf("\n");
+	printf("\n");
+
+   SHA256 sha1;
+
+	sha1.update(st1,i1);
+
+	uint8_t * digest1 = sha1.digest();
+   it=0;//just an iterator
+	//printing digest
+	printf("\n");
+
+   while(it<32){
+		printf("%02x",*(digest1+it));
+		it++;
+	}
+   int aux1;
+   count_digest=0;
+   it=0;
+   while(it<32)
+      {
+
+            aux1=(*(digest1+it)<<24)|(*(digest1+it+1)<<16)|(*(digest1+it+2)<<8)|*(digest1+it+3);
+
+            for(int h=28;h>=0;h=h-4){
+               Sha_of_SignedInfo[count_digest] =HEX_DIGITS[(aux1>>h)&0xf];
+               count_digest++;
+            }
+
+		    it=it+4;
+	   }
+
+   Sha_of_SignedInfo[count_digest]='\0';
+   printf("\nsha of SignedInfo section that has been canonicalized :%s\n",Sha_of_SignedInfo);
+
+//	printf("\n");
+
+
+   // SHA value calculated for extracted canonicalized SIgned info and reference section
+   // end
+
+   //In coming functions :
+   //1) extracting digest value
+   //2)converting it to hex from base64
+   //same above two steps for Signature value.
+
+    // start
+    // storing Digest value
+   getTagvalue(Tag_Digest_value0,Digest_Value0,file_name);
+   //  printf("\nhello  %d\n",Digestv.len);
+
+
+  // printf("\n Digest value in the permission artefact is %s\n",Digest_Value0);
+
+  // printf("\n");
+   base64decoder(Digest_Value0, Digest_Value_in_hex);
+  // printf("\n");
+  // printf("\n Digest value in hex format %s \n",Digest_Value_in_hex);
+
+
+   // storing Signed value
+   getTagvalue(Tag_Signed_Value0,Signature_Value0, file_name);
+
+
+
+   printf("\n Signature value in the permission artefact is%d\n %s\n",int(strlen(Signature_Value0)),Signature_Value0);
+   printf("\n");
+
+   base64decoder(Signature_Value0, Signature_Value_in_hex);
+   printf("\n");
+   printf("\n Signature value in hex format %s \n",Signature_Value_in_hex);
+
+   //end
+
+   // message: bignum object created for storing value of Signature value
+   // now Performing modulus operation on bignumber integers
+
+   mp_int message,modulus,public_key,Decrypted;
+   mp_init_multi(&message,&modulus,&public_key,&Decrypted,NULL);
+   mp_read_radix(&message,Signature_Value_in_hex,16);
+
+   /// Public key of dgca: This has to be taken from a reserved file in directory./ firmware update
+
+ //  mp_int ;
+   char Modulus[513]="ab9d5c8d1fe67207749d63b7dcedd233ce32bb70d175a1bc38c612ab33e2c58e51f83f2788e4d52d9bceb5a1513929de3f526650071a067e6c161b05c60a495fc3ba79ed26f4fa8b2fe2ca8dec44b39759f39206f06a85f9424005a29f05e4cf3a0239340c28c993c1a61cf1b2b6b57c7d8e576ae86827f812b327625baec9ecbf55f1651d35600b9f955f6c2f3bea3aa5852ecdd36a0af818c19acc1030979bed3c89993faa92e0aa0502413b3ca86bbf63477f12ac069aff7137cb72c57f886da79033bbb3b4df0f6cc7fcc18e343aa76036681a566311e267c03b65c98abc91e58f090020c67f776199c0eb76d7e6363687475d3da36ff050f85275607fdd";
+   mp_read_radix(&modulus,Modulus,16);
+
+  // mp_int ;
+   mp_read_radix(&public_key,"65537",10);
+
+   //mp_int ;
+   mp_exptmod(&message, &public_key,&modulus,&Decrypted);   //                       this part for decrypting encrypted text
+
+   char message_string_hex[513];
+   mp_to_hex(&Decrypted,message_string_hex,sizeof(message_string_hex));
+   printf("\n Decrypted signature value : %s\n",message_string_hex);//this is the decrypted message
+   // At this point message has been decrypted
+   // Now having decrypted message in small letters
+   mp_clear_multi(&message,&modulus,&public_key,&Decrypted,NULL);
+   char padding_SHA256[]="1ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff003031300d060960864801650304020105000420";
+   for(int o=0;o<444;o++){
+       if(padding_SHA256[o]!=small_letter(message_string_hex[o])){
+           return 2;
+
+       }
+   }
+  // printf("\n\n");
+   int k_cout=0;
+   for(int i2=445;message_string_hex[i2]!='\0';i2++){
+      Extracted_sha_from_Signature_value[k_cout]=small_letter(message_string_hex[i2]);
+      k_cout++;
+     // printf("%c",message_string_hex[i]);
+   }
+   //with Extracted SHA we are reffering to the expected SHA of SIgned info section
+   Extracted_sha_from_Signature_value[k_cout]='\0';//
+   printf("\n%s\n",Extracted_sha_from_Signature_value);
+
+   if(strcmp(Extracted_sha_from_Signature_value,Sha_of_SignedInfo)==0){
+        printf("SEE if next two string strings are same");
+        printf("\n%s\n ",Sha_of_Reference);
+        printf("%s\n",Digest_Value_in_hex);
+        if(strcmp(Sha_of_Reference,Digest_Value_in_hex)==0){
+            printf("\n 100000000000PA is valid and non tampered \n");
+            int pa_done=1;
+            param_set(param_find("PA_CHECK"),&pa_done);
+            return 1;
+        }else{
+            printf("\n PA is not valid\n");
+            return 0;
+        }
+
+   }else{
+      printf("\n PA is not valid \n");
+    //  PX4_INFO("PA is valid???????????");
+      return 0;
+   }
+
+/// at this point validation is complete
+
+}
+
+
+char* strip(char *str)
+        {
+        size_t len = strlen(str);
+        memmove(str, str+1, len-2);
+        str[len-2] = 0;
+        return str;
+        }
+
+
+void updateStack_remove(char *ptr, stack *ss){
+    int i=0;
+    ss->counter=ss->counter-1;
+    while(1){
+    char t=ss->list_att[ss->counter][i];
+    if (t=='\0'){
+        break;
+    }else{
+        t=' ';
+    }
+    i=i+1;
+    }
+
+}
+
+void updateStack_add(char *ptr,int set, stack *ss)
+{
+    int i=0;
+
+    while(1){
+
+        if(*(ptr+set+i+1)==' ' || *(ptr+set+i+1)=='>'){
+
+            break;
+        }
+
+        ss->list_att[ss->counter][i]=ptr[set+i+1];
+        i++;
+    }
+    ss->list_att[ss->counter][i]='\0';
+   // printf("ha %s ha",ss->list_att[ss->counter]);
+    ss->counter=ss->counter+1;
+
+
+}
+
+void replaceTag(char *ptr, stack *ss,char *result,int *ptr_count){
+    char aux[40];
+    int i=0;
+    ss->counter=ss->counter-1;
+    while(1){
+        char aux_v=ss->list_att[ss->counter][i];
+        if (aux_v=='\0' || aux_v==' '){
+            if(aux_v=='\0'){
+               // printf("endarray");
+            }
+            if(aux_v==' '){
+               // printf("space");
+            }
+            break;
+        }
+        aux[i]=aux_v;
+        i++;
+    }
+
+  //  printf("%c",'>');
+    result[*(ptr_count)]='>';
+    *(ptr_count)=*(ptr_count)+1;
+  //  printf("%c",'<');
+    result[*(ptr_count)]='<';
+    *(ptr_count)=*(ptr_count)+1;
+
+   // printf("%c",'/');
+    result[*(ptr_count)]='/';
+    *(ptr_count)=*(ptr_count)+1;
+
+
+    for(int f=0;f<i;f++){
+
+       // printf("%c",aux[f]);
+        result[*(ptr_count)]=aux[f];
+        *(ptr_count)=*(ptr_count)+1;
+
+    }
+}
+
+int isSignature(char *ptr){
+    /* if signature start ::0
+       if signature end ::1
+       if none  ::2
+    */
+    char check0[18]="<Signature xmlns=";
+
+    char check1[14]="</Signature>";
+
+    char check2[14]="</SignedInfo>";
+
+    char check3[13]="<SignedInfo>";
+
+    int check0_status=1;
+
+    for(int i=0;i<(int)strlen(check0);i++)
+    {
+        if(*(ptr+i)!=check0[i])
+        {
+            check0_status=0;
+            break;
+        }
+    }
+
+    int check1_status=1;
+
+    for(int i=0;i<(int)strlen(check1);i++)
+    {
+        if(*(ptr+i)!=check1[i])
+        {
+            check1_status=0;
+            break;
+        }
+    }
+
+    int check2_status=1;
+    for(int i=0;i<(int)strlen(check2);i++){
+        if(*(ptr+i)!=check2[i]){
+            check2_status=0;
+            break;
+        }
+    }
+
+
+    int check3_status=1;
+    for(int i=0;i<(int)strlen(check3);i++){
+        if(*(ptr+i)!=check3[i]){
+            check3_status=0;
+            break;
+        }
+    }
+
+    if(check0_status==1){
+        return 0;
+    }
+    if(check1_status==1){
+        return 1;
+    }
+    if(check2_status==1){
+        return 2;
+    }
+    if(check3_status==1){
+        return 3;
+    }
+    return 4;
+
+}
+
+
+int aux_space_count;
+void Reference_canon(char *file_name, char *res){
+
+    //char space=' ';
+    //char new_line='\n';
+
+    FILE *fp;
+
+    //char open_bracket='<';//  0
+    //char close_bracket='>';//  1
+    //char slash_bracket[3]="/>";//  2
+
+    fp=fopen(file_name,"r");
+    if(fp)
+    {
+
+
+	    //exit(1);
+
+    char ch;
+    int count_result=0;
+    int *ptr_count_result;
+    ptr_count_result=&count_result;
+    int i=0;
+
+
+
+    char *content=(char*) malloc(sizeof(char)*10000);
+    int stop_variable=0;
+   // int stop_variabletype2=0;
+    while(1)
+    {
+
+        ch=fgetc(fp);
+        if(ch==EOF){
+            break;
+        }
+        if(content[i-1]=='<' && ch=='!'){
+            stop_variable=1;
+            i--;
+        }
+        if(content[i-1]=='<' && ch=='?'){
+            stop_variable=1;
+            i--;
+        }
+        /*if(content[i-1]=='>' && ch==' '){
+            stop_variabletype2=1;
+            i--;
+        }*/
+        if(stop_variable==1 && ch=='>'){
+            stop_variable=0;
+            continue;
+        }
+      /*  if(stop_variabletype2==1 && ch=='<'){
+            stop_variabletype2=0;
+            continue;
+        }*/
+        if(stop_variable!=1 && ch!='\n'){
+            content[i]=ch;
+            i++;
+        }
+
+
+    }
+    stack *dd;
+    stack dds;
+    dds.counter=0;
+    dd=&dds;
+
+    //int comment_start=0;
+    int flag0=0,flag1=0;
+    int aux_check_flag;
+    int space_count=0;
+    for(int u=0;u<i;u++)
+    {
+
+
+
+        if(content[u]=='<')
+        {
+            aux_check_flag=isSignature(content+u);
+           /* if(content[u+1]=='!'){
+                comment_start=1;
+            }*/
+            if(aux_check_flag==0)
+                {   aux_space_count=space_count;
+                    flag0=1;
+                }
+            if(aux_check_flag==1){
+                flag1=1;
+                aux_space_count=space_count;
+                u=u+12;
+
+            }
+            if(aux_check_flag==2){
+
+            }
+        }
+
+        if((flag0==0 && flag1==0) || (flag0==1 && flag1==1) )
+        {
+
+            if(content[u]=='<')
+            {
+                if(content[u+1]!='/')
+                {
+                    updateStack_add(content,u,dd);
+                    space_count=space_count+2;
+                }
+
+            }
+
+            if(content[u]=='/' && content[u+1]=='>')
+            {
+
+                replaceTag(content+u,dd,res,ptr_count_result);
+                space_count=space_count-2;
+
+            }else{
+                res[count_result]=content[u];
+                count_result=count_result+1;
+            }
+
+            if(content[u]=='>' && content[u+1]=='<')
+            {
+
+
+                if(content[u+2]=='/')
+                {
+                    updateStack_remove(content+u,dd);
+
+                     space_count=space_count-2;
+                }
+
+            }
+
+        }
+
+
+    }
+    res[count_result]='\0';
+    printf("\ncacccccccccccc:::::: %s\n",res);
+    free(content);
+    }else{
+        printf("PA File does not exist");
+    }
+}
+void cleanerXML(char *input,char *output){
+    int i=0;
+    int o=0;
+    int checkspace=0;
+    while(input[i]!='\0')
+    {
+        if(input[i]=='>'){
+            checkspace=1;
+        }
+        if(checkspace==1 && input[i]==' '){
+            i++;
+            continue;
+
+        }
+        if(checkspace==1 && input[i]=='<'){
+            checkspace=0;
+
+        }
+        output[o]=input[i];
+        o++;
+        i++;
+
+    }
+    output[o]='\0';
+
+
+}
+
+void SignedInfo_canon(char *file_name, char *res)
+{
+
+    FILE *fp;
+
+    fp=fopen(file_name,"r");
+    if(fp)
+    {
+
+
+    char *content=(char*) malloc(sizeof(char)*10000);
+
+    char ch;
+    char aux_copy[300];
+    int count=0;
+    int flag_ini=0;
+    int flag_end=0;
+     int *ptr_count_result;
+
+    int res_count=0;
+
+    ptr_count_result=&res_count;
+
+    while(1)
+    {
+
+        ch=fgetc(fp);
+        if(ch==EOF){
+            break;
+        }
+        if(ch!='\n'){
+        content[count]=ch;
+        count++;}
+    }
+
+    stack dde;
+    stack *de;
+    de=&dde;
+    dde.counter=0;
+    int space_count;
+    int first_pass_flag=0;
+    int in_count=0;//aux length
+    int first_time_flag=0;
+    for(int i=0;i<count;i++)
+
+    {
+        if(content[i]=='<')
+        {
+
+        int check_Signature;
+
+        check_Signature=isSignature(content+i);
+        if(check_Signature==0)
+        {  // printf("\nfound start of signed info\n");
+            int k=11;
+            while(content[k+i]!='>')
+            {
+                aux_copy[k-11]=content[k+i];
+                k++;
+                in_count++;
+
+            }
+            aux_copy[k]='\0';
+          //  printf("%s\n",aux_copy);
+            flag_ini=1;
+        }
+
+        if(check_Signature==2)
+        {
+            //end()
+           // printf("\njhghggg\n");
+            flag_end=1;
+            for(int f=0;f<13;f++)
+            {
+            res[res_count]=content[i+f];
+            res_count++;
+            }
+        }
+
+        if(check_Signature==3)
+        {
+           // content[i+12]=' ';
+            space_count=aux_space_count;
+            for(int o=0;o<11;o++)
+            {
+                res[res_count]=content[i+o];
+              //  printf("%c",res[res_count]);
+                res_count++;
+            }
+            i=i+12;
+            res[res_count]=' ';
+            res_count++;
+
+            for(int j=0;j<in_count;j++)
+            {
+                res[res_count]=aux_copy[j];
+              //  printf("%c",res[res_count]);
+                res_count++;
+            }
+            res[res_count]='>';
+            res_count++;
+          //  res[res_count]='\n';
+          //  res_count++;
+
+            first_pass_flag=1;
+        }
+        }
+
+        if(flag_ini==1 && first_pass_flag==1 && flag_end!=1)
+        {
+            if(first_time_flag==0){
+                first_time_flag=1;
+                space_count=space_count+4;
+                for(int y=0;y<space_count;y++)
+                {
+                   // res[res_count]=space;
+                   // res_count++;
+                }
+            }
+
+            if(content[i]=='<')
+            {
+                if(content[i+1]!='/')
+                {
+                    updateStack_add(content,i,de);
+                    space_count=space_count+2;
+                }
+                if(content[i+1]=='/' && content[i-1]!='>')
+                {
+
+                    updateStack_remove(content+i,de);
+                   /*  printf("\nprinting stack::\n");
+                    for(int i=0;i<de->counter;i++){
+                        printf("%s ",de->list_att[i]);
+                    }
+                    printf("\n\n");*/
+                    space_count=space_count-2;
+                }
+              //  printf("\npassed updatestack\n");
+
+            }
+
+            if(content[i]=='/' && content[i+1]=='>')
+                {
+
+                    replaceTag(content+i,de,res,ptr_count_result);
+                    space_count=space_count-2;
+
+                }else{
+
+              //  printf("%c",content[i]);
+                res[res_count]=content[i];
+                res_count=res_count+1;
+                }
+
+            if(content[i]=='>' && content[i+1]=='<')
+            {
+               // printf("\n");//new line
+
+               // res[res_count]=0x0a;//'\n';
+
+               // res_count=res_count+1;
+
+
+                if(content[i+2]=='/')
+                {
+                    updateStack_remove(content+i,de);
+                  /*  printf("\nprinting stack::\n");
+                    for(int i=0;i<de->counter;i++){
+                        printf("%s ",de->list_att[i]);
+                    }
+                    printf("\n\n");*/
+                     space_count=space_count-2;
+                }
+
+
+
+
+
+            }
+
+
+        }
+
+    }
+    res[res_count]='\0';
+    free(content);
+    fclose(fp);
+    }
+    else{
+        printf("PA file does not exist");
+
+    }
+
+
+
+}
+
+//function get tag value
+void getTagvalue(char *Tag, char *certificate,char *file_nam_perm){
+    //certificate is the value of tag.
+   FILE *fp;
+   fp=fopen(file_nam_perm,"r");
+   // Digest DD;
+
+    char buf[3000];
+
+    char tagi[30];
+    char tage[30];
+
+    memset(tagi, 0, sizeof(tagi));
+    strcpy(tagi, "<");
+    strcat(tagi,Tag );
+    strcat(tagi, ">");
+
+    memset(tage, 0, sizeof(tage));
+    strcpy(tage, "</");
+    strcat(tage,Tag );
+    strcat(tage, ">");
+
+    char *ptr1,*ptr2;
+
+    int c_flag_i=0,c_flag_e=0,line=0;
+
+    int index[2][2]={{0,0},{0,0}};
+
+    int  aux=0;
+
+    int c=0;
+
+   while(fscanf(fp, "%s", buf) != EOF )
+    {
+    line=line+1;
+    if(isSubstring(tagi,buf)!=-1 || isSubstring(tage,buf)!=-1 ){
+      //  printf(" %d ",line);
+        if (isSubstring(tagi,buf)!=-1){       //for "<X509Certificate>"
+          // printf("start");
+           index[0][0]=line;
+           index[0][1]=isSubstring(tagi,buf);
+           c_flag_i=1;
+           aux=1;
+
+        }
+        if(isSubstring(tage,buf)!=-1){                          //for "</X509Certificate>"
+          // printf("  end");
+           index[1][0]=line;
+           index[1][1]=isSubstring(tage,buf);
+          // printf("\n%d   %d\n",index[1][0],index[1][1]);
+           c_flag_e=1;
+
+
+        }
+        }
+
+        if(c_flag_i==1 && c_flag_e==0 ){
+        if (aux==1){
+
+        for(int u=index[0][1]+strlen(tagi);u<(int)strlen(buf);u++){
+            certificate[c]=buf[u];
+
+            c++;
+        }
+
+        aux=0;
+        }
+        else{ptr1=certificate+c;
+            ptr2=&(buf[0]);
+            memcpy(ptr1,ptr2,strlen(buf));
+            c=c+strlen(buf);
+        }
+        }
+        else if(c_flag_i==1 && c_flag_e==1 )
+        {
+            if(index[0][0]==index[1][0])//start line and end line is same
+        {
+            for(int u=index[0][1]+strlen(tagi);u<index[1][1];u++)
+            {
+            certificate[c]=buf[u];
+            c++;
+            }
+
+        }else
+        {  //end line is different than start line
+           for(int u=0;u<index[1][1];u++)
+            {
+            certificate[c]=buf[u];
+            c++;
+            }
+
+        }
+        break;
+        }else{continue;}
+
+    }
+    certificate[c]='\0';
+    fclose(fp);
+
+}
+
+
+
+////////////////////////
+
+//function for maintaining hardware integrity
+//return types
+//0:not genuine harware used
+//1 : genuine hardware used
+int RPAS_identifier(){
+
+    // taking gps id from the attached gps sensor
+	int vehi_gps=orb_subscribe(ORB_ID(sensor_gps));
+    struct sensor_gps_s raw;
+    orb_copy(ORB_ID(sensor_gps),vehi_gps,&raw);
+    int deviceID=raw.device_id;
+	printf("Device ID of GPS is: %d ",deviceID);
+    deviceID=2348919;
+    // reading device id of gps from HardwareInuse.txt
+    char fname_0[30]="./log/HardwareInuse.txt";
+    char tag_0[30]="GPS_ID";
+    char GPS_ID_file[30];
+
+    // this function first validates the file (if its written inside rfm) and then
+    // fetches the required tag
+    int status_gps=file_read(fname_0,tag_0,GPS_ID_file,0);// file name
+
+    if (status_gps==1){
+        // file is valid
+        // now compare the gps id of attached hardware to the one in the file
+        char aux_gps_id[30];
+
+        sprintf(aux_gps_id,"%d",deviceID);
+
+        int gps_id_status=strcmp(aux_gps_id,GPS_ID_file);
+
+        if (gps_id_status==0){
+
+            // both strings matches and hardware attached is genuine
+            return 1;// all okay: hardware is genuine
+
+        }else{
+            // possiblity of new authentic hardware or unauthentic hardware
+            //check for HardwareChange.txt file
+            char Hardware_fname[30]="./log/HardwareChange.txt" ;
+            FILE *fptr;
+            fptr=fopen("./log/HardwareChange.txt","r");
+            if (fptr==NULL){
+               // printf("\n\nhello inside RPAS identifier\n\n");
+                // no such file exists , it is an attempt to use unautherised hardware
+            //    write_log("UH");//UH =attemp to use unauthorized hardware
+                return 0;
+            }else{
+                //file has been found, now validate it using FMP public key
+                char id_gps_change[20];
+                int file_status = file_read(Hardware_fname,tag_0,id_gps_change,1);
+                if (file_status==1){
+                   //file is valid
+                   //compare strings in id_gps_change and aux_gps_id
+                   if(!strcmp(aux_gps_id,id_gps_change)){
+                       //the strings are same
+                       //start the modification of HardwareInuse.txt
+                       remove("./log/HardwareInuse.txt");
+                       HardwareInuseCreation(deviceID);//new HardwareInuse.txt file created
+                       // and return 1
+                       return 1;
+                   }else{
+                       // id written in the file (HArdwareCHange.txt ) is different from the one
+                       // retrieved from attached hardware.
+                       // different hardware is attached to the RPAS
+                       return 0;
+
+                   }
+
+                }else
+                {
+                   //file is not valid
+                   // case where file exists but is not valid(not sgned by MS)
+                   return 0;
+
+                }
+
+            }
+
+        }
+
+    }
+    else{
+        //file is not valid
+        // firmware update is required
+        // No genuine HardwareInuse.txt found, needs factory reset
+        //write_log for firmware update.
+        return 2;
+    }
+
+
+
+
+}
+
+
+
+void   call_DroneIDcreation(){
+    DroneIDcreation( );
+}
+
+
+
+int call_file_read(char *fname,char *tag,char *result,int file_type){
+    printf("\ninside call file read \n");
+    int return_value=file_read(fname,tag,result,file_type);
+    return return_value;
+
+}
+
+
+
+int CHECK_REUSAGE(char *file_id){
+    //check the given id in file KeyLog.txt
+    //return types 1=file_id is beng reused, dont do key rotation
+    //             0=file_id is fresh , start key rotation and amend KeyLog.txt
+    char fname[20]="./log/KeyLog.txt";
+    FILE *fptr;
+    fptr=fopen(fname,"r");
+    if(fptr!=NULL){
+        fclose(fptr);
+        key RFM_key;
+       // strcpy(RFM_key.modulus,"26495127767604337655831691918113833077956334480395285962585476150242592943334533493300410596845191511956515492348526447864429111984398076478393159921716146324008099192785429713391158778980470576914436564260777828713503499078118282954851831718742193757807790192236071369965695862117529898068098551948463482032984966019192036825055149445334134853954472696975028748893285534653718791714099153590644093991103487859923770318942338310035808291238607889065040628342091199251953687656515817829870399170890472577591915379199888970387732102895345522222635522973211224211091186930411354449072698100145010326153546937615803429429");
+       // strcpy(RFM_key.private_exponent,"24021354375322558781058142276736617999389802434596138079632937453577588041977071136990155131350955784632074057774459381406055342415566243621056270140966629267130220147961070276489248399064064585487617556117107847879807603464052857723291974564966716033712609329726458163489658005940146657360121454440603066594695330718634482791509166056105316975123379501455703860598165895993179884232993174716442550760635024519308123321406513256918808853580242186763289628649427009957647963922327454796638500088631677702805825426368000585849292006901367973110968487920147218164610608698409129440488923014780703396073978252084600942649");
+        get_RFM_Key(&RFM_key);
+       int valid_status= Validating_File(fname,RFM_key);
+
+       if (valid_status==1){
+           //file is valid it can searched for current file_id
+            FILE *fptr1;
+            fptr1=fopen(fname,"r");
+            char aux_c;
+            char *content=(char*) malloc(sizeof(char)*3000);
+            int i=0;
+            while((aux_c=fgetc(fptr1))!=EOF){
+                content[i]=aux_c;
+                i++;
+            }
+            content[i]='\0';
+
+           int prescence=isSubstring(file_id,content);
+           free(content);
+           if(prescence!=-1){
+               return 0;
+           }else{
+               return 1;
+           }
+       }else{
+           return 1;
+       }
+    }else{
+        return 2;
+    }
+
+
+}
+
+
+
+//for calling KeyLog_Regen
+void call_KeyLog_Regen(char *fileID){
+    KeyLog_Regen(fileID);
+}
+
+
+// Key rotation function
+//two files are generated
+//1)PublicKeyNew.txt: later sent to MS
+//2)PublicPrivateNew.txt:kept inside RFM encrypted
+void Key_rotation_start(char *file_id){
+  /// NOW prime number generation begins for KEY pair creation
+    mp_int  p1, q1;
+    char Prime1[1000];
+    char Prime2[1000];
+    char    buf[4096];
+    char PrivateKey[1000];
+    char Modulus[1000];
+    char PublicKey[20];
+
+    //mp_int z,r;
+    mp_init(&p1);
+    mp_init(&q1);
+
+    // mp_prime_rand(&p1,1,90,MP_PRIME_SAFE);
+    mp_prime_rand(&p1,1,1024,MP_PRIME_2MSB_ON);
+    mp_to_decimal(&p1,Prime1,sizeof(Prime1));
+    //printf("\nprime1 == %s \n",buf);
+
+    printf("\n Key Generation...... \n");
+    //mp_prime_rand(&q1,1,90,MP_PRIME_SAFE);
+    mp_prime_rand(&q1,1,1024,MP_PRIME_2MSB_ON);
+    mp_to_decimal(&q1,Prime2,sizeof(Prime2));
+    //mp_clear(&p1);
+   // mp_clear(&q1);
+
+   // printf("\n prime2 == %s \n",buf);
+    printf("\n Key Generation...... \n");
+    //phi(n)=(p1-1)*(q1-1)
+    mp_int s1,s2,product_p1_q1;
+    mp_init_multi(&s1,&s2,&product_p1_q1,NULL);
+
+
+
+    mp_mul(&p1,&q1,&product_p1_q1);//modulus n=p1*q1
+
+    mp_sub_d(&p1, 1uL, &s1);
+  //  mp_to_decimal(&s1, buf, sizeof(buf));
+  //  printf("\n\ns1 == %s\n", buf);//p1-1
+    printf("\n Key Generation...... \n");
+    mp_sub_d(&q1, 1uL, &s2);
+    mp_to_decimal(&s2, buf, sizeof(buf));
+   // printf("\n\ns2 == %s\n", buf);//q1-1
+    printf("\n Key Generation...... \n");
+    mp_int product_s1_s2,e,d;
+    mp_init_multi(&e,&d,&product_s1_s2,NULL);
+    mp_mul(&s1,&s2,&product_s1_s2);// phi(n)=(p1-1)*(q1-1)
+    //mp_int e;
+    mp_read_radix(&e,"65537",10);//
+    //  mp_int d;
+    mp_invmod(&e,&product_s1_s2,&d);
+
+    //writing public key
+    mp_to_decimal(&e,PublicKey,sizeof(PublicKey));
+   // printf("\n Public key : e===\n%s\n\n",buf);
+    printf("\n Key Generation...... \n");
+
+
+
+    ///writing private key
+    mp_to_decimal(&d,PrivateKey,sizeof(PrivateKey));
+  //  printf("\n Private key : d==\n%s\n\n",buf);
+    printf("\n Key Generation...... \n");
+
+
+
+
+
+    mp_to_decimal(&p1,buf,sizeof(buf));
+  //  printf("\n prime number 1: p1==\n%s\n\n",buf);
+    mp_to_decimal(&q1,buf,sizeof(buf));
+  //  printf("\n prime number 2: q1==\n%s\n\n",buf);
+
+
+
+    //writing modulus in file
+    mp_to_decimal(&product_p1_q1,Modulus,sizeof(Modulus));
+  //  printf("\n modulus product==\n%s\n\n",buf);
+    printf("\n Key Generation...... \n");
+
+    mp_clear(&d);
+    mp_clear(&p1);
+    mp_clear(&q1);
+    mp_clear(&e);
+    mp_clear(&product_s1_s2);
+    mp_clear(&s1);
+    mp_clear(&s2);
+    mp_clear(&product_p1_q1);
+
+
+
+    char DroneID[]="ABBDDJEDNDJK";//any string
+    char RFM_version[2]="0";
+    char RPAS_category[10]="Small";
+    pair_set pairset0[7];
+    pair_set pairset1[6];
+
+    strcpy(pairset0[0].tag,"DroneID");
+    strcpy(pairset0[0].value,DroneID);
+
+    strcpy(pairset1[0].tag,"DroneID");
+    strcpy(pairset1[0].value,DroneID);
+
+
+    strcpy(pairset0[1].tag,"RFM_version");
+    strcpy(pairset0[1].value,RFM_version);
+
+    strcpy(pairset1[1].tag,"RFM_version");
+    strcpy(pairset1[1].value,RFM_version);
+
+    strcpy(pairset0[2].tag,"RPAS_category");
+    strcpy(pairset0[2].value,RPAS_category);
+
+    strcpy(pairset1[2].tag,"RPAS_category");
+    strcpy(pairset1[2].value,RPAS_category);
+
+
+    strcpy(pairset0[3].tag,"PublicKey");
+    strcpy(pairset0[3].value,PublicKey);
+
+    strcpy(pairset1[3].tag,"PublicKey");
+    strcpy(pairset1[3].value,PublicKey);
+
+    strcpy(pairset0[4].tag,"PrivateKey");
+    strcpy(pairset0[4].value,PrivateKey);
+
+    strcpy(pairset0[5].tag,"Modulus");
+    strcpy(pairset0[5].value,Modulus);
+
+    strcpy(pairset1[4].tag,"Modulus");
+    strcpy(pairset1[4].value,Modulus);
+
+
+    strcpy(pairset0[6].tag,"KEY_ID");
+    strcpy(pairset0[6].value,file_id);
+
+    strcpy(pairset1[5].tag,"KEY_ID");
+    strcpy(pairset1[5].value,file_id);
+
+
+    char fileName[40]="./log/PublicPrivateNew_aux.txt";
+
+    char filename1[40]="./log/PublicKeyNew.txt";
+
+    key RFM_key;
+    get_RFM_Key(&RFM_key);
+
+
+    pair_file_write(pairset1,6,filename1,RFM_key);
+    pair_file_write(pairset0,7,fileName,RFM_key);//this needs to be encrypted
+
+    // Now signed file has been made
+    FILE *fptr;
+    fptr=fopen("./log/PublicPrivateNew_aux.txt","r");
+
+    char ch;
+    char content[3000];//=(char*) malloc(sizeof(char)*3000);
+    int i=0;
+    while((ch=fgetc(fptr))!=EOF){
+        content[i]=ch;
+        i++;
+    }
+    content[i]='\0';
+    fclose(fptr);
+    remove("./log/PublicPrivateNew_aux.txt");
+    key Inside_RFM;
+
+    char fname[42]="./log/PublicPrivateNew.txt";
+    strcpy(Inside_RFM.modulus,"180919775566931");
+    strcpy(Inside_RFM.private_exponent,"32102716896161");
+    encrypting_File(content,Inside_RFM,fname);
+    char decrypting[3000];
+    decrypting_File(fname,Inside_RFM,decrypting);
+    printf("\n\n%s\n\n",decrypting);
+  //  free(content);
+    // new key is encrypted and saved inside the file
+
+
+
+
+
+/// KEY pair generation ends here
+
+}
+
+/*In this function contents of PublicPrivateNew.txt are fetched. The corresponding tags and values
+inside the PublicPrivateInuse.txt are replaced by the ones that are fetched earlier.
+The process invloves 1)decrypting of PublicPrivateNew.txt
+                     2)fetching Modulus, Privatekey, PublicKey
+                     3)making new PublicPrivateInuse.txt
+*/
+void KEY_CHANGE_INITIATION(){
+
+    char fname[60]="./log/PublicPrivateNew.txt";
+    key Inside_RFM;
+    strcpy(Inside_RFM.modulus,"180919775566931");
+    strcpy(Inside_RFM.private_exponent,"32102716896161");
+
+    char content[5000];//=(char*) malloc(sizeof(char)*5000);
+
+    decrypting_File(fname , Inside_RFM, content);
+   // printf("\n\nThe content of decrypted file is :\n\n%s\n",content);
+
+    char target0[30]="Modulus";
+    char target1[30]="PrivateKey";
+
+    char value_modulus[2000];//=(char*) malloc(sizeof(char)*2000);
+    char value_private[800];//=(char*) malloc(sizeof(char)*800);
+
+    fetch_tag(content,target0,value_modulus);
+    fetch_tag(content,target1,value_private);
+
+    /*pair_set pair_key[2];
+
+
+    strcpy(pair_key[0].tag,"Modulus");
+    strcpy(pair_key[0].value,value_modulus);
+
+    strcpy(pair_key[1].tag,"Privatekey");
+    strcpy(pair_key[1].value,value_private);*/
+
+
+    char content1[5000];
+
+    char Content_Start[10]="<content>";
+    strcpy(content1,Content_Start);
+    strcat(content1,"\n");
+
+    char tag_private[20]="<PrivateKey=";
+    strcat(content1,tag_private);
+    strcat(content1,value_private);
+    strcat(content,">\n");
+
+    char tag_modulus[20]="<Modulus=";
+    strcat(content1,tag_modulus);
+    strcat(content1,value_modulus);
+    strcat(content1,">\n");
+
+
+    char Content_End[12]="</content>";
+    strcat(content1,Content_End);
+    strcat(content1,"\0");
+    //remove("./log/PublicPrivateInuse.txt");
+    char key_file_name[40]="./log/PublicPrivateInuse.txt";
+    encrypting_File(content1,Inside_RFM,key_file_name);
+    // at this point new PublicPrivateInuse.txt is formed
+    remove("./log/PublicPrivateNew.txt");
+    remove("./log/KeyChangePerm.txt");
+    remove("./log/PublicKeyNew.txt");
+
+
+
+}
+
+
+/*This function comes in handy when ParamChangePerm.txt is present and one
+has to modify already existig ParamInuse.txt file
+read ParamChangePerm.txt
+if any similar then change the value
+if any new then add the value
+*/
+void ParamInuseModify(){
+
+     // first store the information inside ParamInuse.txt
+    FILE *fptr_INuse;
+    fptr_INuse=fopen("./log/ParamInuse.txt","r");
+
+    char ch;
+    char ParamInuseContent[5000];
+    int i=0;
+    while((ch=fgetc(fptr_INuse))!=EOF){
+        ParamInuseContent[i]=ch;
+        i++;
+    }
+    ParamInuseContent[i]='\0';
+    fclose(fptr_INuse);
+
+
+    //checking in ParamChangePerm
+    FILE *fptrParamChange;
+    fptrParamChange=fopen("./log/ParamChangePerm.txt","r");
+
+    char ParamChangeContent[4000];
+    i=0;
+    while((ch=fgetc(fptrParamChange))!=EOF){
+        ParamChangeContent[i]=ch;
+        i++;
+    }
+    ParamChangeContent[i]='\0';
+    fclose(fptrParamChange);
+
+
+
+    char no_params_tag[20]="No_Params";
+    char No_params[10];
+    fetch_tag(ParamInuseContent,no_params_tag,No_params);
+
+    int index=isSubstring(no_params_tag,ParamInuseContent);
+
+    while(ParamInuseContent[index]!='\n'){
+        index++;
+    }
+    index++;
+
+   // printf("\ncharacter kfdlkfsldk %c\n",ParamInuseContent[index]);
+
+
+  //  char no_params_tag[20]="No_Params";
+    char No_params_change[10];
+    fetch_tag(ParamChangeContent,no_params_tag,No_params_change);
+    int no_params_change=atoi(No_params_change);
+
+    int no_params=atoi(No_params);
+    printf("dff %d",no_params);
+
+
+
+    int newline_count=0;
+    int start_param=0;
+    int start_value=0;
+    char buff_param[100];
+    char buff_value[100];
+    int buff_it=0;
+    int jump_value=0;
+    //pair *param_value=(pair*) malloc(no)
+    pair_set param_value[400];
+    int param_value_count=1;
+    printf("\n%s\n",ParamInuseContent);
+    while(newline_count<no_params)
+    {
+
+       // printf("\ncharacter inside 000 %c\n",ParamInuseContent[index]);
+
+        if(ParamInuseContent[index]=='>'){
+          //  printf("\ninsiid\n");
+            newline_count++;
+            index=index+2;
+            start_value=0;
+            buff_value[buff_it]='\0';
+            buff_it=0;
+            if(jump_value!=1){
+                strcpy(param_value[param_value_count].tag,buff_param);
+                strcpy(param_value[param_value_count].value,buff_value);
+                param_value_count++;
+
+
+            }else{
+                jump_value=0;
+            }
+        }
+
+        if(start_value==1 && jump_value==0){
+            buff_value[buff_it]=ParamInuseContent[index];
+            buff_it++;
+        }
+
+
+        if(ParamInuseContent[index]=='='){
+            start_param=0;
+            start_value=1;
+            buff_param[buff_it]='\0';
+            buff_it=0;
+            int check_availability=isSubstring(buff_param,ParamChangeContent);
+            if(check_availability!=-1){
+                // tag is available in ParamChange also
+                // fetch the value from ParamChangeContent
+
+                fetch_tag(ParamChangeContent,buff_param,buff_value);
+                strcpy(param_value[param_value_count].tag,buff_param);
+                strcpy(param_value[param_value_count].value,buff_value);
+                param_value_count++;
+
+                jump_value=1;
+            }
+        }
+
+
+
+        if(start_param==1){
+            buff_param[buff_it]=ParamInuseContent[index];
+           // printf("\n adcdsnfdfds this is char %c\n",buff_param[buff_it]);
+            buff_it++;
+        }
+
+
+        if(ParamInuseContent[index]=='<'){
+            start_param=1;
+        }
+
+      //  printf("\ncharacter inside %c\n",ParamInuseContent[index]);
+        index++;
+
+
+    }
+
+
+
+    start_param=0;
+    start_value=0;
+    buff_it=0;
+    jump_value=0;
+
+    index=isSubstring(no_params_tag,ParamChangeContent);
+
+    while(ParamChangeContent[index]!='\n'){
+        index++;
+    }
+    index++;
+    newline_count=0;
+    while(newline_count<no_params_change){
+
+            if(ParamChangeContent[index]=='>'){
+                newline_count++;
+                index=index+2;
+                start_value=0;
+                buff_value[buff_it]='\0';
+                buff_it=0;
+            if(jump_value!=1){
+                strcpy(param_value[param_value_count].tag,buff_param);
+                strcpy(param_value[param_value_count].value,buff_value);
+                param_value_count++;
+
+            }else{
+                jump_value=0;
+            }
+            }
+            if(start_value==1 && jump_value==0){
+                buff_value[buff_it]=ParamChangeContent[index];
+                buff_it++;
+            }
+        if(ParamChangeContent[index]=='='){
+            start_param=0;
+            start_value=1;
+            buff_param[buff_it]='\0';
+            buff_it=0;
+            printf("\n helloooooooo %s  \n",buff_param);
+            int check_availability=isSubstring(buff_param,ParamInuseContent);
+            if(check_availability==-1){
+                // tag is available in ParamInuse also
+                // no need to add
+                //fetch_tag(ParamChangeContent,buff_param,buff_value);
+                //strcpy(param_value[param_value_count].tag,buff_param);
+                //strcpy(param_value[param_value_count].value,buff_value);
+                //param_value_count++;
+
+            }else{
+                jump_value=1;
+            }
+        }
+
+        if(start_param==1){
+            buff_param[buff_it]=ParamChangeContent[index];
+            buff_it++;
+        }
+
+        if(ParamChangeContent[index]=='<'){
+            start_param=1;
+        }
+
+
+        index++;
+
+
+
+    }
+    char aux_int_no[20];
+
+    sprintf(aux_int_no,"%d",param_value_count);
+    strcpy(param_value[0].tag,"No_Params");
+    strcpy(param_value[0].value,aux_int_no);
+
+    char file_name_inuse[40]="./log/ParamInuseNew.txt";
+    key RFM_key;
+
+    get_RFM_Key(&RFM_key);
+
+    pair_file_write(param_value,param_value_count,file_name_inuse,RFM_key);
+
+    remove("./log/ParamChangePerm.txt");
+
+}
+
+
+/*
+function to start setting the parameters as specified in ParamInuse.txt
+*/
+void ParamSetfile(){
+     // first store the information inside ParamInuse.txt
+    FILE *fptr_INuse;
+    fptr_INuse=fopen("./log/ParamInuse.txt","r");
+
+    char ch;
+    char ParamInuseContent[5000];
+    int i=0;
+    while((ch=fgetc(fptr_INuse))!=EOF){
+        ParamInuseContent[i]=ch;
+        i++;
+    }
+    ParamInuseContent[i]='\0';
+    fclose(fptr_INuse);
+
+    char no_params_tag[20]="No_Params";
+    char No_params[10];
+    fetch_tag(ParamInuseContent,no_params_tag,No_params);
+
+    int index=isSubstring(no_params_tag,ParamInuseContent);
+
+    while(ParamInuseContent[index]!='\n'){
+        index++;
+    }
+    index++;
+
+    int no_params=atoi(No_params);
+   // printf("dff %d",no_params);
+
+
+
+    int newline_count=0;
+    int start_param=0;
+    int start_value=0;
+    char buff_param[100];
+    char buff_value[100];
+    int buff_it=0;
+   // int jump_value=0;
+    //pair *param_value=(pair*) malloc(no)
+
+    printf("\n%s\n",ParamInuseContent);
+    while(newline_count<no_params)
+    {
+
+      //  printf("\ncharacter inside 000 %c\n",ParamInuseContent[index]);
+
+        if(ParamInuseContent[index]=='>'){
+            //printf("\ninsiid\n");
+            newline_count++;
+            index=index+2;
+            start_value=0;
+            buff_value[buff_it]='\0';
+            buff_it=0;
+
+
+            int gfint=atoi(buff_value);
+
+            param_set(param_find(buff_param),&gfint);
+
+        }
+
+        if(start_value==1 ){
+            buff_value[buff_it]=ParamInuseContent[index];
+            buff_it++;
+        }
+
+
+        if(ParamInuseContent[index]=='='){
+            start_param=0;
+            start_value=1;
+            buff_param[buff_it]='\0';
+            buff_it=0;
+
+        }
+
+
+
+        if(start_param==1){
+            buff_param[buff_it]=ParamInuseContent[index];
+          //  printf("\n adcdsnfdfds this is char %c\n",buff_param[buff_it]);
+            buff_it++;
+        }
+
+
+        if(ParamInuseContent[index]=='<'){
+            start_param=1;
+        }
+
+       // printf("\ncharacter inside %c\n",ParamInuseContent[index]);
+        index++;
+
+
+    }
+
+
+}
+
+
+
+
+//this function will make the amendments in recentPA.txt file
+/* type == 0,1,2;
+fetch_required    0
+freq_done         1
+previous_log_hash 2
+*/
+void update_recentPA(int type,char *value){
+   FILE *fptr;
+
+    fptr=fopen("./logs/recentPA.txt","r");
+    char ch;
+    int i=0;
+
+    char content[5000];
+
+    while((ch=fgetc(fptr))!=EOF){
+        content[i]=ch;
+        i++;
+    }
+    content[i]='\0';
+   // type == 0,1,2;
+   // first fetching all the constant tags
+ /*permissionArtifactId
+   frequency_allowable
+   maxAltitude
+   Start_time
+   End_time
+   lattitude1
+   longitude1
+   lattitude2
+   longitude2*/
+   pair_set pairset[14];
+
+   //permissionArtifactId
+   char tag_PAid[70]="permissionArtifactId";
+   char tag_content_paID[100];
+   fetch_tag(content,tag_PAid,tag_content_paID);
+   strcpy(pairset[0].tag,tag_PAid);
+   strcpy(pairset[0].value,tag_content_paID);
+
+   // frequency allowable
+   char tag_freq[70]="frequency_allowable";
+   char tag_content_freq[100];
+   fetch_tag(content,tag_freq,tag_content_freq);
+   strcpy(pairset[1].tag,tag_freq);
+   strcpy(pairset[1].value,tag_content_freq);
+
+   //    maxAltitude
+   char tag_max[70]="maxAltitude";
+   char tag_content_max[100];
+   fetch_tag(content,tag_max,tag_content_max);
+   strcpy(pairset[2].tag,tag_max);
+   strcpy(pairset[2].value,tag_content_max);
+
+
+
+    //// start time
+   char tag_st[70]="Start_time";
+   char tag_content_st[100];
+   fetch_tag(content,tag_st,tag_content_st);
+   strcpy(pairset[3].tag,tag_st);
+   strcpy(pairset[3].value,tag_content_st);
+
+
+    //// end time
+   char tag_et[70]="End_time";
+   char tag_content_et[100];
+   fetch_tag(content,tag_et,tag_content_et);
+   strcpy(pairset[4].tag,tag_et);
+   strcpy(pairset[4].value,tag_content_et);
+
+
+   //lattitude1
+   char tag_lat1[70]="lattitude1";
+   char tag_content_lat1[100];
+   fetch_tag(content,tag_lat1,tag_content_lat1);
+   strcpy(pairset[5].tag,tag_lat1);
+   strcpy(pairset[5].value,tag_content_lat1);
+
+
+   //longitude1
+   char tag_lon1[70]="longitude1";
+   char tag_content_lon1[100];
+   fetch_tag(content,tag_lon1,tag_content_lon1);
+   strcpy(pairset[6].tag,tag_lon1);
+   strcpy(pairset[6].value,tag_content_lon1);
+
+   //lattitude2
+   char tag_lat2[70]="lattitude2";
+   char tag_content_lat2[100];
+   fetch_tag(content,tag_lat2,tag_content_lat2);
+   strcpy(pairset[7].tag,tag_lat2);
+   strcpy(pairset[7].value,tag_content_lat2);
+
+
+   //longitude2
+   char tag_lon2[70]="longitude2";
+   char tag_content_lon2[100];
+   fetch_tag(content,tag_lon2,tag_content_lon2);
+   strcpy(pairset[8].tag,tag_lon2);
+   strcpy(pairset[8].value,tag_content_lon2);
+
+
+
+   if(type==0){
+      // changing fetch_required
+
+      char tag_freq_done[70]="frequencies_done";
+      char tag_content_freq_done[100];
+      fetch_tag(content,tag_lon2,tag_content_freq_done);
+      strcpy(pairset[9].tag,tag_freq_done);
+      strcpy(pairset[9].value,tag_content_freq_done);
+
+
+      char tag_fetch[70]="fetch_required";
+      //char tag_content_fetch[100];
+      //fetch_tag(content,tag_fetch,tag_content_fetch);
+      strcpy(pairset[10].tag,tag_fetch);
+      strcpy(pairset[10].value,value);
+
+      char tag_prev_log_hash[70]="previous_log_hash";
+      char tag_content_prev_log_hash[100];
+      fetch_tag(content,tag_prev_log_hash,tag_content_prev_log_hash);
+      strcpy(pairset[11].tag,tag_prev_log_hash);
+      strcpy(pairset[11].value,tag_content_prev_log_hash);
+
+
+   }else if(type==1){
+      //changing freq_done
+
+      char tag_freq_done[70]="frequencies_done";
+      char tag_content_freq_done[100];
+      fetch_tag(content,tag_lon2,tag_content_freq_done);
+      int aux;
+      char aux1[20];
+      aux=strtol(tag_content_freq_done,NULL,10);
+      aux=aux+1;
+      sprintf(aux1,"%d",aux);
+      strcpy(pairset[9].tag,tag_freq_done);
+      strcpy(pairset[9].value,aux1);
+
+      char tag_fetch[70]="fetch_required";
+      char tag_content_fetch[100];
+      fetch_tag(content,tag_fetch,tag_content_fetch);
+      strcpy(pairset[10].tag,tag_fetch);
+      strcpy(pairset[10].value,tag_content_fetch);
+
+      char tag_prev_log_hash[70]="previous_log_hash";
+      char tag_content_prev_log_hash[100];
+      fetch_tag(content,tag_prev_log_hash,tag_content_prev_log_hash);
+      strcpy(pairset[11].tag,tag_prev_log_hash);
+      strcpy(pairset[11].value,tag_content_prev_log_hash);
+
+   }else{
+      // changing previous_log_hash
+      char tag_freq_done[70]="frequencies_done";
+      char tag_content_freq_done[100];
+      fetch_tag(content,tag_lon2,tag_content_freq_done);
+      strcpy(pairset[9].tag,tag_freq_done);
+      strcpy(pairset[9].value,tag_content_freq_done);
+
+
+      char tag_fetch[70]="fetch_required";
+      char tag_content_fetch[100];
+      fetch_tag(content,tag_fetch,tag_content_fetch);
+      strcpy(pairset[10].tag,tag_fetch);
+      strcpy(pairset[10].value,tag_content_fetch);
+
+      char tag_prev_log_hash[70]="previous_log_hash";
+      //char tag_content_fetch[100];
+      //fetch_tag(content,tag_fetch,tag_content_fetch);
+      strcpy(pairset[11].tag,tag_prev_log_hash);
+      strcpy(pairset[11].value,value);
+   }
+
+
+   char fileName[20]="./log/recentPA.txt";
+   key RFM_private_key;
+
+   get_RFM_Key(&RFM_private_key);
+
+  //  free(value_modulus);
+
+   pair_file_write(pairset,12,fileName,RFM_private_key);
+}
+
+
+// functions remaining to define.
+/*
+void Bundling_begins();
+
+int read_for_fetch();
+
+int check_fetch();
+
+void fetching_publish_padata();
+*/

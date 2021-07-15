@@ -88,6 +88,7 @@
 #include <uORB/topics/vehicle_land_detected.h>
 #include <uORB/topics/vehicle_local_position.h>
 #include <uORB/topics/vtol_vehicle_status.h>
+#include <uORB/topics/takeoff_status.h>
 
 using math::constrain;
 using systemlib::Hysteresis;
@@ -276,8 +277,8 @@ private:
 
 		(ParamFloat<px4::params::BAT_LOW_THR>) _param_bat_low_thr,
 		(ParamFloat<px4::params::BAT_CRIT_THR>) _param_bat_crit_thr,
-		(ParamInt<px4::params::PA_CHECK>) _param_pa_check,
-		(ParamInt<px4::params::KEY_ROT>) _param_key_rot
+		(ParamInt<px4::params::PA_CHECK>) _param_pa_check
+
 	)
 
 	enum class PrearmedMode {
@@ -408,6 +409,7 @@ private:
 	uORB::Subscription					_vehicle_angular_velocity_sub{ORB_ID(vehicle_angular_velocity)};
 	uORB::Subscription					_vehicle_attitude_sub{ORB_ID(vehicle_attitude)};
 	uORB::Subscription					_vtol_vehicle_status_sub{ORB_ID(vtol_vehicle_status)};
+	int takeoff_status_sub = orb_subscribe(ORB_ID(takeoff_status));
 
 	uORB::SubscriptionInterval				_parameter_update_sub{ORB_ID(parameter_update), 1_s};
 

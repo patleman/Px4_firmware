@@ -284,6 +284,7 @@ int Commander::custom_command(int argc, char *argv[])
 	}
 
 	if (!strcmp(argv[0], "takeoff")) {
+
 		// switch to takeoff mode and arm
 		send_vehicle_command(vehicle_command_s::VEHICLE_CMD_NAV_TAKEOFF);
 		send_vehicle_command(vehicle_command_s::VEHICLE_CMD_COMPONENT_ARM_DISARM, 1.f, 0.f);
@@ -343,6 +344,7 @@ int Commander::custom_command(int argc, char *argv[])
 				send_vehicle_command(vehicle_command_s::VEHICLE_CMD_DO_SET_MODE, 1, PX4_CUSTOM_MAIN_MODE_STABILIZED);
 
 			} else if (!strcmp(argv[1], "auto:takeoff")) {
+
 				send_vehicle_command(vehicle_command_s::VEHICLE_CMD_DO_SET_MODE, 1, PX4_CUSTOM_MAIN_MODE_AUTO,
 						     PX4_CUSTOM_SUB_MODE_AUTO_TAKEOFF);
 
@@ -759,6 +761,7 @@ Commander::handle_command(const vehicle_command_s &cmd)
 							break;
 
 						case PX4_CUSTOM_SUB_MODE_AUTO_RTL:
+						        printf("\nhey its in RTL\n");
 							main_ret = main_state_transition(_status, commander_state_s::MAIN_STATE_AUTO_RTL, _status_flags, _internal_state);
 							break;
 
@@ -1839,9 +1842,16 @@ Commander::run()
 			if (_armed.armed) {
 				if (!was_landed && _land_detector.landed) {
 					mavlink_log_info(&_mavlink_log_pub, "Landing detected");
+					/*takeoff_status_s to_status{};
+					orb_copy(ORB_ID(takeoff_status), takeoff_status_sub, &to_status);
+				        printf("\n\nwhen landing happens: %d ,%d\n\n",takeoff_status_sub,to_status.takeoff_state);*/
 					_status.takeoff_time = 0;
 
 				} else if (was_landed && !_land_detector.landed) {
+					/*	takeoff_status_s to_status_o{};
+						orb_copy(ORB_ID(takeoff_status), takeoff_status_sub, &to_status_o);
+						printf("\n\nwhen landing happens: %d\n\n",to_status_o.takeoff_state);*/
+
 					mavlink_log_info(&_mavlink_log_pub, "Takeoff detected");
 					_status.takeoff_time = hrt_absolute_time();
 					_have_taken_off_since_arming = true;

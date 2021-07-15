@@ -222,6 +222,7 @@ battery_simulator start
 tone_alarm start
 rc_update start
 sensors start
+px4_simple_app start
 commander start
 navigator start
 

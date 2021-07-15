@@ -41,7 +41,8 @@
 
 #ifndef AIRSPEED_H_
 #define AIRSPEED_H_
-
+#include <uORB/topics/vehicle_gps_position.h>
+#include <uORB/Publication.hpp>
 #include "math.h"
 
 __BEGIN_DECLS

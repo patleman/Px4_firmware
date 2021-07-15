@@ -89,8 +89,9 @@
 #include <uORB/topics/vehicle_status.h>
 #include <uORB/topics/wind.h>
 #include <uORB/topics/yaw_estimator_status.h>
-
+#include <uORB/topics/vehicle_acceleration.h>
 #include "Utility/PreFlightChecker.hpp"
+#include <uORB/topics/takeoff_status.h>
 
 extern pthread_mutex_t ekf2_module_mutex;
 
@@ -123,6 +124,8 @@ public:
 	bool multi_init(int imu, int mag);
 
 	int instance() const { return _instance; }
+
+
 
 private:
 	void Run() override;
@@ -229,7 +232,7 @@ private:
 
 	uORB::SubscriptionCallbackWorkItem _sensor_combined_sub{this, ORB_ID(sensor_combined)};
 	uORB::SubscriptionCallbackWorkItem _vehicle_imu_sub{this, ORB_ID(vehicle_imu)};
-
+	int sensor_sub_fd = orb_subscribe(ORB_ID(vehicle_acceleration));
 	bool _callback_registered{false};
 
 	bool _distance_sensor_selected{false}; // because we can have several distance sensor instances with different orientations
@@ -269,8 +272,9 @@ private:
 	uORB::PublicationMulti<vehicle_global_position_s>    _global_position_pub;
 	uORB::PublicationMulti<vehicle_odometry_s>           _odometry_pub;
 	uORB::PublicationMulti<wind_s>              _wind_pub;
-
-
+	//uORB::Publication<vehicle_command_s>		_cmd_pub{ORB_ID(vehicle_command)};// newly added on 7/7/21
+	int takeoff_status_sub = orb_subscribe(ORB_ID(takeoff_status));
+	int vehicle_land_detected_sub = orb_subscribe(ORB_ID(vehicle_land_detected));
 	PreFlightChecker _preflt_checker;
 
 	Ekf _ekf;
