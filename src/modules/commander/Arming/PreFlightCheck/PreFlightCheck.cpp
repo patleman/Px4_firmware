@@ -323,7 +323,7 @@ if(checky==0)
 						valid_sum++;
 					}
 					if(valid_sum==3){
-						// file is valid and belongs to this drone only
+						// file is valid and belongs to this drone
 						// begin the changes that are needed
 						KEY_CHANGE_INITIATION();
 						checky++;
@@ -503,8 +503,8 @@ if(check_recent==0){
 		if(action==0 || action==1){
 			// start bundling and update recentPA.txt with fetchrequired=0;
 		//	Bundling_begins();//how to bundle part/modifying and updating recentPA.txt
-			char NO[20]="1";
-			update_recentPA(0,No);
+			char yes[20]="1";
+			update_recentPA(0,yes);
 			recentPA_presence++;
 
 			check_recent=1;
@@ -544,9 +544,9 @@ if(recentPA_presence){
 	status_fetch=read_for_fetch();
 
 	if(status_fetch!=1){
-		//fetch is not required (no need to check for fetch.txt file_)
+		//fetch is not required (no need to check for fetched.txt file_)
 	}else{
-		// fetch is required (need to check for fetch.txt file)
+		// fetch is required (need to check for fetched.txt file)
 		check_status_fetch=check_fetch();
 		//if check_status==0 : no file present, return false
 		//               ==1  : file is present but not valid return false(attempt to hack)
@@ -567,102 +567,103 @@ int verification=0;
 if(!checky1)
 {
 
-if((time_since_boot > 10_s))
-{
-	FILE *file;
-	file = fopen("./log/permission_artifact_breach.xml", "r");// ./log/ for posix /log/ for nuttx
-	if (file){
+	if((time_since_boot > 10_s))
+	{
+		FILE *file;
+		file = fopen("./log/permission_artifact_breach.xml", "r");// ./log/ for posix /log/ for nuttx
+		if (file){
 
-		fclose(file);
-		if(tampercheck==0)
-		{
-
-			verification=Is_PA_VAlid();// if pa
-
-			if (verification==1)
+			fclose(file);
+			if(tampercheck==0)
 			{
-				//printf("bale bale\n");
-				mavlink_log_info(mavlink_log_pub," Permission Artefact is non tampered (valid)");
-				tampercheck=1;
-				checky1=1;
-				data_fetch_delete();
-				//checky0=1;
-			}else if(verification==2)
-			{
-				mavlink_log_critical(mavlink_log_pub, "Permission Artefact  has bad Sign");
-				//remove("./log/permission_artifact_breach.xml");
+
+				verification=Is_PA_VAlid();// if pa
+
+				if (verification==1)
+				{
+					//printf("bale bale\n");
+					mavlink_log_info(mavlink_log_pub," Permission Artefact is non tampered (valid)");
+					tampercheck=1;
+					checky1=1;
+					fetching_publish_padata();
+					//data_fetch_delete();
+					//checky0=1;
+				}else if(verification==2)
+				{
+					mavlink_log_critical(mavlink_log_pub, "Permission Artefact  has bad Sign");
+					//remove("./log/permission_artifact_breach.xml");
+					return false;
+
+				}
+				else{
+					//
+					mavlink_log_critical(mavlink_log_pub, "Permission Artefact  has been tampered(non valid)");
+					//remove("./log/permission_artifact_breach.xml");
+					return false;
+				}
+			}
+		// 2) Now extracting date_time and geo_coordinates and checking for time and geofence breach.
+
+
+
+	/*
+			time_verification=date_time_extract_and_check();
+			printf("\ntime verification ::::%d\n",time_verification);
+			if (time_verification==0){
+				printf("\nNot in time limit\n");
+				mavlink_log_critical(mavlink_log_pub, "Preflight Fail: Not allowed to fly, Time breach (bad time)");
 				return false;
+			}else if(time_verification==2)
+			{
 
+				printf("\nNot in correct place \n");
+				mavlink_log_critical(mavlink_log_pub, "Preflight Fail: Not allowed to fly, Geo breach (bad geo)");
+				return false;
+			}else{
+				printf("\n In time limit and permitted area. \n");
+			}
+			//if(recentPA_presence==0){
+			drone_id_verification=DroneIDverification();
+			//}else{
+			//	drone_id_verification=DroneIDverification(PA_ID);
+			//}
+			if(drone_id_verification==0){
+				printf("\nNot correct DroneID \n");
+				mavlink_log_critical(mavlink_log_pub, "Preflight Fail: Not valid DroneID");
+				return false;
+			}else if(drone_id_verification==2){
+				mavlink_log_critical(mavlink_log_pub, "Please upload the previous permission artefact in use, its end limit hasnt reached yet");
+				return false;
 			}
 			else{
-				//
-				mavlink_log_critical(mavlink_log_pub, "Permission Artefact  has been tampered(non valid)");
-				//remove("./log/permission_artifact_breach.xml");
-				return false;
+			//	if(recentPA_presence==0){
+
+					// data_fetch_delete will only run for new PAs(when recentPA.txt is not present)
+					// Now delete PA.xml and take its data inside recentPA.txt
+
+					data_fetch_delete();// at this point pa_data.msg will get published
+				// }else{
+					// this suggests that recentPA.txt has the information of time and area limit
+					// from recentPA.txt it would be published to pa_data.msg
+					//fetching_publish_padata();
+
+				//}
+			checky0=1;
+			checky1=1;
 			}
-		}
-	 // 2) Now extracting date_time and geo_coordinates and checking for time and geofence breach.
+	*/
 
 
 
-/*
-		time_verification=date_time_extract_and_check();
-		printf("\ntime verification ::::%d\n",time_verification);
-		if (time_verification==0){
-			printf("\nNot in time limit\n");
-			mavlink_log_critical(mavlink_log_pub, "Preflight Fail: Not allowed to fly, Time breach (bad time)");
-			return false;
-		}else if(time_verification==2)
-		{
-
-			printf("\nNot in correct place \n");
-			mavlink_log_critical(mavlink_log_pub, "Preflight Fail: Not allowed to fly, Geo breach (bad geo)");
-			return false;
 		}else{
-			printf("\n In time limit and permitted area. \n");
-		}
-		//if(recentPA_presence==0){
-		drone_id_verification=DroneIDverification();
-		//}else{
-		//	drone_id_verification=DroneIDverification(PA_ID);
-		//}
-		if(drone_id_verification==0){
-			printf("\nNot correct DroneID \n");
-			mavlink_log_critical(mavlink_log_pub, "Preflight Fail: Not valid DroneID");
-			return false;
-		}else if(drone_id_verification==2){
-			mavlink_log_critical(mavlink_log_pub, "Please upload the previous permission artefact in use, its end limit hasnt reached yet");
+			mavlink_log_critical(mavlink_log_pub, "Preflight Fail: no Permission artefact found. Please send Permission artefact from Management client.");
 			return false;
 		}
-		else{
-		//	if(recentPA_presence==0){
-
-				// data_fetch_delete will only run for new PAs(when recentPA.txt is not present)
-				// Now delete PA.xml and take its data inside recentPA.txt
-
-				data_fetch_delete();// at this point pa_data.msg will get published
-			// }else{
-				// this suggests that recentPA.txt has the information of time and area limit
-				// from recentPA.txt it would be published to pa_data.msg
-				//fetching_publish_padata();
-
-			//}
-		checky0=1;
-		checky1=1;
-		}
-*/
-
-
 
 	}else{
-		mavlink_log_critical(mavlink_log_pub, "Preflight Fail: no Permission artefact found. Please send Permission artefact from Management client.");
+		printf("\nwaiting for gps signals....\n");
 		return false;
 	}
-
-}else{
-	printf("\nwaiting for gps signals....\n");
-	return false;
-}
 
 }
 

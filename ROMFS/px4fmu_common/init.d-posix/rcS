@@ -223,9 +223,11 @@ tone_alarm start
 rc_update start
 sensors start
 px4_simple_app start
+
 commander start
 navigator start
 
+logging_json start
 
 if param greater -s MNT_MODE_IN -1
 then

@@ -1047,3 +1047,32 @@ freq_done
 previous_log_hash
 */
 void update_recentPA(int type,char *value);
+
+
+/*This function fetches data from recentPA.txt and publishes pa_data.msg
+*/
+void fetching_publish_padata();
+
+// this function will tell if there is a requirement to check for fetched.txt
+// by reading recentPA.txt
+int read_for_fetch();
+
+
+// this function check the availability + validity of the fetched.txt
+int check_fetch();
+
+
+// This function will generate a file name bundled.txt with following contents
+// <content>
+// 1)filename::hash
+// 2)single hash ::
+// 3)signed_single_hash ::
+// </content>
+// signature::
+//
+void Bundling_begins();
+
+
+// keeping track of log files and their hash values.
+
+void update_log_of_logs(char *tag,char *value,char *done_freq,char *pa_id,char *start_file);

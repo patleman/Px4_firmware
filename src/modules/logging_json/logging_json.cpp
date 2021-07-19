@@ -49,7 +49,7 @@
 #include <errno.h>
 #include <math.h>
 #include <poll.h>
-#include <drivers/drv_hrt.h>
+
 #include <uORB/Subscription.hpp>
 #include <uORB/SubscriptionInterval.hpp>
 
@@ -131,7 +131,7 @@ int logging_json_thread_main(int argc, char *argv[])
 	 */
 
 
-	Geo_tag content_holder[100];
+	Geo_tag *content_holder=(Geo_tag*) malloc(1500*sizeof(Geo_tag));
 
 
 
@@ -176,7 +176,7 @@ int logging_json_thread_main(int argc, char *argv[])
 	 * */
 	//orb_advert_t v_cmd_pub = orb_advertise(ORB_ID(vehicle_command), &v_cmd);
 
-
+        static int pas_time=0;
 	/* subscribe to topics. */
 	int vgp_sub = orb_subscribe(ORB_ID(vehicle_global_position));
 
@@ -188,7 +188,8 @@ int logging_json_thread_main(int argc, char *argv[])
 
 	int VLD_sub = orb_subscribe(ORB_ID(vehicle_land_detected));
 
-
+	orb_set_interval(vgp_sub,1000);
+	orb_set_interval(vgps_sub,1000);
 	/* Setup of loop */
 
 	struct pollfd fds[1] {};
@@ -202,7 +203,7 @@ reset_check:
 	thread_should_exit=0;
 	int rtl_pass=0;
 	int geo_tag_count=0;
-	memset(&content_holder,0,sizeof(content_holder));
+	memset(content_holder,0,1500);
 
 	// Now control will go into the  second loop only when two conditions are met, which are
 	// 1)pa_data is updated
@@ -212,20 +213,23 @@ reset_check:
 	while(1){
 		orb_copy(ORB_ID(pa_data),pad_sub,&pad);
 		orb_copy(ORB_ID(takeoff_status),TO_status_sub,&TO_status);
+		//printf(",hey patlee\n");
 
 		if((pad.updated==1)&&(TO_status.takeoff_state==5)){
 			break;
 		}
 
 	}
+        printf("\n\nwhile loop break\n\n");
+
 	if(TO_status.takeoff_state==5){
 
 		orb_copy(ORB_ID(vehicle_global_position),vgp_sub,&vgp);// for lat,lon,altitude
-		orb_copy(ORB_ID(vehicle_global_position),vgps_sub,&vgps);// for timestamp
+		orb_copy(ORB_ID(vehicle_gps_position),vgps_sub,&vgps);// for timestamp
 		// notedown the takeoff instance in log file
-
+		printf("\n\nwhile loop break  66\n\n");
 		content_holder[geo_tag_count].Entrytype=1;
-		content_holder[geo_tag_count].Timestamp=vgps.time_utc_usec;
+		content_holder[geo_tag_count].Timestamp=(vgps.time_utc_usec)/1000000;
 		content_holder[geo_tag_count].Lattitude=vgp.lat;
 		content_holder[geo_tag_count].Longitude=vgp.lon;
 		content_holder[geo_tag_count].Altitude=vgp.alt;
@@ -235,7 +239,8 @@ reset_check:
 
 
 	}
-
+	hrt_abstime then=hrt_absolute_time();
+       printf("\n\ntakeoff detected block passed %d\n\n",TO_status.takeoff_state);
 	while (!thread_should_exit) {
 
 		/*
@@ -265,78 +270,80 @@ reset_check:
 
 				//this section runs  when a new estimate from vehicle_global_position arrives
 
+                                if (hrt_elapsed_time(&then)>1_s){
+					orb_copy(ORB_ID(vehicle_global_position),vgp_sub,&vgp);
+					orb_copy(ORB_ID(vehicle_gps_position),vgps_sub,&vgps);
+					orb_copy(ORB_ID(pa_data),pad_sub,&pad);
 
-				orb_copy(ORB_ID(vehicle_global_position),vgp_sub,&vgp);
-				orb_copy(ORB_ID(vehicle_gps_position),vgps_sub,&vgps);
-				orb_copy(ORB_ID(pa_data),pad_sub,&pad);
-
-				int geobreach_status=check_Geobreach(pad,vgp);
-				int timebreach_status=check_Timebreach(pad,vgps);
+					int geobreach_status=check_Geobreach(pad,vgp);
+					int timebreach_status=check_Timebreach(pad,vgps);
 
 
-				//check for geo_breach
-				if(geobreach_status==1){
-					content_holder[geo_tag_count].Entrytype=0;
-					content_holder[geo_tag_count].Timestamp=vgps.time_utc_usec;
-					content_holder[geo_tag_count].Lattitude=vgp.lat;
-					content_holder[geo_tag_count].Longitude=vgp.lon;
-					content_holder[geo_tag_count].Altitude=vgp.alt;
-					geo_tag_count++;
+					//check for geo_breach
+					if(geobreach_status==1){
+						pas_time++;
+						content_holder[geo_tag_count].Entrytype=0;
+						content_holder[geo_tag_count].Timestamp=(vgps.time_utc_usec)/1000000;
+						content_holder[geo_tag_count].Lattitude=vgp.lat;
+						content_holder[geo_tag_count].Longitude=vgp.lon;
+						content_holder[geo_tag_count].Altitude=vgp.alt;
+						geo_tag_count++;
 
-				}
-				//check for time breach
-				if(timebreach_status==1){
-					content_holder[geo_tag_count].Entrytype=2;
-					content_holder[geo_tag_count].Timestamp=vgps.time_utc_usec;
-					content_holder[geo_tag_count].Lattitude=vgp.lat;
-					content_holder[geo_tag_count].Longitude=vgp.lon;
-					content_holder[geo_tag_count].Altitude=vgp.alt;
-					geo_tag_count++;
+					}
+					//check for time breach
+					if(timebreach_status==1){
+						content_holder[geo_tag_count].Entrytype=2;
+						content_holder[geo_tag_count].Timestamp=(vgps.time_utc_usec)/1000000;
+						content_holder[geo_tag_count].Lattitude=vgp.lat;
+						content_holder[geo_tag_count].Longitude=vgp.lon;
+						content_holder[geo_tag_count].Altitude=vgp.alt;
+						geo_tag_count++;
 
-				}
-				//if(timebreach_status || geobreach_status){
+					}
+					//if(timebreach_status || geobreach_status){
 
 					memset(&vgps,0,sizeof(vgps));
 					memset(&vgp,0,sizeof(vgp));
 					memset(&pad,0,sizeof(pad));
 
-				//}
-				if((timebreach_status || geobreach_status) && (!rtl_pass) ){
-					//send RTL command
+					//}
+					if((timebreach_status || geobreach_status) && (!rtl_pass) ){
+						//send RTL command
 
-					vehicle_command_s vcmd{};
-					//vcmd.command = vehicle_command_s::VEHICLE_CMD_NAV_RETURN_TO_LAUNCH;
-					vcmd.command =vehicle_command_s::VEHICLE_CMD_DO_SET_MODE;
-					vcmd.param1 = 1;
-					vcmd.param2 = 4;
-					vcmd.param3 = 5;
+						vehicle_command_s vcmd{};
+						//vcmd.command = vehicle_command_s::VEHICLE_CMD_NAV_RETURN_TO_LAUNCH;
+						vcmd.command =vehicle_command_s::VEHICLE_CMD_DO_SET_MODE;
+						vcmd.param1 = 1;
+						vcmd.param2 = 4;
+						vcmd.param3 = 5;
 
 
-					uORB::SubscriptionData<vehicle_status_s> vehicle_status_sub{ORB_ID(vehicle_status)};
-					vcmd.source_system = vehicle_status_sub.get().system_id;
-					vcmd.target_system = vehicle_status_sub.get().system_id;
-					vcmd.source_component = vehicle_status_sub.get().component_id;
-					vcmd.target_component = vehicle_status_sub.get().component_id;
+						uORB::SubscriptionData<vehicle_status_s> vehicle_status_sub{ORB_ID(vehicle_status)};
+						vcmd.source_system = vehicle_status_sub.get().system_id;
+						vcmd.target_system = vehicle_status_sub.get().system_id;
+						vcmd.source_component = vehicle_status_sub.get().component_id;
+						vcmd.target_component = vehicle_status_sub.get().component_id;
 
-					uORB::Publication<vehicle_command_s> vcmd_pub{ORB_ID(vehicle_command)};
-					vcmd.timestamp = hrt_absolute_time();
-					vcmd_pub.publish(vcmd);
-					rtl_pass=1;
+						uORB::Publication<vehicle_command_s> vcmd_pub{ORB_ID(vehicle_command)};
+						vcmd.timestamp = hrt_absolute_time();
+						vcmd_pub.publish(vcmd);
+						rtl_pass=1;
+					}
+					then=hrt_absolute_time();
 				}
-
-
 
 
 				// check if landing has taken place or not
 				orb_copy(ORB_ID(vehicle_land_detected), VLD_sub, &VLD);
 				char bnm[4]="hi";
 				if(VLD.landed){
+
 					orb_copy(ORB_ID(vehicle_global_position),vgp_sub,&vgp);// for lat,lon,altitude
-					orb_copy(ORB_ID(vehicle_global_position),vgps_sub,&vgps);// for timestamp
+					orb_copy(ORB_ID(vehicle_gps_position),vgps_sub,&vgps);// for timestamp
 					// landing has taken place
 					//notedown the instance in log
 					content_holder[geo_tag_count].Entrytype=3;
-					content_holder[geo_tag_count].Timestamp=vgps.time_utc_usec;
+					content_holder[geo_tag_count].Timestamp=(vgps.time_utc_usec)/1000000;
 					content_holder[geo_tag_count].Lattitude=vgp.lat;
 					content_holder[geo_tag_count].Longitude=vgp.lon;
 					content_holder[geo_tag_count].Altitude=vgp.alt;
@@ -344,19 +351,21 @@ reset_check:
 
 					memset(&vgps,0,sizeof(vgps));
 					memset(&vgp,0,sizeof(vgp));
-
+                                        printf("\nhey its landing\n");
 
 					// exit from the loop
+					update_recentPA(1,bnm);
+					 printf("\nhey recent PA updaed after landing\n");
 					thread_should_exit=1;
 					// update the flight frequency
 
-					update_recentPA(1,bnm);
+
 				}
 				if(VLD.freefall){
 					// drone is in freefall state
 					// notedown the instance in log
 					orb_copy(ORB_ID(vehicle_global_position),vgp_sub,&vgp);// for lat,lon,altitude
-					orb_copy(ORB_ID(vehicle_global_position),vgps_sub,&vgps);// for timestamp
+					orb_copy(ORB_ID(vehicle_gps_position),vgps_sub,&vgps);// for timestamp
 
 					//notedown the instance in log
 					content_holder[geo_tag_count].Entrytype=4;
@@ -384,9 +393,12 @@ reset_check:
 			}
 		}
 	}
-
+        printf("\n\ncount geobreach :::::::%d\n\n",pas_time);
 
         main_json_file_writing(content_holder,geo_tag_count);
+	free(content_holder);
+
+	//Bundling_begins();
 
 	goto reset_check;
 
@@ -442,7 +454,7 @@ int logging_json_main(int argc, char *argv[])
 		deamon_task = px4_task_spawn_cmd("logging_json",
 						 SCHED_DEFAULT,
 						 SCHED_PRIORITY_MAX - 20,
-						 2048,
+						 3548,
 						 logging_json_thread_main,
 						 (argv) ? (char *const *)&argv[2] : (char *const *)nullptr);
 		thread_running = true;

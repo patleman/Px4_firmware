@@ -78,6 +78,7 @@ px4_add_board(
 		mc_hover_thrust_estimator
 		mc_pos_control
 		mc_rate_control
+		logging_json
 		#micrortps_bridge
 		navigator
 		rc_update

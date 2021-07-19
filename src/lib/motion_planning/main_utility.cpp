@@ -1,4 +1,5 @@
 #include "main_utility.hpp"
+#include <stdio.h>
 /* reverse an array, used for radix code */
 static void s_reverse(char *s, size_t len)
 {
@@ -2417,28 +2418,31 @@ LBL_Q:
 static mp_err s_recursion(const mp_int *a, const mp_int *b, mp_int *q, mp_int *r)
 {
    mp_err err;
-   mp_int A1, A2, B1, B0, Q1, Q0, R1, R0, t;
+   mp_int A1, A2, B1;
+
+   mp_int Q1, Q0, R1, R0, t;
+   mp_int  B_0;
    int m = a->used - b->used, k = m/2;
 
    if (m < (MP_MUL_KARATSUBA_CUTOFF)) {
       return s_mp_div_school(a, b, q, r);
    }
 
-   if ((err = mp_init_multi(&A1, &A2, &B1, &B0, &Q1, &Q0, &R1, &R0, &t, NULL)) != MP_OKAY) {
+   if ((err = mp_init_multi(&A1, &A2, &B1, &B_0, &Q1, &Q0, &R1, &R0, &t, NULL)) != MP_OKAY) {
       goto LBL_ERR;
    }
 
-   /* B1 = b / beta^k, B0 = b % beta^k*/
-   if ((err = mp_div_2d(b, k * MP_DIGIT_BIT, &B1, &B0)) != MP_OKAY)        goto LBL_ERR;
+   /* B1 = b / beta^k, B_0 = b % beta^k*/
+   if ((err = mp_div_2d(b, k * MP_DIGIT_BIT, &B1, &B_0)) != MP_OKAY)        goto LBL_ERR;
 
    /* (Q1, R1) =  RecursiveDivRem(A / beta^(2k), B1) */
    if ((err = mp_div_2d(a, 2*k * MP_DIGIT_BIT, &A1, &t)) != MP_OKAY)       goto LBL_ERR;
    if ((err = s_recursion(&A1, &B1, &Q1, &R1)) != MP_OKAY)                 goto LBL_ERR;
 
-   /* A1 = (R1 * beta^(2k)) + (A % beta^(2k)) - (Q1 * B0 * beta^k) */
+   /* A1 = (R1 * beta^(2k)) + (A % beta^(2k)) - (Q1 * B_0 * beta^k) */
    if ((err = mp_lshd(&R1, 2*k)) != MP_OKAY)                               goto LBL_ERR;
    if ((err = mp_add(&R1, &t, &A1)) != MP_OKAY)                            goto LBL_ERR;
-   if ((err = mp_mul(&Q1, &B0, &t)) != MP_OKAY)                            goto LBL_ERR;
+   if ((err = mp_mul(&Q1, &B_0, &t)) != MP_OKAY)                            goto LBL_ERR;
    if ((err = mp_lshd(&t, k)) != MP_OKAY)                                  goto LBL_ERR;
    if ((err = mp_sub(&A1, &t, &A1)) != MP_OKAY)                            goto LBL_ERR;
 
@@ -2454,10 +2458,10 @@ static mp_err s_recursion(const mp_int *a, const mp_int *b, mp_int *q, mp_int *r
    if ((err = mp_div_2d(&A1, k * MP_DIGIT_BIT, &A1, &t)) != MP_OKAY)       goto LBL_ERR;
    if ((err = s_recursion(&A1, &B1, &Q0, &R0)) != MP_OKAY)                 goto LBL_ERR;
 
-   /* A2 = (R0*beta^k) +  (A1 % beta^k) - (Q0*B0) */
+   /* A2 = (R0*beta^k) +  (A1 % beta^k) - (Q0*B_0) */
    if ((err = mp_lshd(&R0, k)) != MP_OKAY)                                 goto LBL_ERR;
    if ((err = mp_add(&R0, &t, &A2)) != MP_OKAY)                            goto LBL_ERR;
-   if ((err = mp_mul(&Q0, &B0, &t)) != MP_OKAY)                            goto LBL_ERR;
+   if ((err = mp_mul(&Q0, &B_0, &t)) != MP_OKAY)                            goto LBL_ERR;
    if ((err = mp_sub(&A2, &t, &A2)) != MP_OKAY)                            goto LBL_ERR;
 
    /* while A2 < 0 do Q0 = Q0 - 1, A2 = A2 + B */
@@ -2472,7 +2476,7 @@ static mp_err s_recursion(const mp_int *a, const mp_int *b, mp_int *q, mp_int *r
    if ((err = mp_copy(&A2, r)) != MP_OKAY)                                 goto LBL_ERR;
 
 LBL_ERR:
-   mp_clear_multi(&A1, &A2, &B1, &B0, &Q1, &Q0, &R1, &R0, &t, NULL);
+   mp_clear_multi(&A1, &A2, &B1, &B_0, &Q1, &Q0, &R1, &R0, &t, NULL);
    return err;
 }
 
@@ -2790,7 +2794,7 @@ mp_err mp_kronecker(const mp_int *a, const mp_int *p, int *c)
    mp_err err;
    int v, k;
 
-   static const char table[] = {0, 1, 0, -1, 0, -1, 0, 1};
+   static const signed char table[] = {0, 1, 0, -1, 0, -1, 0, 1};
 
    if (mp_iszero(p)) {
       if ((a->used == 1) && (a->dp[0] == 1u)) {
@@ -6057,6 +6061,123 @@ void base64Encoder(char input_str[], int len_str, char *result)
 }
 
 
+
+
+
+////////
+
+// signs the content with signKey(a key) and puts the result inside result
+void signing_support_0(key signKey,char *content,char *result,char *result1){
+    printf("\n\n%s\n\n",content);
+    char ch;
+    unsigned char *st=new unsigned char[3000];
+    unsigned int i_sha=0;
+    //// assigning char to unsigned char, this has to be done to implement sha256
+    int i_sha_a=0;
+    while(1){
+
+	   ch=content[i_sha_a];
+      // printf("%c",ch);
+	   if(ch=='\0'){
+		   break;
+	   }
+       if(ch!='\n'){
+        *(st+i_sha)=ch;
+	//	printf("%c",*(st+i_sha));
+		i_sha++;}
+        i_sha_a++;
+
+    }
+    *(st+i_sha)='\0';
+    printf("ooooLLL\n\n%s\n\n",st);
+
+    SHA256 sha;
+
+	sha.update(st,i_sha);
+
+	uint8_t * digest = sha.digest();
+    //int it=0;//just an iterator
+
+    char HEX_format_Digest[65];
+
+    // code for making hex string
+    int hex_count=0;
+    for(int yui=0;yui<32;yui++){
+     //    printf("%d ",*(digest+yui)>>4||0x0f);
+         HEX_format_Digest[hex_count]=HEX_ele[*(digest+yui)>>4 & 0x0f];
+         hex_count++;
+         HEX_format_Digest[hex_count]=HEX_ele[*(digest+yui) & 0x0f];
+         hex_count++;
+      }
+   // delete[] digest;
+    //digest=NULL;
+    HEX_format_Digest[hex_count]='\0';
+static int pass=0;
+pass++;
+    printf("\nhere is the string %d:%s\n\n",pass,HEX_format_Digest);
+    strcpy(result1,HEX_format_Digest);
+
+    //At this point we have got the string format for the digest
+
+
+    delete []st;
+    st=NULL;
+    ////////////////////
+
+    // modulus in public key
+
+    mp_int modulus;
+    mp_init(&modulus);
+    mp_read_radix(&modulus,signKey.modulus,10);
+
+    //private key exponent
+    mp_int Private_key;
+    mp_init(&Private_key);
+    mp_read_radix(&Private_key,signKey.private_exponent,10);
+
+   //making the signing process pkcs.1.15 compatible
+   char padding_SHA256[446]="1ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff003031300d060960864801650304020105000420";
+   strcat(padding_SHA256,HEX_format_Digest);
+   //printf("\npadded sha digest :%s\n",padding_SHA256);
+   mp_int hash_to_sign;
+   mp_init(&hash_to_sign);
+   mp_read_radix(&hash_to_sign,padding_SHA256,16);
+   char aux_hash_ex[514];
+   mp_to_hex(&hash_to_sign,aux_hash_ex,sizeof(aux_hash_ex));
+   printf("\n   hash to sign ===\n%s\n\n",aux_hash_ex);
+
+   ////Signing begins
+
+   mp_int cipher;
+   mp_init(&cipher);
+
+   mp_exptmod(&hash_to_sign,&Private_key,&modulus,&cipher);
+
+   char cipher_string_hex[513];
+   mp_to_hex(&cipher,cipher_string_hex,sizeof(cipher_string_hex));
+   printf("\n%s\n",cipher_string_hex);//this is the encrypted message
+
+
+    base64Encoder(cipher_string_hex,strlen(cipher_string_hex),result);
+
+
+mp_clear(&hash_to_sign);
+mp_clear(&modulus);
+mp_clear(&cipher);
+mp_clear(&Private_key);
+
+}
+
+//////////
+
+
+
+
+
+
+
+
+
 // signs the content with signKey(a key) and puts the result inside result
 void signing_support(key signKey,char *content,char*result){
     printf("\n\n%s\n\n",content);
@@ -6079,7 +6200,7 @@ void signing_support(key signKey,char *content,char*result){
         i_sha_a++;
 
     }
-
+    *(st+i_sha)='\0';
     printf("ooooLLL\n\n%s\n\n",st);
 
     SHA256 sha;
@@ -6196,10 +6317,10 @@ void pair_file_write(pair_set *ptr,int ptr_quant ,char *file_name , key Skey){
 
     ////////////////////
 
-    FILE *fptr;
-    fptr=fopen(file_name,"w");
-    fprintf(fptr, "%s", content);
-    fclose(fptr);
+    FILE *fptr1;
+    fptr1=fopen(file_name,"w");
+    fprintf(fptr1, "%s", content);
+    fclose(fptr1);
     //free(content);
   //  free(signature);
 }
@@ -6295,7 +6416,7 @@ int Validating_File(char *file , key key){
     char tag2[30]="Signature";
     FILE *fptr;
     fptr=fopen(file,"r");
-    char ch;
+    signed char ch;
     char file_content[3000];//=(char*) malloc(sizeof(char)*3000);
     int i=0;
 
@@ -6306,7 +6427,7 @@ int Validating_File(char *file , key key){
     }
 
     file_content[i]='\0';
-
+   fclose(fptr);
     int index=isSubstring(tag1,file_content);
     index=index+int(strlen(tag1));
 
@@ -6516,7 +6637,7 @@ void decrypting_File(char *file , key key, char *result){
     mp_int aux_int_result;
     mp_init(&aux_int_result);
 
-    char tao;
+    signed char tao;
     char decrypt;
     char buff2[30];
     int k=0,di=0;
@@ -6540,6 +6661,7 @@ void decrypting_File(char *file , key key, char *result){
         }
 
     }
+    fclose(fptr);
     result[di]='\0';
 mp_clear(&aux_int);
 mp_clear(&aux_int_result);
@@ -6775,7 +6897,7 @@ int file_read(char *fname,char *tag,char *result,int file_type){
         int validation_stats=Validating_File(fname,RFM_KEY);
         if (validation_stats==1){
             FILE *fptr;
-            char ch;
+            signed char ch;
             fptr=fopen(fname,"r");
             char *content=(char*) malloc(sizeof(char)*3000);
             int i=0;
@@ -6784,6 +6906,7 @@ int file_read(char *fname,char *tag,char *result,int file_type){
                 i++;
             }
             content[i]='\0';
+            fclose(fptr);
             // Now fetch the tag value
             fetch_tag(content,tag,result);
             free(content);
@@ -6804,7 +6927,7 @@ int file_read(char *fname,char *tag,char *result,int file_type){
         int validation_stats=Validating_File(fname,FMP_key);
          if (validation_stats==1){
             FILE *fptr;
-            char ch;
+            signed char ch;
             fptr=fopen(fname,"r");
             char *content=(char*) malloc(sizeof(char)*3000);
             int i=0;
@@ -6813,6 +6936,7 @@ int file_read(char *fname,char *tag,char *result,int file_type){
                 i++;
             }
             content[i]='\0';
+            fclose(fptr);
             // Now fetch the tag value
             fetch_tag(content,tag,result);
             free(content);
@@ -6831,7 +6955,7 @@ int file_read(char *fname,char *tag,char *result,int file_type){
 void KeyLog_Regen(char *fileID){
     FILE *fptr;
     fptr = fopen("./log/KeyLog.txt","r");
-    char ch;
+    signed char ch;
     char *content=(char*) malloc(sizeof(char)*3000);
     int i=0;
     while((ch=fgetc(fptr))!=EOF){
@@ -6850,7 +6974,7 @@ void KeyLog_Regen(char *fileID){
     change_aux++;
 
     char changeAux[3];
-    sprintf(changeAux,"%d",change_aux);
+    sprintf(changeAux,"%hu",(unsigned short)change_aux);////change1
     printf("\n\n%s\n\n",changeAux);
     // number of new lines char
     int index= isSubstring(tag_changes1,content);
@@ -7169,13 +7293,14 @@ int check_recentPA(char *paID){
     FILE *fptr;
     fptr=fopen("./log/recentPA.txt","r");
     int i=0;
-    char aux;
+    signed char aux;
     char content[5000];
     while((aux=fgetc(fptr))!=EOF){
         content[i]=aux;
         i++;
     }
     content[i]='\0';
+    fclose(fptr);
     //tags to be fetched are:
     //1) start time and end time
     //2) allowable frequency
@@ -7503,14 +7628,14 @@ void data_fetch_delete(){
     FILE *fptr;
     fptr=fopen("./log/permission_artifact_breach.xml","r");
     char content[5000];
-    char ch;
+    signed char ch;
     int i=0;
     while((ch=fgetc(fptr))!=EOF){
         content[i]=ch;
         i++;
     }
     content[i]='\0';
-
+    fclose(fptr);
    // printf("\ndata fetch delete:::%s\n",content);
     // fetching frequency
     char tag_frequency[30]="frequency=";
@@ -7595,9 +7720,9 @@ void data_fetch_delete(){
     strcpy(pairset[4].tag,"End_time");
     strcpy(pairset[4].value,data.end_time);
 
-    //sprintf(aux_float,"%d",int((10^7)*data.long_lat_coords[0][0]));
-    char *f1=gcvt(data.long_lat_coords[0][0], 8, aux_float);
-    printf("\n%s\n",f1);
+    sprintf(aux_float,"%f",data.long_lat_coords[0][0]);
+    //char *f1=gcvt(data.long_lat_coords[0][0], 8, aux_float);
+    //printf("\n%s\n",f1);
     printf("\n mainnf %s\n",aux_float);
     //lattitude1
     strcpy(pairset[5].tag,"lattitude1");
@@ -7605,27 +7730,27 @@ void data_fetch_delete(){
     memset(aux_float,' ',sizeof(aux_float));
 
     //longitude1
-    //sprintf(aux_float,"%d",int((10^7)*data.long_lat_coords[0][1]));
-   f1=gcvt(data.long_lat_coords[0][1], 8, aux_float);
-    printf("\n%s\n",f1);
+    sprintf(aux_float,"%f",data.long_lat_coords[0][1]);
+   //f1=gcvt(data.long_lat_coords[0][1], 8, aux_float);
+    //printf("\n%s\n",f1);
     printf("\n mainnf %s\n",aux_float);
     strcpy(pairset[6].tag,"longitude1");
     strcpy(pairset[6].value,aux_float);
     memset(aux_float,' ',sizeof(aux_float));
 
     //lattitude2
-   // sprintf(aux_float,"%d",int((10^7)*data.long_lat_coords[1][0]));
-    f1=gcvt(data.long_lat_coords[1][0], 8, aux_float);
-    printf("\n%s\n",f1);
+    sprintf(aux_float,"%f",data.long_lat_coords[1][0]);
+   // f1=gcvt(data.long_lat_coords[1][0], 8, aux_float);
+   //printf("\n%s\n",f1);
     printf("\n mainnf %s\n",aux_float);
     strcpy(pairset[7].tag,"lattitude2");
     strcpy(pairset[7].value,aux_float);
     memset(aux_float,' ',12*sizeof(char));
 
     //longitude2
-   // printf("printitng %d",int((10^7)*data.long_lat_coords[2][1]));
-   // sprintf(aux_float,"%d",int((10^7)*data.long_lat_coords[2][1]));
-    f1=gcvt(data.long_lat_coords[2][1], 8, aux_float);
+   // printf("printitng %d",int((10^7)*data.long_lat_coord)s[2][1]));
+    sprintf(aux_float,"%f",data.long_lat_coords[2][1]);
+   // f1=gcvt(data.long_lat_coords[2][1], 8, aux_float);
     printf("\n mainnf %f %s\n",data.long_lat_coords[2][1],aux_float);
    // printf("\n%s\n",f1);
     strcpy(pairset[8].tag,"longitude2");
@@ -7644,17 +7769,64 @@ void data_fetch_delete(){
    strcpy(pairset[11].value,"None");
 
 
+   //publishing Permission Artefact information to pa_data.msg
+
+	struct pa_data_s pa_data_raw;
+	memset(&pa_data_raw, 0, sizeof(pa_data_raw));
+	orb_advert_t pa_data_raw_pub = orb_advertise(ORB_ID(pa_data), &pa_data_raw);
+
+   pa_data_raw.lattitude1=data.long_lat_coords[0][0];
+   pa_data_raw.longitude1=data.long_lat_coords[0][1];
+   pa_data_raw.lattitude2=data.long_lat_coords[1][0];
+   pa_data_raw.longitude2=data.long_lat_coords[1][1];
+   pa_data_raw.allowable_height=strtol(tag_content_maxalt,NULL,10);
+
+   Date_time startTime;
+   Date_time endTime;
+   conversion_to_dateTime(&startTime,data.start_time);
+   conversion_to_dateTime(&endTime,data.end_time);
+
+   pa_data_raw.start_hours=startTime.Hours;
+   pa_data_raw.start_date=startTime.date;
+   pa_data_raw.start_minutes=startTime.Minutes;
+   pa_data_raw.start_month=startTime.Month;
+   pa_data_raw.start_year=startTime.Year;
+   pa_data_raw.start_seconds=startTime.Seconds;
 
 
-    char fileName[20]="./log/recentPA.txt";
+   pa_data_raw.end_hours=endTime.Hours;
+   pa_data_raw.end_date=endTime.date;
+   pa_data_raw.end_minutes=endTime.Minutes;
+   pa_data_raw.end_month=endTime.Month;
+   pa_data_raw.end_year=endTime.Year;
+   pa_data_raw.end_seconds=endTime.Seconds;
 
-    key RFM_private_key;
+   int vehi_gps_pos=orb_subscribe(ORB_ID(vehicle_gps_position));
 
-    get_RFM_Key(&RFM_private_key);
+   struct vehicle_gps_position_s raw;
+   orb_copy(ORB_ID(vehicle_gps_position),vehi_gps_pos,&raw);
+
+   pa_data_raw.home_altitude=pow(10,-3)*(raw.alt);// in meters
+
+   pa_data_raw.updated=1;
+
+
+   orb_publish(ORB_ID(pa_data), pa_data_raw_pub, &pa_data_raw);
+
+
+
+
+   char fileName[20]="./log/recentPA.txt";
+
+
+
+   key RFM_private_key;
+
+   get_RFM_Key(&RFM_private_key);
 
   //  free(value_modulus);
 
-    pair_file_write(pairset,12,fileName,RFM_private_key);
+   pair_file_write(pairset,12,fileName,RFM_private_key);
 
 
 
@@ -8615,7 +8787,7 @@ void Reference_canon(char *file_name, char *res){
 
 	    //exit(1);
 
-    char ch;
+    signed char ch;
     int count_result=0;
     int *ptr_count_result;
     ptr_count_result=&count_result;
@@ -8742,6 +8914,7 @@ void Reference_canon(char *file_name, char *res){
     }else{
         printf("PA File does not exist");
     }
+    fclose(fp);
 }
 void cleanerXML(char *input,char *output){
     int i=0;
@@ -8783,7 +8956,7 @@ void SignedInfo_canon(char *file_name, char *res)
 
     char *content=(char*) malloc(sizeof(char)*10000);
 
-    char ch;
+    signed char ch;
     char aux_copy[300];
     int count=0;
     int flag_ini=0;
@@ -9123,6 +9296,7 @@ int RPAS_identifier(){
                 return 0;
             }else{
                 //file has been found, now validate it using FMP public key
+                fclose(fptr);
                 char id_gps_change[20];
                 int file_status = file_read(Hardware_fname,tag_0,id_gps_change,1);
                 if (file_status==1){
@@ -9205,7 +9379,7 @@ int CHECK_REUSAGE(char *file_id){
            //file is valid it can searched for current file_id
             FILE *fptr1;
             fptr1=fopen(fname,"r");
-            char aux_c;
+            signed char aux_c;
             char *content=(char*) malloc(sizeof(char)*3000);
             int i=0;
             while((aux_c=fgetc(fptr1))!=EOF){
@@ -9213,7 +9387,7 @@ int CHECK_REUSAGE(char *file_id){
                 i++;
             }
             content[i]='\0';
-
+            fclose(fptr1);
            int prescence=isSubstring(file_id,content);
            free(content);
            if(prescence!=-1){
@@ -9398,7 +9572,7 @@ void Key_rotation_start(char *file_id){
     FILE *fptr;
     fptr=fopen("./log/PublicPrivateNew_aux.txt","r");
 
-    char ch;
+    signed char ch;
     char content[3000];//=(char*) malloc(sizeof(char)*3000);
     int i=0;
     while((ch=fgetc(fptr))!=EOF){
@@ -9510,7 +9684,7 @@ void ParamInuseModify(){
     FILE *fptr_INuse;
     fptr_INuse=fopen("./log/ParamInuse.txt","r");
 
-    char ch;
+    signed char ch;
     char ParamInuseContent[5000];
     int i=0;
     while((ch=fgetc(fptr_INuse))!=EOF){
@@ -9734,7 +9908,7 @@ void ParamSetfile(){
     FILE *fptr_INuse;
     fptr_INuse=fopen("./log/ParamInuse.txt","r");
 
-    char ch;
+    signed char ch;
     char ParamInuseContent[5000];
     int i=0;
     while((ch=fgetc(fptr_INuse))!=EOF){
@@ -9838,17 +10012,22 @@ previous_log_hash 2
 void update_recentPA(int type,char *value){
    FILE *fptr;
 
-    fptr=fopen("./logs/recentPA.txt","r");
-    char ch;
+    fptr=fopen("./log/recentPA.txt","r");
+    if(fptr==NULL){
+       printf("\nproblem in opening file.\n");
+    }
+    signed char ch;
     int i=0;
 
-    char content[5000];
+    char content[10000];
 
     while((ch=fgetc(fptr))!=EOF){
         content[i]=ch;
         i++;
     }
     content[i]='\0';
+   printf("\ndata_fetched\n");
+   fclose(fptr);
    // type == 0,1,2;
    // first fetching all the constant tags
  /*permissionArtifactId
@@ -9900,7 +10079,7 @@ void update_recentPA(int type,char *value){
    strcpy(pairset[4].tag,tag_et);
    strcpy(pairset[4].value,tag_content_et);
 
-
+   printf("\nproblem at 9950\n");
    //lattitude1
    char tag_lat1[70]="lattitude1";
    char tag_content_lat1[100];
@@ -9932,17 +10111,17 @@ void update_recentPA(int type,char *value){
    strcpy(pairset[8].value,tag_content_lon2);
 
 
-
+   printf("\nproblem at 9982\n");
    if(type==0){
       // changing fetch_required
 
       char tag_freq_done[70]="frequencies_done";
       char tag_content_freq_done[100];
-      fetch_tag(content,tag_lon2,tag_content_freq_done);
+      fetch_tag(content,tag_freq_done,tag_content_freq_done);
       strcpy(pairset[9].tag,tag_freq_done);
       strcpy(pairset[9].value,tag_content_freq_done);
 
-
+printf("\nproblem at 9992\n");
       char tag_fetch[70]="fetch_required";
       //char tag_content_fetch[100];
       //fetch_tag(content,tag_fetch,tag_content_fetch);
@@ -9961,12 +10140,13 @@ void update_recentPA(int type,char *value){
 
       char tag_freq_done[70]="frequencies_done";
       char tag_content_freq_done[100];
-      fetch_tag(content,tag_lon2,tag_content_freq_done);
+      fetch_tag(content,tag_freq_done,tag_content_freq_done);
       int aux;
       char aux1[20];
       aux=strtol(tag_content_freq_done,NULL,10);
       aux=aux+1;
       sprintf(aux1,"%d",aux);
+      printf("\n\n%s %s %d\n\n",tag_content_freq_done,aux1,aux);
       strcpy(pairset[9].tag,tag_freq_done);
       strcpy(pairset[9].value,aux1);
 
@@ -9986,7 +10166,7 @@ void update_recentPA(int type,char *value){
       // changing previous_log_hash
       char tag_freq_done[70]="frequencies_done";
       char tag_content_freq_done[100];
-      fetch_tag(content,tag_lon2,tag_content_freq_done);
+      fetch_tag(content,tag_freq_done,tag_content_freq_done);
       strcpy(pairset[9].tag,tag_freq_done);
       strcpy(pairset[9].value,tag_content_freq_done);
 
@@ -10017,12 +10197,390 @@ void update_recentPA(int type,char *value){
 
 
 // functions remaining to define.
+
+void Bundling_begins(){
+   // files are already present, this function will generate a combined hash
+   // file name:: (pa_Id_first_term)_log_(<=frequnecy_done)
+   // generate bundledLog.txt containing:1)combine hash 2)signed combined hash 3)sign
+   FILE *fptr;
+   signed char ch;
+   int i=0;
+   char *content=(char*) malloc(4000*sizeof(char));
+   fptr=fopen("./log/log_of_logs.txt","r");
+
+   while((ch=fgetc(fptr))!=EOF){
+      content[i]=ch;
+      i++;
+   }
+
+   content[i]='\0';
+   fclose(fptr);
+
+   // preparing for bundled.txt creation
+   pair_set *new_content=(pair_set*) malloc(20*sizeof(pair_set));
+   int new_cont=0;
+
+
+   char tag_pa_id[50]="PA_ID";
+   char tag_pa_id_contain[70];
+   fetch_tag(content,tag_pa_id,tag_pa_id_contain);
+   strcpy(new_content[new_cont].tag,tag_pa_id);
+   strcpy(new_content[new_cont].value,tag_pa_id_contain);
+   new_cont++;
+
+
+   char tag_num_logs[70]="number_of_logs";
+   char tag_logs_contain[40];
+   fetch_tag(content,tag_num_logs,tag_logs_contain);
+   strcpy(new_content[new_cont].tag,tag_num_logs);
+   strcpy(new_content[new_cont].value,tag_logs_contain);
+   new_cont++;
+
+
+
+   char file_ini[30];
+
+   i=0;
+   while(tag_pa_id_contain[i]!='-'){
+      file_ini[i]=tag_pa_id_contain[i];
+      i++;
+   }
+
+   file_ini[i]='\0';
+
+   int log_count=strtol(tag_logs_contain,NULL,10);
+   char aux0[100];
+   strcpy(aux0,"./log/");
+   strcat(aux0,file_ini);
+   strcat(aux0,"_log_");
+   char aux1[100];
+   char aux_count[50];
+
+   char *aux_hold=(char*) malloc(150*sizeof(char));
+
+   char *combined_hash=(char*) malloc(1500*sizeof(char));
+
+
+   //fetching hashes of each log and concating it into aux_hold.
+   for (int u=1;u<=log_count;u++){
+
+      strcpy(aux1,aux0);
+      sprintf(aux_count,"%d",u);
+      strcat(aux1,aux_count);
+      strcat(aux1,".json");
+
+      //fetching the hash
+      fetch_tag(content,aux1,aux_hold);
+
+      strcpy(new_content[new_cont].tag,aux1);
+      strcpy(new_content[new_cont].value,aux_hold);
+      new_cont++;
+      if(u==1){
+         strcpy(combined_hash,aux_hold);
+      }else{
+         strcat(combined_hash,aux_hold);
+      }
+
+
+
+   }
+   free(aux_hold);
+
+
+   free(content);
+
+   strcat(combined_hash,"\0");
+
+   printf("combined_hash ::: %s",combined_hash);
+
+   key RFM_private_key;
+
+   get_RFM_Key(&RFM_private_key);
+
+   char hash_combined_hash[180];
+   char signed_combined_hash[1080];
+
+   signing_support_0(RFM_private_key,combined_hash,signed_combined_hash,hash_combined_hash);
+
+
+   free(combined_hash);
+
+
+   strcpy(new_content[new_cont].tag,"combined_hash");
+   strcpy(new_content[new_cont].value,hash_combined_hash);
+   new_cont++;
+
+
+   strcpy(new_content[new_cont].tag,"signed_combined_hash");
+   strcpy(new_content[new_cont].value,signed_combined_hash);
+   new_cont++;
+
+
+   char filename[30]="./log/bundled.txt";
+   pair_file_write(new_content,new_cont,filename,RFM_private_key);
+   free(new_content);
+}
+
+
+int read_for_fetch(){
+   char tag_fetch[30]="fetch_required";
+   char tag_fetch_contain[20];
+   char fname[40]="./log/recentPA.txt";
+   int status = call_file_read(fname,tag_fetch,tag_fetch_contain,0);
+   if(status==1){
+      // file is genuine
+      int aux = strtol(tag_fetch_contain,NULL,10);
+      if(aux==1){
+         // fetching is required
+         return 1;
+      }else{
+         // fetching is not required
+         return 2;
+      }
+
+   }else{
+      // file is not genuine
+      return 3;
+   }
+
+}
+
+
 /*
-void Bundling_begins();
+int check_fetch(){
+   char fname[40]="./log/fetched.txt";
 
-int read_for_fetch();
+   FILE *fptr;
+   fptr=fopen(fname,"r");
+   if(fptr!=NULL){
+      fclose(fptr);
+      // fetched.txt is present
 
-int check_fetch();
+      key MC_key_public;// for validating the source to be no other than management client
 
-void fetching_publish_padata();
+      get_MC_public(&MC_key_public);
+
+
+      int valid_status=Validating_File(fname,MC_key_public);
+      // match the pa_id
+      //if matches then delete the recentPA.txt, log of logs and log files (leaving space)
+
+   }else{
+      // fetched.txt is not present
+   }
+
+}
 */
+
+void update_log_of_logs(char *tag,char *value,char *done_freq,char *pa_id,char *start_file){
+   // this file will keep track of the log file names with the their hash value
+   // then when bundling_begins function is evoked the file is used to form a bundled.txt
+   // file with signed combined hash
+   FILE *fptr;
+   fptr=fopen("./log/log_of_logs.txt","r");
+   if(fptr!=NULL){
+
+     signed  char ch;
+      int a=0;
+      char content_file[5000];
+      while((ch=fgetc(fptr))!=EOF){
+         content_file[a]=ch;
+         a++;
+      }
+      content_file[a]='\0';
+      fclose(fptr);
+      // this is not the first time log is generated
+      //first fetch the information from the file and then regenerate the file with additional tag and value.
+      // note down the done_freq.
+      //  done_freq-1 log file names would be there in the log_of_logs.txt.
+
+      int count=atoi(done_freq);
+      printf("\n%d\n",count);
+ printf("\nproblem at 10126\n");
+      pair_set *content=(pair_set*) malloc((count+4)*sizeof(pair_set));
+      int content_count=0;
+ printf("\nproblem at 10129\n");
+      strcpy(content[content_count].tag,"PA_ID");
+      strcpy(content[content_count].value,pa_id);
+      content_count++;
+ printf("\nproblem at 10133\n");
+      strcpy(content[content_count].tag,"number_of_logs");
+      strcpy(content[content_count].value,done_freq);
+      content_count++;
+ printf("\nproblem at 10137\n");
+      char fetching_tg[100];
+      strcpy(fetching_tg,start_file);
+      char aux_st[100];
+      char fetch_tag_contain[100];
+      char aux0[100];
+      printf("\nproblem at 10143\n");
+      for(int i=1;i<count;i++){
+         printf("\ni value   ;;;;;;;  %d\n",i);
+         strcpy(aux_st,fetching_tg);
+         sprintf(aux0,"%d",i);
+         strcat(aux_st,aux0);
+         strcat(aux_st,".json");
+
+         fetch_tag(content_file,aux_st,fetch_tag_contain);
+
+
+         strcpy(content[content_count].tag,aux_st);
+         strcpy(content[content_count].value,fetch_tag_contain);
+         content_count++;
+
+         memset(aux_st,0,sizeof(aux_st));
+         memset(fetch_tag_contain,0,sizeof(fetch_tag_contain));
+
+
+
+      }
+
+      strcpy(content[content_count].tag,tag);
+      strcpy(content[content_count].value,value);
+      content_count++;
+      printf("\nproblem at 10165\n");
+      char wr_filename[70]="./log/log_of_logs.txt";
+
+      key RFM_private_key;
+
+      get_RFM_Key(&RFM_private_key);
+       printf("\nproblem at 10171\n");
+
+      pair_file_write(content,content_count,wr_filename,RFM_private_key);
+       printf("\nproblem at 10174\n");
+      free(content);
+
+
+   }else{
+      // this is the first time log is generated
+
+      //char buff1[5000];
+      pair_set content_holder[3];
+
+      strcpy(content_holder[0].tag,"PA_ID");
+      strcpy(content_holder[0].value,pa_id);
+
+      strcpy(content_holder[1].tag,"number_of_logs");
+      strcpy(content_holder[1].value,"1");
+
+
+      strcpy(content_holder[2].tag,tag);
+      strcpy(content_holder[2].value,value);
+
+
+      char filename[70]="./log/log_of_logs.txt";
+
+      key private_rfm_key;
+
+      get_RFM_Key(&private_rfm_key);
+
+      pair_file_write(content_holder,3,filename,private_rfm_key);
+
+   }
+
+
+
+
+
+
+}
+
+
+void fetching_publish_padata(){
+
+   FILE *fptr;
+   fptr=fopen("./log/recentPA.txt","r");
+   if(fptr!=NULL){
+      signed char ch;
+      int i=0;
+      char content[5000];
+      while((ch=fgetc(fptr))!=EOF){
+
+         content[i]=ch;
+         i++;
+
+      }
+      content[i]='\0';
+     fclose(fptr);
+
+   //publishing Permission Artefact information to pa_data.msg
+   struct pa_data_s pa_data_raw;
+   memset(&pa_data_raw, 0, sizeof(pa_data_raw));
+   orb_advert_t pa_data_raw_pub = orb_advertise(ORB_ID(pa_data), &pa_data_raw);
+      char lat1_tag[40]="lattitude1";
+      char lattitude1[40];
+      char lat2_tag[40]="lattitude2";
+      char lattitude2[40];
+      char long1_tag[40]="longitude1";
+      char longitude1[40];
+      char long2_tag[40]="longitude2";
+      char longitude2[40];
+      char st_tag[40]="Start_time";
+      char start_time[80];
+      char et_tag[40]="End_time";
+      char end_time[80];
+      char max_alt_tag[80]="maxAltitude";
+      char maxalt[70];
+
+      //fetching lattitude and longitude
+      fetch_tag(content,lat1_tag,lattitude1);
+      pa_data_raw.lattitude1=atof(lattitude1);
+
+      fetch_tag(content,long1_tag,longitude1);
+      pa_data_raw.longitude1=atof(longitude1);
+
+      fetch_tag(content,lat2_tag,lattitude2);
+      pa_data_raw.lattitude2=atof(lattitude2);
+
+
+
+      fetch_tag(content,long2_tag,longitude2);
+      pa_data_raw.longitude2=atof(longitude2);
+
+      fetch_tag(content,max_alt_tag,maxalt);
+      pa_data_raw.allowable_height=strtol(maxalt,NULL,10);
+
+      //fetching start time and end time.
+      fetch_tag(content,st_tag,start_time);
+      fetch_tag(content,et_tag,end_time);
+
+      Date_time startTime;
+      Date_time endTime;
+      conversion_to_dateTime(&startTime,start_time);
+      conversion_to_dateTime(&endTime,end_time);
+
+      pa_data_raw.start_hours=startTime.Hours;
+      pa_data_raw.start_date=startTime.date;
+      pa_data_raw.start_minutes=startTime.Minutes;
+      pa_data_raw.start_month=startTime.Month;
+      pa_data_raw.start_year=startTime.Year;
+      pa_data_raw.start_seconds=startTime.Seconds;
+
+
+      pa_data_raw.end_hours=endTime.Hours;
+      pa_data_raw.end_date=endTime.date;
+      pa_data_raw.end_minutes=endTime.Minutes;
+      pa_data_raw.end_month=endTime.Month;
+      pa_data_raw.end_year=endTime.Year;
+      pa_data_raw.end_seconds=endTime.Seconds;
+
+      int vehi_gps_pos=orb_subscribe(ORB_ID(vehicle_gps_position));
+
+      struct vehicle_gps_position_s raw;
+      orb_copy(ORB_ID(vehicle_gps_position),vehi_gps_pos,&raw);
+
+      pa_data_raw.home_altitude=pow(10,-3)*(raw.alt);// in meters
+
+      pa_data_raw.updated=1;
+
+
+      orb_publish(ORB_ID(pa_data), pa_data_raw_pub, &pa_data_raw);
+
+
+
+   }else{
+      printf("\nfile is not opening\n");
+   }
+
+}
+

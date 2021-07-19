@@ -469,6 +469,7 @@ else
 	# Start the navigator.
 	#
 	navigator start
+	logging_json start
 
 	#
 	# Start a thermal calibration if required.
