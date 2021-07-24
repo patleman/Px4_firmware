@@ -605,8 +605,8 @@ if(!checky1)
 		// 2) Now extracting date_time and geo_coordinates and checking for time and geofence breach.
 
 
+/*
 
-	/*
 			time_verification=date_time_extract_and_check();
 			printf("\ntime verification ::::%d\n",time_verification);
 			if (time_verification==0){
@@ -622,6 +622,7 @@ if(!checky1)
 			}else{
 				printf("\n In time limit and permitted area. \n");
 			}
+
 			//if(recentPA_presence==0){
 			drone_id_verification=DroneIDverification();
 			//}else{

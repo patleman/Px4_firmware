@@ -137,60 +137,62 @@ void signing_log_content(char *HEX,char *cipher_string_hex){
       printf("\nproblem at line 668 possible mp iniialization %s\n",HEX);
 
     // modulus in public key
-   mp_int modulus;
-   mp_init(&modulus);
-   char Modulus[513] ="c8f770862ad1bc391310984fde3bb0879590e44e25dfbf9177431b27af55bb21bb6e93358d22d6ea60a38ce9e08cb30077e3d8e6908a2cc46bde10e767c0cc8977d66322be0fc196e5f399675a22a666563ce7de7af613c9dc23f79df8abd8e99391d957de97e9950bd2e1a8671404e8a9d19c32cae9dd5f6d29474cf45b613a31596bead1db45c7a929994fc99bdf68426ab3e9857b61fee826c01ee81c9fc030754252e26822ee26d5931b8835d221cc7889cdefec20ccc4312934d52b4de3cdfcb258dfefbf73ad365fb04a18edd3b8d3f68196fb910b791f6dbcd60b5c25b7f646176f9b009305c47d1b6c2cfe1ebddb58c08ad2da9dc932851ba9e258ef";
+    mp_int modulus;
+    mp_init(&modulus);
+    char Modulus[513] ="a7f5781267c153741d140afab399e1d1052bcfcc075f146c09ac7ba0eef6912c1a8e89f4c8c2440d8123f1b6f8b0545650260135a65d93fda39d540935e7462bae44124e6dd2a1eb62c570b4f276d863870ba9e5d3feb6e1923a5bda8ef28b1355cada3e710f8c0227035848303c0966a577d567d1b4dec1651f244cfe7b06a5e853b83517d00939bfa6450c3dec551bf0a673d6fac7563b737a4c80f11cf6c57aeb5997e951a1521d36d881e4ca0e9b83726c78ac6f6b5eedc6e1ffc9a247e20fb9ac306fa92e8749f689d1353a32fd9f5eeb2c71a839975c8c7e0fdc25bbda1c678d6fa71962be337854cd8e6d0043ab4ce1e5de035798451d73ee25c487f3";
+   // char Modulus[513] ="c8f770862ad1bc391310984fde3bb0879590e44e25dfbf9177431b27af55bb21bb6e93358d22d6ea60a38ce9e08cb30077e3d8e6908a2cc46bde10e767c0cc8977d66322be0fc196e5f399675a22a666563ce7de7af613c9dc23f79df8abd8e99391d957de97e9950bd2e1a8671404e8a9d19c32cae9dd5f6d29474cf45b613a31596bead1db45c7a929994fc99bdf68426ab3e9857b61fee826c01ee81c9fc030754252e26822ee26d5931b8835d221cc7889cdefec20ccc4312934d52b4de3cdfcb258dfefbf73ad365fb04a18edd3b8d3f68196fb910b791f6dbcd60b5c25b7f646176f9b009305c47d1b6c2cfe1ebddb58c08ad2da9dc932851ba9e258ef";
 	//char Modulus[513] = "bc07d529450214ef63a8d61966987e8ca0594d9a7ec4f1881117b4f8ecbdc74b8769f6c98bfe931c9474116be8bd36527acfd95f6633d12cc8a960ab3d3e7a0b4b3e4990b594ee61af3b56315337501225525fb997b65c38118d614601dcb8bd631673a510498f2c3dab44d723d8b6daa697d0108e7fcb4d27525f386e7fcd9ce29c4ab12c4258aa77872259a25804791a1eaef54b65226ec84765442ac839db30467d86910e700d802807de1f4fef5235738d66359cb0a2707cb9cd90e90bb1f2d0d807aafbd048b1ddbb156d4984cfbbaa9a435b9230d213140dd5be64b5e594945d474665eaf5267fc598a5f75b99f83b029971b80c4149891d43abe62b95";
 	//char Modulus[513]="cfb7e3ed5fb094ca81a2da9b07db403fc3882a33acf45f34c57d8fe677b3c787e3f034b4cfeba70f8a7beb95a53520780a59b1494ce00393aa812edf96abdafab551dd6728cd5d4ac4371c6049acecc6b63972737e60773129fa86dd8c5277ed64d13febb808776f630f7afb895789f609b28ba37caf0b14381f48ab123c093dc2621c34c570144d912de27fbf1d5669d427a07c9cf027013c93167d7faab8e8b4c95cfd0a9be0e4a92ae132713891a63af36315fce8d6f376cd2be410ef2155be9182caba4772275c93b47d5b8eed6cfe3fda8be884f79d49de09d02e42d93f350a25486a90653b0c72b6fb4d7bf9d40a2bc1559785b4bd0dd24a70aca7ef93";
-   mp_read_radix(&modulus,Modulus,16);
+    mp_read_radix(&modulus,Modulus,16);
 
-    //private key exponent
-   mp_int Private_key;
-   mp_init(&Private_key);
-   char private_hex[513]="184885e9405d4d801c04a252ec488c2125fa770bd659bdfd26cb0e09f28eca68de0c136fa219369ce5867dad78fba75984231cff6731bb0d14f7a55540dd3419dc48247c7b38ce2c9ca69dbfb64d7f8bd819cdeebd2ee4df3c6180372f681c72c4e917b91d657fcd09bbb696b1b5e28df68f246fa2c33583a55e1a867af45bc004583335a5d5a79d046b2d9c74bb5b7282a4ffb0167c3f0c982051fe6e253a8c20d063e1eccf0dfcdcaf4c34a3f0ca2cf8ebbb37d03c8176ed157b55f738c5f47fe4d0d42b05c6c0e9a58cc3766ec87926ee8e38843b25171886ec413c644b931acbb92895c4665274a17355d1d72401339d59ee0ec69a65d613e9b5c215a7c9";
-  // char private_hex[513] = "9b78ea83264133684182400d5eaca6aec68330cc97176712f7f71f3758210f61df44f9beead78372753987922f2e0c75a480aa1edc95e9d65ad0da529ce044ef83b6ac03507125ae75c2dd61098ac9d54730d65fd21702278633dd8392549c18548f22ee100a92aca50d316da68131a897691dac22f77df57c96fa8ee1a7212db313396410a5c9c8a31f6f940724cff2b2db5eb078eedad92b6ff29a8636fcd370e99773e96168f34839693f84b7a083597bfbe0f674c79b2348b038ca730cada30bcf2dd9cde27dd555891d3cc10b7831b23e7cda163570635727f11d569492a201f55c56d9a92d46f71b6ecea30f28f8c040f834a2da43f72a1ec927df9441";
-   //char private_hex[513]="6beefbcaae7c4cf46524403f6a77ad0cf5075e1677fa8b361aa0c2135983db5c6b3eb7c4747dd8d3247c7bcfc886b0966f9a679ad50d5a0e72fca964992037ab2a689d892b147b338c7dae8b01fd8f133a40e38dcbcf48600d96165a2cbdf57f2f71e3ab1277a3c8074b55f63a497870965d665dcf3e0d9db603db78b902e5317897c3538a24057c29f25f98284c7262bd965f4923da6a117f37c88e78ec6ce34da38eae946c06cc4ac166df70a7dd24b1be2254c8a25797bde3c58918b9f8ae0b5bf8019f8f60fb9e7e087d20bcb935b0b9c3a43c0b7f64ca9027c8bfa9e83525781dfd7b529a88a305ae8b4ec56e2cadff1ded53f2ec461ae2bd56e26231f1";
-   mp_read_radix(&Private_key,private_hex,16);//
-   //char yu[]="b59cab400e9c64525f566e85c97c2d65a2d0620f0479cb8ef8e6eb1d3c1cf093be5eb827a4d01d9a585b0043f148d9e3c213676d819818be05bf39a7657cd953bd4a7b2e361d03e1d64d99c755036eb1f97223832b1d596ee131f0adb84879cbd6763f1fbe61c214ff6514551900ef6034feb20cf0daf995ebaf9d7e5c3566cf012e1aa32e3733747be37955ec0d127d32fbddfdd8451fc5254dfe09a4b1b26bd9ec3487cd04121fd4b965456c024e21086da38c81670b8cb57fdad93f8f90eb6bfa109d57ffda156c105fe15c4c78d588de116ff06abc1ea03546ef36b1ac711cfe4feb64250264ac5ff2704a76a6b1fe04480af906e9ee71836190c345bf67";
-    /*const char *content_to_hash =(const char*) malloc(sizeof(char)*4000);
+        //private key exponent
+    mp_int Private_key;
+    mp_init(&Private_key);
+    char private_hex[513]="011a1d3591b4b50578035fa711729b06b20ffd870b2d5686f6f148c65f8b029cd577c5f3f33543190b95deca228b95a213588c7d7b9ff58e9e7a33c8f3af96c846966fc04ffc27cfd190161339dc09c36d69682df7dc1dfb10e88d1dbbfe5f673b12dfa7b53a32e2f8ba8ee3ba5d4a7a7fef6f59050938c4f012ea3c0f17638dc459cde1898e47cabcb1d3c92e9ea09775738a84a4cf951cbe697a6ae9f332bd0351a5b7be91a8cb939f7d5b76b2753fbb903721cd181f705f724303bfdc56927fbb44aa19ed9a76b4c5165e356d5cf06fc543803e55431757d0355a48e90c6b73c5210f4f886964a2ae8432af68223bf40fe1a0d68a32b1b80a0595747ae801";
+    //char private_hex[513]="184885e9405d4d801c04a252ec488c2125fa770bd659bdfd26cb0e09f28eca68de0c136fa219369ce5867dad78fba75984231cff6731bb0d14f7a55540dd3419dc48247c7b38ce2c9ca69dbfb64d7f8bd819cdeebd2ee4df3c6180372f681c72c4e917b91d657fcd09bbb696b1b5e28df68f246fa2c33583a55e1a867af45bc004583335a5d5a79d046b2d9c74bb5b7282a4ffb0167c3f0c982051fe6e253a8c20d063e1eccf0dfcdcaf4c34a3f0ca2cf8ebbb37d03c8176ed157b55f738c5f47fe4d0d42b05c6c0e9a58cc3766ec87926ee8e38843b25171886ec413c644b931acbb92895c4665274a17355d1d72401339d59ee0ec69a65d613e9b5c215a7c9";
+    // char private_hex[513] = "9b78ea83264133684182400d5eaca6aec68330cc97176712f7f71f3758210f61df44f9beead78372753987922f2e0c75a480aa1edc95e9d65ad0da529ce044ef83b6ac03507125ae75c2dd61098ac9d54730d65fd21702278633dd8392549c18548f22ee100a92aca50d316da68131a897691dac22f77df57c96fa8ee1a7212db313396410a5c9c8a31f6f940724cff2b2db5eb078eedad92b6ff29a8636fcd370e99773e96168f34839693f84b7a083597bfbe0f674c79b2348b038ca730cada30bcf2dd9cde27dd555891d3cc10b7831b23e7cda163570635727f11d569492a201f55c56d9a92d46f71b6ecea30f28f8c040f834a2da43f72a1ec927df9441";
+    //char private_hex[513]="6beefbcaae7c4cf46524403f6a77ad0cf5075e1677fa8b361aa0c2135983db5c6b3eb7c4747dd8d3247c7bcfc886b0966f9a679ad50d5a0e72fca964992037ab2a689d892b147b338c7dae8b01fd8f133a40e38dcbcf48600d96165a2cbdf57f2f71e3ab1277a3c8074b55f63a497870965d665dcf3e0d9db603db78b902e5317897c3538a24057c29f25f98284c7262bd965f4923da6a117f37c88e78ec6ce34da38eae946c06cc4ac166df70a7dd24b1be2254c8a25797bde3c58918b9f8ae0b5bf8019f8f60fb9e7e087d20bcb935b0b9c3a43c0b7f64ca9027c8bfa9e83525781dfd7b529a88a305ae8b4ec56e2cadff1ded53f2ec461ae2bd56e26231f1";
+    mp_read_radix(&Private_key,private_hex,16);//
+    //char yu[]="b59cab400e9c64525f566e85c97c2d65a2d0620f0479cb8ef8e6eb1d3c1cf093be5eb827a4d01d9a585b0043f148d9e3c213676d819818be05bf39a7657cd953bd4a7b2e361d03e1d64d99c755036eb1f97223832b1d596ee131f0adb84879cbd6763f1fbe61c214ff6514551900ef6034feb20cf0daf995ebaf9d7e5c3566cf012e1aa32e3733747be37955ec0d127d32fbddfdd8451fc5254dfe09a4b1b26bd9ec3487cd04121fd4b965456c024e21086da38c81670b8cb57fdad93f8f90eb6bfa109d57ffda156c105fe15c4c78d588de116ff06abc1ea03546ef36b1ac711cfe4feb64250264ac5ff2704a76a6b1fe04480af906e9ee71836190c345bf67";
+        /*const char *content_to_hash =(const char*) malloc(sizeof(char)*4000);
 
-    int rsa_encryption_count_aux=0;
-    while(HEX_format_Digest[rsa_encryption_count_aux]!='\0'){
-        content_to_hash[rsa_encryption_count_aux]=HEX_format_Digest[rsa_encryption_count_aux];
-        rsa_encryption_count_aux++;
-    }*/
-   //making the signing process pkcs.1.15 compatible
-   char padding_SHA256[810]="1ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff003031300d060960864801650304020105000420";
-   strcat(padding_SHA256,HEX);
-   printf("\npadded sha digest :%s\n",padding_SHA256);
-   mp_int hash_to_sign;
-   mp_init(&hash_to_sign);
+        int rsa_encryption_count_aux=0;
+        while(HEX_format_Digest[rsa_encryption_count_aux]!='\0'){
+            content_to_hash[rsa_encryption_count_aux]=HEX_format_Digest[rsa_encryption_count_aux];
+            rsa_encryption_count_aux++;
+        }*/
+    //making the signing process pkcs.1.15 compatible
+    char padding_SHA256[810]="1ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff003031300d060960864801650304020105000420";
+    strcat(padding_SHA256,HEX);
+    printf("\npadded sha digest :%s\n",padding_SHA256);
+    mp_int hash_to_sign;
+    mp_init(&hash_to_sign);
 
-   mp_read_radix(&hash_to_sign,padding_SHA256,16);
-   char *aux_hash_ex=(char*) malloc(1014*sizeof(char));
-   memset(aux_hash_ex,0,1014);
-  // char aux_hash_ex[1014];
-   mp_to_hex(&hash_to_sign,aux_hash_ex,1014);
-   printf("\n   hash to sign ===\n%s\n\n",aux_hash_ex);
-   free(aux_hash_ex);
+    mp_read_radix(&hash_to_sign,padding_SHA256,16);
+    char *aux_hash_ex=(char*) malloc(1014*sizeof(char));
+    memset(aux_hash_ex,0,1014);
+    // char aux_hash_ex[1014];
+    mp_to_hex(&hash_to_sign,aux_hash_ex,1014);
+    printf("\n   hash to sign ===\n%s\n\n",aux_hash_ex);
+    free(aux_hash_ex);
 
-   //Signing begins
+    //Signing begins
 
-   mp_int cipher;
-   mp_init(&cipher);
+    mp_int cipher;
+    mp_init(&cipher);
 
-   mp_exptmod(&hash_to_sign,&Private_key,&modulus,&cipher);
-  //
-   //char cipher_string[1013];
-   char *cipher_string=(char*) malloc(1013*sizeof(char));
-   mp_to_hex(&cipher,cipher_string,1013);
-   printf("\ncipher string in hex %s\n",cipher_string);//this is the encrypted message
-    strcpy(cipher_string_hex,cipher_string);
-    free(cipher_string);
-    mp_clear(&modulus);
-     mp_clear(&Private_key);
-      mp_clear(&hash_to_sign);
-    mp_clear(&cipher);
+    mp_exptmod(&hash_to_sign,&Private_key,&modulus,&cipher);
+    //
+    //char cipher_string[1013];
+    char *cipher_string=(char*) malloc(1013*sizeof(char));
+    mp_to_hex(&cipher,cipher_string,1013);
+    printf("\ncipher string in hex %s\n",cipher_string);//this is the encrypted message
+        strcpy(cipher_string_hex,cipher_string);
+        free(cipher_string);
+        mp_clear(&modulus);
+        mp_clear(&Private_key);
+        mp_clear(&hash_to_sign);
+        mp_clear(&cipher);
 
 
 }
