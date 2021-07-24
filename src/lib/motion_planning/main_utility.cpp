@@ -6706,7 +6706,14 @@ void DroneIDcreation( ){
  // RFM_public_key: needs to be fetched from PublicPrivateInuse.txt(which is kept encrypted)
  // inside the rfm, decrypted using decrypting key.
     key RFM_private_key;
-    char fname[60]="./log/PublicPrivateInuse.txt";
+
+    char aux_fname[100];
+    strcpy(aux_fname,dir);
+    char fname[60]="/log/PublicPrivateInuse.txt";//"./log/PublicPrivateInuse.txt";
+    strcat(aux_fname,fname);
+    memset(fname,0,sizeof(fname));
+    strcpy(fname,aux_fname);
+
     key Inside_RFM;
     strcpy(Inside_RFM.modulus,"180919775566931");
     strcpy(Inside_RFM.private_exponent,"32102716896161");
@@ -6767,7 +6774,13 @@ void DroneIDcreation( ){
     strcpy(pairset[6].tag,rfm_key1);
     strcpy(pairset[6].value,"65537");
 
-    char fileName[20]="./log/DroneID.txt";
+    char fileName[100]="/log/DroneID.txt";
+
+      char aux_fname[100];
+      strcpy(aux_fname,dir);
+      strcat(aux_fname,fileName);
+      memset(fileName,0,sizeof(fileName));
+      strcpy(fileName,aux_fname);
 
 
 
@@ -6793,7 +6806,15 @@ void HardwareInuseCreation(int gps){
  // RFM_public_key: needs to be fetched from PublicPrivateInuse.txt(which is kept encrypted)
  // inside the rfm, decrypted using decrypting key.
     key RFM_private_key;
-    char fname[60]="./log/PublicPrivateInuse.txt";
+    char fname[100]="/log/PublicPrivateInuse.txt";
+
+    char aux_fname[100];
+    strcpy(aux_fname,dir);
+    strcat(aux_fname,fname);
+    memset(fname,0,sizeof(fname));
+    strcpy(fname,aux_fname);
+
+
     key Inside_RFM;
     strcpy(Inside_RFM.modulus,"180919775566931");
     strcpy(Inside_RFM.private_exponent,"32102716896161");
@@ -6842,7 +6863,13 @@ void HardwareInuseCreation(int gps){
 
 
 
-    char fileName[40]="./log/HardwareInuse.txt";
+    char fileName[100]="/log/HardwareInuse.txt";
+
+    char aux_fname[100];
+    strcpy(aux_fname,dir);
+    strcat(aux_fname,fileName);
+    memset(fileName,0,sizeof(fileName));
+    strcpy(fileName,aux_fname);
 
 
 
@@ -6854,7 +6881,14 @@ void HardwareInuseCreation(int gps){
 
 
 void get_RFM_Key(key *key1){
-    char fname[60]="./log/PublicPrivateInuse.txt";
+    char fname[100]="/log/PublicPrivateInuse.txt";
+
+    char aux_fname[100];
+    strcpy(aux_fname,dir);
+    strcat(aux_fname,fname);
+    memset(fname,0,sizeof(fname));
+    strcpy(fname,aux_fname);
+
     key Inside_RFM;
     strcpy(Inside_RFM.modulus,"180919775566931");
     strcpy(Inside_RFM.private_exponent,"32102716896161");
@@ -6954,7 +6988,16 @@ int file_read(char *fname,char *tag,char *result,int file_type){
 //amendment in KeyLog.txt with fileID of a file
 void KeyLog_Regen(char *fileID){
     FILE *fptr;
-    fptr = fopen("./log/KeyLog.txt","r");
+
+    fileName[100]="/log/KeyLog.txt";
+
+    char aux_fname[100];
+    strcpy(aux_fname,dir);
+    strcat(aux_fname,fileName);
+    memset(fileName,0,sizeof(fileName));
+    strcpy(fileName,aux_fname);
+
+    fptr = fopen(fileName,"r");
     signed char ch;
     char *content=(char*) malloc(sizeof(char)*3000);
     int i=0;
@@ -7057,14 +7100,28 @@ void KeyLog_Regen(char *fileID){
     strcat(content2,"\0");
 
     fclose(fptr);
-    remove("./log/KeyLog.txt");
+
+   char fileName[100]="/log/KeyLog.txt";
+    char aux_fname[100];
+    strcpy(aux_fname,dir);
+    strcat(aux_fname,fileName);
+    memset(fileName,0,sizeof(fileName));
+    strcpy(fileName,aux_fname);
+    remove(fileName);
 
     printf("\n\n%s\n\n",content2);
     char aux_copy[3000];
     strcpy(aux_copy,content2);
     free(content2);
     FILE *fptr2;
-    fptr2=fopen("./log/KeyLog.txt","w");
+
+    char filename[100]="/log/KeyLog.txt";
+    strcpy(aux_fname,dir);
+    strcat(aux_fname,filename);
+    memset(filename,0,sizeof(filename));
+    strcpy(filename,aux_fname);
+
+    fptr2=fopen(filename,"w");
     fprintf(fptr2,"%s",aux_copy);
 
     fclose(fptr2);
@@ -7282,7 +7339,14 @@ return : 3 :: invalid recentPA.txt file, someone is trying to hack
 retunr
 */
 int check_recentPA(char *paID){
-    char filename[50]="./log/recentPA.txt";
+    char filename[100]="/log/recentPA.txt";
+
+
+    strcpy(aux_fname,dir);
+    strcat(aux_fname,filename);
+    memset(filename,0,sizeof(filename));
+    strcpy(filename,aux_fname);
+
     key RFM_key;
     get_RFM_Key(&RFM_key);
     int valid_status= Validating_File(filename , RFM_key);
@@ -7292,7 +7356,7 @@ int check_recentPA(char *paID){
     }
     // file is valid and can be further used
     FILE *fptr;
-    fptr=fopen("./log/recentPA.txt","r");
+    fptr=fopen(filename,"r");
     int i=0;
     signed char aux;
     char content[5000];
@@ -7358,7 +7422,12 @@ ParsedData parse_artifact()
 
     ParsedData result{};
 
-    char file_name[100]="./log/permission_artifact_breach.xml"; // read mode
+    char file_name[100]="/log/permission_artifact_breach.xml"; // read mode
+
+    strcpy(aux_fname,dir);
+    strcat(aux_fname,file_name);
+    memset(file_name,0,sizeof(file_name));
+    strcpy(file_name,aux_fname);
 
     char  start_time[200], end_time[200];//,long_lat_coords[20][20];
 
@@ -7627,7 +7696,14 @@ void data_fetch_delete(){
 
     ParsedData data= parse_artifact();
     FILE *fptr;
-    fptr=fopen("./log/permission_artifact_breach.xml","r");
+    char fileName[100]="/log/permission_artifact_breach.xml";
+    char aux_fname[100];
+    strcpy(aux_fname,dir);
+    strcat(aux_fname,fileName);
+    memset(fileName,0,sizeof(fileName));
+    strcpy(fileName,aux_fname);
+
+    fptr=fopen(fileName,"r");
     char content[5000];
     signed char ch;
     int i=0;
@@ -7817,7 +7893,15 @@ void data_fetch_delete(){
 
 
 
-   char fileName[20]="./log/recentPA.txt";
+   char fileName[20]="/log/recentPA.txt";
+
+    char aux_fname[100];
+    strcpy(aux_fname,dir);
+    strcat(aux_fname,fileName);
+    memset(fileName,0,sizeof(fileName));
+    strcpy(fileName,aux_fname);
+
+
 
 
 
@@ -7861,7 +7945,14 @@ int date_time_extract_and_check()
 	DT.Seconds=ts.tm_sec;
 	printf("\n%d/%d/%d current date and time from GPS %d:%d:%d \n",DT.Year,DT.Month,DT.date,DT.Hours,DT.Minutes,DT.Seconds);
 
-	file = fopen("./log/permission_artifact_breach.xml", "r");// ./log/ for posix /log/ for nuttx
+    char fileName[100]="/log/permission_artifact_breach.xml";
+    char aux_fname[100];
+    strcpy(aux_fname,dir);
+    strcat(aux_fname,fileName);
+    memset(fileName,0,sizeof(fileName));
+    strcpy(fileName,aux_fname);
+
+	file = fopen(fileName, "r");// ./log/ for posix /log/ for nuttx
 	if (file)
     {
         fclose(file);
@@ -8037,7 +8128,14 @@ int date_time_extract_and_check()
 }
 
 int DroneIDverification(char *paID){
-    char file_name[60]="./log/permission_artifact_breach.xml";
+    char file_name[100]="/log/permission_artifact_breach.xml";
+
+    char aux_fname[100];
+    strcpy(aux_fname,dir);
+    strcat(aux_fname,file_name);
+    memset(file_name,0,sizeof(file_name));
+    strcpy(file_name,aux_fname);
+
     char Reference_canonilized[5000];// variable to hold canonicalized reference section
 
     char content[5000];
@@ -8083,7 +8181,13 @@ int DroneIDverification(char *paID){
 
 
 int DroneIDverification(){
-    char file_name[60]="./log/permission_artifact_breach.xml";
+    char file_name[100]="/log/permission_artifact_breach.xml";
+
+    char aux_fname[100];
+    strcpy(aux_fname,dir);
+    strcat(aux_fname,file_name);
+    memset(file_name,0,sizeof(file_name));
+    strcpy(file_name,aux_fname);
     char Reference_canonilized[5000];// variable to hold canonicalized reference section
 
     char content[5000];
@@ -8366,9 +8470,13 @@ int Is_PA_VAlid(){
         char Signature_Value_in_hex[500];// in hex
         char  Extracted_sha_from_Signature_value[100];
 
-        char file_name[48]="./log/permission_artifact_breach.xml";//"permission_artifact_1.xml";
+        char file_name[100]="/log/permission_artifact_breach.xml";//"permission_artifact_1.xml";
 
-
+      char aux_fname[100];
+      strcpy(aux_fname,dir);
+      strcat(aux_fname,file_name);
+      memset(file_name,0,sizeof(file_name));
+      strcpy(file_name,aux_fname);
 
         char Sha_of_Reference[300];
 
@@ -9263,7 +9371,14 @@ int RPAS_identifier(){
 	printf("Device ID of GPS is: %d ",deviceID);
     deviceID=2348919;
     // reading device id of gps from HardwareInuse.txt
-    char fname_0[30]="./log/HardwareInuse.txt";
+
+    char fname_0[100]="/log/HardwareInuse.txt";
+    char aux_fname[100];
+    strcpy(aux_fname,dir);
+    strcat(aux_fname,fname_0);
+    memset(fname_0,0,sizeof(fname_0));
+    strcpy(fname_0,aux_fname);
+
     char tag_0[30]="GPS_ID";
     char GPS_ID_file[30];
 
@@ -9288,9 +9403,9 @@ int RPAS_identifier(){
         }else{
             // possiblity of new authentic hardware or unauthentic hardware
             //check for HardwareChange.txt file
-            char Hardware_fname[30]="./log/HardwareChange.txt" ;
+            char Hardware_fname[30]="fs/microsd/log/HardwareChange.txt" ;
             FILE *fptr;
-            fptr=fopen("./log/HardwareChange.txt","r");
+            fptr=fopen("fs/microsd/log/HardwareChange.txt","r");
             if (fptr==NULL){
                // printf("\n\nhello inside RPAS identifier\n\n");
                 // no such file exists , it is an attempt to use unautherised hardware
@@ -9307,7 +9422,7 @@ int RPAS_identifier(){
                    if(!strcmp(aux_gps_id,id_gps_change)){
                        //the strings are same
                        //start the modification of HardwareInuse.txt
-                       remove("./log/HardwareInuse.txt");
+                       remove("fs/microsd/log/HardwareInuse.txt");
                        HardwareInuseCreation(deviceID);//new HardwareInuse.txt file created
                        // and return 1
                        return 1;
@@ -9366,7 +9481,7 @@ int CHECK_REUSAGE(char *file_id){
     //check the given id in file KeyLog.txt
     //return types 1=file_id is beng reused, dont do key rotation
     //             0=file_id is fresh , start key rotation and amend KeyLog.txt
-    char fname[20]="./log/KeyLog.txt";
+    char fname[20]="fs/microsd/log/KeyLog.txt";
     FILE *fptr;
     fptr=fopen(fname,"r");
     if(fptr!=NULL){
@@ -9559,9 +9674,9 @@ void Key_rotation_start(char *file_id){
     strcpy(pairset1[5].value,file_id);
 
 
-    char fileName[40]="./log/PublicPrivateNew_aux.txt";
+    char fileName[40]="fs/microsd/log/PublicPrivateNew_aux.txt";
 
-    char filename1[40]="./log/PublicKeyNew.txt";
+    char filename1[40]="fs/microsd/log/PublicKeyNew.txt";
 
     key RFM_key;
     get_RFM_Key(&RFM_key);
@@ -9572,7 +9687,7 @@ void Key_rotation_start(char *file_id){
 
     // Now signed file has been made
     FILE *fptr;
-    fptr=fopen("./log/PublicPrivateNew_aux.txt","r");
+    fptr=fopen("fs/microsd/log/PublicPrivateNew_aux.txt","r");
 
     signed char ch;
     char content[3000];//=(char*) malloc(sizeof(char)*3000);
@@ -9583,10 +9698,10 @@ void Key_rotation_start(char *file_id){
     }
     content[i]='\0';
     fclose(fptr);
-    remove("./log/PublicPrivateNew_aux.txt");
+    remove("fs/microsd/log/PublicPrivateNew_aux.txt");
     key Inside_RFM;
 
-    char fname[42]="./log/PublicPrivateNew.txt";
+    char fname[42]="fs/microsd/log/PublicPrivateNew.txt";
     strcpy(Inside_RFM.modulus,"180919775566931");
     strcpy(Inside_RFM.private_exponent,"32102716896161");
     encrypting_File(content,Inside_RFM,fname);
@@ -9612,7 +9727,7 @@ The process invloves 1)decrypting of PublicPrivateNew.txt
 */
 void KEY_CHANGE_INITIATION(){
 
-    char fname[60]="./log/PublicPrivateNew.txt";
+    char fname[60]="fs/microsd/log/PublicPrivateNew.txt";
     key Inside_RFM;
     strcpy(Inside_RFM.modulus,"180919775566931");
     strcpy(Inside_RFM.private_exponent,"32102716896161");
@@ -9662,12 +9777,12 @@ void KEY_CHANGE_INITIATION(){
     strcat(content1,Content_End);
     strcat(content1,"\0");
     //remove("./log/PublicPrivateInuse.txt");
-    char key_file_name[40]="./log/PublicPrivateInuse.txt";
+    char key_file_name[40]="fs/microsd/log/PublicPrivateInuse.txt";
     encrypting_File(content1,Inside_RFM,key_file_name);
     // at this point new PublicPrivateInuse.txt is formed
-    remove("./log/PublicPrivateNew.txt");
-    remove("./log/KeyChangePerm.txt");
-    remove("./log/PublicKeyNew.txt");
+    remove("fs/microsd/log/PublicPrivateNew.txt");
+    remove("fs/microsd/log/KeyChangePerm.txt");
+    remove("fs/microsd/log/PublicKeyNew.txt");
 
 
 
@@ -9684,7 +9799,7 @@ void ParamInuseModify(){
 
      // first store the information inside ParamInuse.txt
     FILE *fptr_INuse;
-    fptr_INuse=fopen("./log/ParamInuse.txt","r");
+    fptr_INuse=fopen("fs/microsd/log/ParamInuse.txt","r");
 
     signed char ch;
     char ParamInuseContent[5000];
@@ -9699,7 +9814,7 @@ void ParamInuseModify(){
 
     //checking in ParamChangePerm
     FILE *fptrParamChange;
-    fptrParamChange=fopen("./log/ParamChangePerm.txt","r");
+    fptrParamChange=fopen("fs/microsd/log/ParamChangePerm.txt","r");
 
     char ParamChangeContent[4000];
     i=0;
@@ -9890,14 +10005,14 @@ void ParamInuseModify(){
     strcpy(param_value[0].tag,"No_Params");
     strcpy(param_value[0].value,aux_int_no);
 
-    char file_name_inuse[40]="./log/ParamInuseNew.txt";
+    char file_name_inuse[40]="fs/microsd/log/ParamInuseNew.txt";
     key RFM_key;
 
     get_RFM_Key(&RFM_key);
 
     pair_file_write(param_value,param_value_count,file_name_inuse,RFM_key);
 
-    remove("./log/ParamChangePerm.txt");
+    remove("fs/microsd/log/ParamChangePerm.txt");
 
 }
 
@@ -9908,7 +10023,7 @@ function to start setting the parameters as specified in ParamInuse.txt
 void ParamSetfile(){
      // first store the information inside ParamInuse.txt
     FILE *fptr_INuse;
-    fptr_INuse=fopen("./log/ParamInuse.txt","r");
+    fptr_INuse=fopen("fs/microsd/log/ParamInuse.txt","r");
 
     signed char ch;
     char ParamInuseContent[5000];
@@ -10014,7 +10129,7 @@ previous_log_hash 2
 void update_recentPA(int type,char *value){
    FILE *fptr;
 
-    fptr=fopen("./log/recentPA.txt","r");
+    fptr=fopen("fs/microsd/log/recentPA.txt","r");
     if(fptr==NULL){
        printf("\nproblem in opening file.\n");
     }
@@ -10187,7 +10302,7 @@ printf("\nproblem at 9992\n");
    }
 
 
-   char fileName[20]="./log/recentPA.txt";
+   char fileName[20]="fs/microsd/log/recentPA.txt";
    key RFM_private_key;
 
    get_RFM_Key(&RFM_private_key);
@@ -10208,7 +10323,7 @@ void Bundling_begins(){
    signed char ch;
    int i=0;
    char *content=(char*) malloc(4000*sizeof(char));
-   fptr=fopen("./log/log_of_logs.txt","r");
+   fptr=fopen("fs/microsd/log/log_of_logs.txt","r");
 
    while((ch=fgetc(fptr))!=EOF){
       content[i]=ch;
@@ -10252,7 +10367,7 @@ void Bundling_begins(){
 
    int log_count=strtol(tag_logs_contain,NULL,10);
    char aux0[100];
-   strcpy(aux0,"./log/");
+   strcpy(aux0,"fs/microsd/log/");
    strcat(aux0,file_ini);
    strcat(aux0,"_log_");
    char aux1[100];
@@ -10318,7 +10433,7 @@ void Bundling_begins(){
    new_cont++;
 
 
-   char filename[30]="./log/bundled.txt";
+   char filename[30]="fs/microsd/log/bundled.txt";
    pair_file_write(new_content,new_cont,filename,RFM_private_key);
    free(new_content);
 }
@@ -10327,7 +10442,7 @@ void Bundling_begins(){
 int read_for_fetch(){
    char tag_fetch[30]="fetch_required";
    char tag_fetch_contain[20];
-   char fname[40]="./log/recentPA.txt";
+   char fname[40]="fs/microsd/log/recentPA.txt";
    int status = call_file_read(fname,tag_fetch,tag_fetch_contain,0);
    if(status==1){
       // file is genuine
@@ -10379,7 +10494,7 @@ void update_log_of_logs(char *tag,char *value,char *done_freq,char *pa_id,char *
    // then when bundling_begins function is evoked the file is used to form a bundled.txt
    // file with signed combined hash
    FILE *fptr;
-   fptr=fopen("./log/log_of_logs.txt","r");
+   fptr=fopen("fs/microsd/log/log_of_logs.txt","r");
    if(fptr!=NULL){
 
      signed  char ch;
@@ -10441,7 +10556,7 @@ void update_log_of_logs(char *tag,char *value,char *done_freq,char *pa_id,char *
       strcpy(content[content_count].value,value);
       content_count++;
       printf("\nproblem at 10165\n");
-      char wr_filename[70]="./log/log_of_logs.txt";
+      char wr_filename[70]="fs/microsd/log/log_of_logs.txt";
 
       key RFM_private_key;
 
@@ -10470,7 +10585,7 @@ void update_log_of_logs(char *tag,char *value,char *done_freq,char *pa_id,char *
       strcpy(content_holder[2].value,value);
 
 
-      char filename[70]="./log/log_of_logs.txt";
+      char filename[70]="fs/microsd/log/log_of_logs.txt";
 
       key private_rfm_key;
 
@@ -10491,7 +10606,7 @@ void update_log_of_logs(char *tag,char *value,char *done_freq,char *pa_id,char *
 void fetching_publish_padata(){
 
    FILE *fptr;
-   fptr=fopen("./log/recentPA.txt","r");
+   fptr=fopen("fs/microsd/log/recentPA.txt","r");
    if(fptr!=NULL){
       signed char ch;
       int i=0;

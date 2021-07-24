@@ -104,7 +104,7 @@ double max(double a,double b){
 int fetch_previous_log_hash(char *result){
     // this function will fetch hash value from recentPA.txt
     FILE *fptr;
-    fptr=fopen("./log/recentPA.txt","r");
+    fptr=fopen("fs/microsd/log/recentPA.txt","r");
     signed char ch;
     int i=0;
     char *content=(char*)malloc(sizeof(char)*5000);
@@ -200,7 +200,7 @@ void signing_log_content(char *HEX,char *cipher_string_hex){
 
 void get_PA_ID(char *res){
     FILE *fptr;
-    fptr=fopen("./log/recentPA.txt","r");
+    fptr=fopen("fs/microsd/log/recentPA.txt","r");
     if(fptr==NULL){
         printf("\nfile is not opening\n");
     }
@@ -520,7 +520,7 @@ void  log_naming_support(char *paID_firstTerm,char *done_freq){
 
     FILE *fptr;
 
-    fptr=fopen("./log/recentPA.txt","r");
+    fptr=fopen("fs/microsd/log/recentPA.txt","r");
     signed char ch;
     int i=0;
     char *content=(char*)malloc(sizeof(char)*5000);
@@ -888,7 +888,7 @@ printf("\nproblem at 525\n");
 
    log_naming_support(paID_firstTerm,done_freq);
 
-   char file_directory[10]="./log/";
+   char file_directory[10]="fs/microsd/log/";
 
    char filename[100];
 

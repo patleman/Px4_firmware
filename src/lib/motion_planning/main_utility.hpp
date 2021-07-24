@@ -193,6 +193,10 @@
 
 
 #include "print_hello.hpp"
+
+// static const char dir[40]="."; for posix
+
+static const char dir[40]="/fs/microsd";//"/fs/microsd"
 ///////////
 using namespace std;
 //typedef uint32_t             mp_digit;
