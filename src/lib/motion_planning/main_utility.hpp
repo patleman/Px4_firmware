@@ -14,6 +14,7 @@
 ////////////// headers from file_operations.h
 #include<inttypes.h>
 #include <uORB/topics/vehicle_gps_position.h>
+#include <uORB/topics/vehicle_global_position.h>// added for logging_json
 #include <uORB/Publication.hpp>
 #include<stdarg.h>
 #include<string.h>
@@ -790,6 +791,7 @@ class SHA256 {
 public:
 	SHA256();
 	void update(uint8_t * data, size_t length);
+   void update( FILE* data, int length);
 	uint8_t * digest();
 
 
@@ -844,16 +846,21 @@ struct pair_set{
 };
 
 struct key{
-char modulus[1000];
-char private_exponent[1000];
+char modulus[750];
+char private_exponent[750];
 };
 
 
 static const char HEX_ele[17]="0123456789abcdef";
 
-void fetch_tag(char *content, char *target, char *result);
+//void fetch_tag(char *content, char *target, char *result);
+
+int isSubstring(char *s1, char *s2,FILE *fptr);///s1 is the sub string ; s2 is the larger string
+
 
 int isSubstring(char *s1, char *s2);///s1 is the sub string ; s2 is the larger string
+
+
 
 int find_int_hex(char ptr);
 
@@ -873,7 +880,7 @@ void base64decoder(char *base64_ptr,char *hex);
 char small_letter(char a);
 
 int Validating_File(char *file , key key);
-
+int Validating_File(char *file , key key, FILE *fptr_de);
 // this function is for encrypting files that has to be remained inside the RFM
 void encrypting_File(char *content, key key, char *fname);
 
@@ -883,7 +890,7 @@ void decrypting_File(char *file , key key, char *result);
 
 // this function is for fetching value of a particular tag in the given string
 void fetch_tag(char *content, char *target, char *result);
-
+void fetch_tag(char *content, char *target, char *result, char *fptr);
 
 //function to generate DroneID.txt
 void DroneIDcreation( );
@@ -1000,7 +1007,7 @@ int DroneIDverification();
 //return types
 //0:not genuine harware used
 //1 : genuine hardware used
-int RPAS_identifier();
+int RPAS_identifier(FILE *fptr);
 
 void   call_DroneIDcreation();
 
@@ -1080,3 +1087,65 @@ void Bundling_begins();
 // keeping track of log files and their hash values.
 
 void update_log_of_logs(char *tag,char *value,char *done_freq,char *pa_id,char *start_file);
+
+
+/////////////// logging json content
+struct Geo_tag{
+
+    int Entrytype ;
+    long Timestamp;
+    float Longitude;
+    float Lattitude;
+    int Altitude;
+
+};
+// functions in logging json
+
+double max(double a,double b);
+
+int fetch_previous_log_hash(char *result);
+
+void signing_log_content(char *HEX,char *cipher_string_hex);
+
+
+void get_PA_ID(char *res);
+
+void writingKey_Value(char *str_ptr,char *Key,int *count,char *value,int last);
+
+void writingKey_Value(char *str_ptr,char *Key,int *count,int value,int last);
+
+
+void writingKey_Value(char *str_ptr,char *Key,int *count,long value,int last);
+
+
+void writingKey_Value(char *str_ptr,char *Key,int *count,double value,int last);
+
+void writingKey(char *str_ptr,char *Key,int *count);
+
+void putSpace(int count_Space,char *ptr_string ,int *i_ptr);
+
+void objectCreator(char *ptr,Geo_tag geo,int last,int space_count,int *count);
+
+
+void  log_naming_support(char *paID_firstTerm,char *done_freq);
+
+void main_json_file_writing(Geo_tag *data_array, int length_dat);
+
+int check_Geobreach(pa_data_s data,vehicle_global_position_s vgp);
+
+int check_Timebreach(pa_data_s data,vehicle_gps_position_s vgp);
+
+
+//void Sha256_implement(char *Input, char *output);
+void Sha256_implement(char *Input, char *output, FILE *fptr, int index_count);
+
+//void check_debug_mp(char *res);
+void check_debug_mp(char *res);
+
+int Is_PA_VAlid1();
+
+void valid_chunk_refe(FILE *fptr, char *re_sha,int type);
+
+//void valid_chunk_refe_2(FILE *fptr, char *re_sha);
+
+void pa_validation();

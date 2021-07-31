@@ -1,6 +1,6 @@
 ############################################################################
 #
-#   Copyright (c) 2015 PX4 Development Team. All rights reserved.
+#   Copyright (c) 2018 PX4 Development Team. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -31,44 +31,12 @@
 #
 ############################################################################
 
-add_subdirectory(failure_detector)
-add_subdirectory(Arming)
-
 px4_add_module(
-	MODULE modules__commander
-	MAIN commander
-	COMPILE_FLAGS
-	STACK_MAX 35750
-	SRCS
-		accelerometer_calibration.cpp
-		airspeed_calibration.cpp
-		calibration_routines.cpp
-		Commander.cpp
-		commander_helper.cpp
-		esc_calibration.cpp
-		factory_calibration_storage.cpp
-		gyro_calibration.cpp
-		level_calibration.cpp
-		lm_fit.cpp
-		mag_calibration.cpp
-		ManualControl.cpp
-		rc_calibration.cpp
-		state_machine_helper.cpp
-		worker_thread.cpp
+	MODULE examples__logging_json
+	MAIN logging_json
+	SRCS	logging_json.hpp
+		logging_json.cpp
 	DEPENDS
-		circuit_breaker
-		failure_detector
-		git_ecl
-		ecl_geo
-		hysteresis
-		PreFlightCheck
-		ArmAuthorization
-		HealthFlags
-		sensor_calibration
+		motion_planning
 	)
 
-if(PX4_TESTING)
-	add_subdirectory(commander_tests)
-endif()
-
-px4_add_unit_gtest(SRC mag_calibration_test.cpp LINKLIBS modules__commander)

@@ -57,6 +57,7 @@ Output: Signed Json flight Log
 
 
 //////////////////////////////////////////////
+#pragma once
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
@@ -76,9 +77,7 @@ Output: Signed Json flight Log
 
 
 using namespace std;
-
-
-
+/*
 struct Geo_tag{
 
     int Entrytype ;
@@ -104,7 +103,7 @@ double max(double a,double b){
 int fetch_previous_log_hash(char *result){
     // this function will fetch hash value from recentPA.txt
     FILE *fptr;
-    fptr=fopen("fs/microsd/log/recentPA.txt","r");
+    fptr=fopen("/fs/microsd/log/recentPA.txt","r");
     signed char ch;
     int i=0;
     char *content=(char*)malloc(sizeof(char)*5000);
@@ -131,8 +130,8 @@ int fetch_previous_log_hash(char *result){
 
 }
 
-
-
+*/
+/*
 void signing_log_content(char *HEX,char *cipher_string_hex){
       printf("\nproblem at line 668 possible mp iniialization %s\n",HEX);
 
@@ -152,7 +151,7 @@ void signing_log_content(char *HEX,char *cipher_string_hex){
     //char private_hex[513]="184885e9405d4d801c04a252ec488c2125fa770bd659bdfd26cb0e09f28eca68de0c136fa219369ce5867dad78fba75984231cff6731bb0d14f7a55540dd3419dc48247c7b38ce2c9ca69dbfb64d7f8bd819cdeebd2ee4df3c6180372f681c72c4e917b91d657fcd09bbb696b1b5e28df68f246fa2c33583a55e1a867af45bc004583335a5d5a79d046b2d9c74bb5b7282a4ffb0167c3f0c982051fe6e253a8c20d063e1eccf0dfcdcaf4c34a3f0ca2cf8ebbb37d03c8176ed157b55f738c5f47fe4d0d42b05c6c0e9a58cc3766ec87926ee8e38843b25171886ec413c644b931acbb92895c4665274a17355d1d72401339d59ee0ec69a65d613e9b5c215a7c9";
     // char private_hex[513] = "9b78ea83264133684182400d5eaca6aec68330cc97176712f7f71f3758210f61df44f9beead78372753987922f2e0c75a480aa1edc95e9d65ad0da529ce044ef83b6ac03507125ae75c2dd61098ac9d54730d65fd21702278633dd8392549c18548f22ee100a92aca50d316da68131a897691dac22f77df57c96fa8ee1a7212db313396410a5c9c8a31f6f940724cff2b2db5eb078eedad92b6ff29a8636fcd370e99773e96168f34839693f84b7a083597bfbe0f674c79b2348b038ca730cada30bcf2dd9cde27dd555891d3cc10b7831b23e7cda163570635727f11d569492a201f55c56d9a92d46f71b6ecea30f28f8c040f834a2da43f72a1ec927df9441";
     //char private_hex[513]="6beefbcaae7c4cf46524403f6a77ad0cf5075e1677fa8b361aa0c2135983db5c6b3eb7c4747dd8d3247c7bcfc886b0966f9a679ad50d5a0e72fca964992037ab2a689d892b147b338c7dae8b01fd8f133a40e38dcbcf48600d96165a2cbdf57f2f71e3ab1277a3c8074b55f63a497870965d665dcf3e0d9db603db78b902e5317897c3538a24057c29f25f98284c7262bd965f4923da6a117f37c88e78ec6ce34da38eae946c06cc4ac166df70a7dd24b1be2254c8a25797bde3c58918b9f8ae0b5bf8019f8f60fb9e7e087d20bcb935b0b9c3a43c0b7f64ca9027c8bfa9e83525781dfd7b529a88a305ae8b4ec56e2cadff1ded53f2ec461ae2bd56e26231f1";
-    mp_read_radix(&Private_key,private_hex,16);//
+    mp_read_radix(&Private_key,private_hex,16);//*/
     //char yu[]="b59cab400e9c64525f566e85c97c2d65a2d0620f0479cb8ef8e6eb1d3c1cf093be5eb827a4d01d9a585b0043f148d9e3c213676d819818be05bf39a7657cd953bd4a7b2e361d03e1d64d99c755036eb1f97223832b1d596ee131f0adb84879cbd6763f1fbe61c214ff6514551900ef6034feb20cf0daf995ebaf9d7e5c3566cf012e1aa32e3733747be37955ec0d127d32fbddfdd8451fc5254dfe09a4b1b26bd9ec3487cd04121fd4b965456c024e21086da38c81670b8cb57fdad93f8f90eb6bfa109d57ffda156c105fe15c4c78d588de116ff06abc1ea03546ef36b1ac711cfe4feb64250264ac5ff2704a76a6b1fe04480af906e9ee71836190c345bf67";
         /*const char *content_to_hash =(const char*) malloc(sizeof(char)*4000);
 
@@ -162,7 +161,7 @@ void signing_log_content(char *HEX,char *cipher_string_hex){
             rsa_encryption_count_aux++;
         }*/
     //making the signing process pkcs.1.15 compatible
-    char padding_SHA256[810]="1ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff003031300d060960864801650304020105000420";
+   /* char padding_SHA256[810]="1ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff003031300d060960864801650304020105000420";
     strcat(padding_SHA256,HEX);
     printf("\npadded sha digest :%s\n",padding_SHA256);
     mp_int hash_to_sign;
@@ -196,11 +195,11 @@ void signing_log_content(char *HEX,char *cipher_string_hex){
 
 
 }
-
-
+*/
+/*
 void get_PA_ID(char *res){
     FILE *fptr;
-    fptr=fopen("fs/microsd/log/recentPA.txt","r");
+    fptr=fopen("/fs/microsd/log/recentPA.txt","r");
     if(fptr==NULL){
         printf("\nfile is not opening\n");
     }
@@ -441,18 +440,21 @@ void putSpace(int count_Space,char *ptr_string ,int *i_ptr){
     *i_ptr=y;
 }
 
+
+
+
 void objectCreator(char *ptr,Geo_tag geo,int last,int space_count,int *count){
 
     /// this function will make object entries inside LogEntries
-    /*
-    {
-        "Entry_type": "TAKEOFF/ARM",
-        "TimeStamp": 41,
-        "Longitude": 380.000000,
-        "Latitude": 443.5000000,
-        "Altitude": 704.3400,
-    }
-    */
+
+   // {
+   //     "Entry_type": "TAKEOFF/ARM",
+   //     "TimeStamp": 41,
+   //     "Longitude": 380.000000,
+     //   "Latitude": 443.5000000,
+    //    "Altitude": 704.3400,
+  //  }
+
 
 
     char Geolat[]="Latitude";// float  Latitude in Degrees East
@@ -520,7 +522,7 @@ void  log_naming_support(char *paID_firstTerm,char *done_freq){
 
     FILE *fptr;
 
-    fptr=fopen("fs/microsd/log/recentPA.txt","r");
+    fptr=fopen("/fs/microsd/log/recentPA.txt","r");
     signed char ch;
     int i=0;
     char *content=(char*)malloc(sizeof(char)*5000);
@@ -635,8 +637,8 @@ void main_json_file_writing(Geo_tag *data_array, int length_dat){
 
         putSpace(space_count,&buff[0],&i);
     }
-   /* space_count=space_count-2;
-    putSpace(space_count,&buff[0],&i);*/
+   // space_count=space_count-2;
+   // putSpace(space_count,&buff[0],&i);
     buff[i]=']';
     i++;
     buff[i]=',';
@@ -708,10 +710,10 @@ printf("\nproblem at 525\n");
 
    for(int h=str_start;h<=str_end;h++)
     {
-    /* canonicalize hack : all the serialization under objects have been taken care of
-    earlier only, now just keep on taking the elements one by one from one array to another
-    except new lines and spaces
-    */
+    // canonicalize hack : all the serialization under objects have been taken care of
+   // earlier only, now just keep on taking the elements one by one from one array to another
+   // except new lines and spaces
+
         if (buff[h]!=' ' && buff[h]!='\n'){
             canonicalized_flight[canon_count]=buff[h];
             canon_count++;
@@ -787,19 +789,19 @@ printf("\nproblem at 525\n");
     //printf("%s",buff);
   // printf("\n");
 
-/*
-   FILE *fptr;
-   fptr=fopen("flight_log1.json","w");// this is the resultant json file
-   fprintf(fptr, "%s", buff);
-   fclose(fptr);
-*/
+
+   //FILE *fptr;
+   //fptr=fopen("flight_log1.json","w");// this is the resultant json file
+  // fprintf(fptr, "%s", buff);
+//   fclose(fptr);
+
 
 
     // Now RSA encryption is required
-    /* following elements are required
-    1)Private key
-    2) above calculated digest HEX_format_digest
-    */
+    // following elements are required
+   // 1)Private key
+    //2) above calculated digest HEX_format_digest
+
     //////////////////////// RSA Encryption ///////////////
     char *cipher_string_hex=(char*) malloc(1013*sizeof(char));
 
@@ -810,16 +812,16 @@ printf("\nproblem at 525\n");
 
 
     //char ty[]="734CB799A64A670D68F3AA84B2542BBEE1F7FD5AC022460CDD63E297DF55D8B04CBCB1103BDC720EB85D090CCA091D067A5F54BFADBECB09A2EBDDA9D92E00AF83D5E9FED29B38C295A315CBD52CB4ED1645BC3707D4ED165E5E4D906A1C149E5073AE6A8D5FC74CC11D63885CEFE236E4464C0D387A5861234814FF31A8A3A0B2D6022B8A8FAEC79DF61B638B0B85392F152D4743BFD2779C4472B73CF952027C83A8DB7EEA32D6A1B96ED8F92CF7576EBBB35F8CA341C69E60C352BD79628C17585030D8BF07C8E6D73FC0AB51D2226B1E7C42D5DA0BC4EAF5063C8F72601AC0090D92B74C17365463B3F07B0397692AF204F58A0ACB665CBA4C336121C4CA";
-    /*
-    mp_int Public_key;
-    mp_read_radix(&Public_key,"65537",10);
-    mp_int message;
-    mp_exptmod(&cipher, &Public_key,&modulus,&message);                          this part for decrypting encrypted text
 
-   char message_string_hex[513];
-    mp_to_hex(&message,message_string_hex,sizeof(message_string_hex));
-    printf("\n%s\n",message_string_hex);//this is the decrypted message
-    */
+    //mp_int Public_key;
+    //mp_read_radix(&Public_key,"65537",10);
+   // mp_int message;
+    //mp_exptmod(&cipher, &Public_key,&modulus,&message);                          this part for decrypting encrypted text
+
+   //char message_string_hex[513];
+    //mp_to_hex(&message,message_string_hex,sizeof(message_string_hex));
+    //printf("\n%s\n",message_string_hex);//this is the decrypted message
+
 
 
    /////////////////////// base64 Encoded //////////////// hex to base64
@@ -842,10 +844,10 @@ printf("\nproblem at 525\n");
 
 
    /////////////////////// Writing Signature ///////////////// open file and rewrite
-   /* string insertion
-   1) length of string that has to be inserted  l1   res
-   2) length of string  where we want to insert  l2  buff
-   */
+   // string insertion
+  // 1) length of string that has to be inserted  l1   res
+   //2) length of string  where we want to insert  l2  buff
+
     int i_sign=0;
     char *buff1=(char*) malloc(sizeof(char)*15000);
     //char buff1[15000];
@@ -888,7 +890,7 @@ printf("\nproblem at 525\n");
 
    log_naming_support(paID_firstTerm,done_freq);
 
-   char file_directory[10]="fs/microsd/log/";
+   char file_directory[50]="/fs/microsd/log/";
 
    char filename[100];
 
@@ -1010,3 +1012,6 @@ int check_Timebreach(pa_data_s data,vehicle_gps_position_s vgp){
 
 
 }
+
+
+*/

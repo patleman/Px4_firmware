@@ -469,7 +469,14 @@ else
 	# Start the navigator.
 	#
 	navigator start
-	logging_json start
+	#logging_json start
+	#hello start
+	#px4_simple_app start
+	ex_fixedwing_control start
+	#initial_checks start
+
+	
+
 
 	#
 	# Start a thermal calibration if required.
@@ -554,7 +561,7 @@ else
 			reboot
 		fi
 	fi
-
+	logging_json start
 #
 # End of autostart.
 #

@@ -87,7 +87,7 @@ bool PreFlightCheck::preflightCheck(orb_advert_t *mavlink_log_pub, vehicle_statu
 // if they didnt , RPAS has been tampered , not allow to fly, A file is created and send to
 //management client (signed by key/pair_C), then from management client to Management server.
 //file informaton: 1)timestamp 2)Component's device id that didnt match.
-
+/*
 static int RPAS_identifier_check=0;
 
 if (RPAS_identifier_check==0){
@@ -109,8 +109,8 @@ if(identity_check==1){
 	RPAS_identifier_check=1;
 
 }
-}
-
+}*/
+/*
 
 
 //Function 2
@@ -126,7 +126,7 @@ if(drone_id_generation==0)
 //This has to be a function (taking in account all the unique things of the RPAS)
 
 FILE *droneid;
-droneid=fopen("fs/microsd/log/DroneID.txt","r");
+droneid=fopen("/fs/microsd/log/DroneID.txt","r");
 if(droneid==NULL){
   // the file is not there in the system, it has to be created
   // currently without signing, later has to be with signing support(Key_pair_C)
@@ -138,11 +138,11 @@ drone_id_generation=1;
 	// by checking for the signature
 	char DroneID_container[30];
 	char TAG_DRONE_ID[10]="DroneID";
-	char DRONE_ID_FILE[20]="fs/microsd/log/DroneID.txt";
+	char DRONE_ID_FILE[100]="/fs/microsd/log/DroneID.txt";
 	int check_validity_DroneID=call_file_read(DRONE_ID_FILE,TAG_DRONE_ID,DroneID_container,0);
 	// if non tampered -->then continue
 	if (check_validity_DroneID==0){
-		remove("fs/microsd/log/DroneID.txt");
+		remove("/fs/microsd/log/DroneID.txt");
 		call_DroneIDcreation( );
 	}else{
 		printf("\n\nDRONEID.txt already made\n\n");
@@ -171,19 +171,19 @@ static int UUID_check=0;
 if (UUID_check==0)
 {
 	FILE *fptr_registration;
-	fptr_registration=fopen("fs/microsd/log/UUID.txt","r");
+	fptr_registration=fopen("/fs/microsd/log/UUID.txt","r");
 	printf("\ninside UUID check\n");
 	if(fptr_registration!=NULL)
 	{//file is present
 		fclose(fptr_registration);
 		char DroneID_container_1[30];
 		char TAG_DRONE_ID_1[10]="DroneID";
-		char DRONE_ID_FILE_1[20]="fs/microsd/log/UUID.txt";
+		char DRONE_ID_FILE_1[100]="/fs/microsd/log/UUID.txt";
 		int check_validity_DroneID_1=call_file_read(DRONE_ID_FILE_1,TAG_DRONE_ID_1,DroneID_container_1,1);
 		// if non tampered -->then continue
 		if (check_validity_DroneID_1==0){
 			//UUID file is not valid, remove the invalid file
-			remove("fs/microsd/log/UUID.txt");
+			remove("/fs/microsd/log/UUID.txt");
 			mavlink_log_critical(mavlink_log_pub, "Drone registration not done, Connect Management Client and Internet to begin registration");
 
 		}else{
@@ -194,7 +194,7 @@ if (UUID_check==0)
 			}else{
 				// UUID.txt file is for different drone
 				// not UUID.txt of this drone
-				remove("fs/microsd/log/UUID.txt");
+				remove("/fs/microsd/log/UUID.txt");
 				mavlink_log_critical(mavlink_log_pub, "Drone registration not done, Connect Management Client and Internet to begin registration");
 			}
 
@@ -222,7 +222,7 @@ static int checky=0;
 if(checky==0)
 {
 	FILE *fptr_key;
-	fptr_key=fopen("fs/microsd/log/KeyRotation.txt","r");
+	fptr_key=fopen("/fs/microsd/log/KeyRotation.txt","r");
 
 	if(fptr_key!=NULL)
 	{// if present, then check for its validity
@@ -233,14 +233,14 @@ if(checky==0)
 		char FILE_ID_container[30];
 		char TAG_DRONE_ID_2[10]="DroneID";
 		char TAG_KEY_ROT_ID[20]="FILE_ID";
-		char DRONE_ID_FILE_2[30]="fs/microsd/log/KeyRotation.txt";
+		char DRONE_ID_FILE_2[100]="/fs/microsd/log/KeyRotation.txt";
 		int check_validity_DroneID_2=call_file_read(DRONE_ID_FILE_2,TAG_DRONE_ID_2,DroneID_container_2,1);
 		// if non tampered -->then continue
 		check_validity_DroneID_2=call_file_read(DRONE_ID_FILE_2,TAG_KEY_ROT_ID,FILE_ID_container,1);
 
 		if (check_validity_DroneID_2==0){
 			//KeyRotation.txt file is not valid, remove the invalid file
-			remove("fs/microsd/log/KeyRotation.txt");
+			remove("/fs/microsd/log/KeyRotation.txt");
 
 
 		}else{
@@ -254,18 +254,18 @@ if(checky==0)
 					call_KeyLog_Regen(FILE_ID_container);
 					// start key rotation
 					Key_rotation_start(FILE_ID_container);
-					remove("fs/microsd/log/KeyRotation.txt");
+					remove("/fs/microsd/log/KeyRotation.txt");
 					checky=1;
 				}else{// The file for key rotation has already been used
 				      // key rotation will not take place
-					remove("fs/microsd/log/KeyRotation.txt");
+					remove("/fs/microsd/log/KeyRotation.txt");
 
 				}
 
 			}else{
 				// KeyRotation.txt file is for different drone
 				//
-				remove("fs/microsd/log/KeyRotation.txt");
+				remove("/fs/microsd/log/KeyRotation.txt");
 			}
 
 		}
@@ -274,7 +274,7 @@ if(checky==0)
 	//no need of key rotation as there is no keyRotation.txt file present.
 		//check for KeyChangePerm.txt
 		FILE *fptr_keychange;
-		char fname_keychange[40]="fs/microsd/log/KeyChangePerm.txt";
+		char fname_keychange[40]="/fs/microsd/log/KeyChangePerm.txt";
 
 		fptr_keychange=fopen(fname_keychange,"r");
 		if(fptr_keychange!=NULL){
@@ -291,7 +291,7 @@ if(checky==0)
 			char TAG_KEY_ID[20]="KEY_ID";
 			char MODULUS_FILE[720];
 			char MODULUS_tag[20]="Modulus";
-			char DRONE_ID_FILE_2[60]="fs/microsd/log/KeyChangePerm.txt";
+			char DRONE_ID_FILE_2[60]="/fs/microsd/log/KeyChangePerm.txt";
 			int check_validity_DroneID_3=call_file_read(DRONE_ID_FILE_2,TAG_DRONE_ID_2,DroneID_container_3,1);
 		// if non tampered -->then continue
 			check_validity_DroneID_3=call_file_read(DRONE_ID_FILE_2,TAG_KEY_ID,KEY_ID_container,1);
@@ -304,13 +304,13 @@ if(checky==0)
 				char PKN_Modulus[720];
 				char PKN_DroneID[30];
 				char PKN_KEY_ID[30];
-				char PKN_file[60]="fs/microsd/log/PublicKeyNew.txt";
+				char PKN_file[60]="/fs/microsd/log/PublicKeyNew.txt";
 				check_validity_DroneID_3=call_file_read(PKN_file,MODULUS_tag,PKN_Modulus,0);
 				check_validity_DroneID_3=call_file_read(PKN_file,TAG_DRONE_ID_2,PKN_DroneID,0);
 				check_validity_DroneID_3=call_file_read(PKN_file,TAG_KEY_ID,PKN_KEY_ID,0);
 				if(check_validity_DroneID_3==0){
 					//not valid PublicKeyNew.txt, remove it
-					remove("fs/microsd/log/PublicKeyNew.txt");
+					remove("/fs/microsd/log/PublicKeyNew.txt");
 				}else{
 					int valid_sum=0;
 					if(strcmp(PKN_Modulus,MODULUS_FILE)==0){
@@ -330,13 +330,13 @@ if(checky==0)
 
 					}else{	//
 						//file is valid but does not belong to this drone.
-						remove("fs/microsd/log/KeyChangePerm.txt");
+						remove("/fs/microsd/log/KeyChangePerm.txt");
 					}
 				}
 
 			}else{
 				//file is not valid, remove the invalid file
-				remove("fs/microsd/log/KeyChangePerm.txt");
+				remove("/fs/microsd/log/KeyChangePerm.txt");
 			}
 
 		}else{//file is not present, no need to change keys
@@ -354,13 +354,13 @@ if(checky==0)
 static int para_set=0;
 if(para_set==0){
 	FILE *fptr_ParamChange;
-	fptr_ParamChange=fopen("fs/microsd/log/ParamChangePerm.txt","r");
+	fptr_ParamChange=fopen("/fs/microsd/log/ParamChangePerm.txt","r");
 	if(fptr_ParamChange!=NULL)
 	{	fclose(fptr_ParamChange);
 		//a modified ParamInuse.txt is needed to be formed
 		//also check the presence of ParamInuse.txt
 		FILE *fptr_ParamInuse;
-		fptr_ParamInuse=fopen("fs/microsd/log/ParamInuse.txt","r");
+		fptr_ParamInuse=fopen("/fs/microsd/log/ParamInuse.txt","r");
 		if(fptr_ParamInuse!=NULL){
 			fclose(fptr_ParamInuse);
 			//both the files are present
@@ -370,8 +370,8 @@ if(para_set==0){
 			char DroneID_container_4[30];
 			char DroneID_container_5[30];
 			char TAG_DRONE_ID_4[10]="DroneID";
-			char PARAM_IN_FILE_2[30]="fs/microsd/log/ParamInuse.txt";
-			char PARAM_CHANGE_FILE_2[30]="fs/microsd/log/ParamChangePerm.txt";
+			char PARAM_IN_FILE_2[30]="/fs/microsd/log/ParamInuse.txt";
+			char PARAM_CHANGE_FILE_2[100]="/fs/microsd/log/ParamChangePerm.txt";
 			int check_validity_DroneID_3=call_file_read(PARAM_IN_FILE_2,TAG_DRONE_ID_4,DroneID_container_4,0);
 			// if non tampered -->then continue
 			if(check_validity_DroneID_3==1){
@@ -379,14 +379,14 @@ if(para_set==0){
 					//droneID is valid
 				}else{
 					//droneID is not of this drone, remove the file
-					remove("fs/microsd/log/ParamInuse.txt");
+					remove("/fs/microsd/log/ParamInuse.txt");
 					mavlink_log_critical(mavlink_log_pub, "Authentic Parameter file missing");
 
 					return false;
 				}
 			}else{
 				//remove the file
-				remove("fs/microsd/log/ParamInuse.txt");
+				remove("/fs/microsd/log/ParamInuse.txt");
 				mavlink_log_critical(mavlink_log_pub, "Authentic Parameter file missing");
 
 				return false;
@@ -404,12 +404,12 @@ if(para_set==0){
 					para_set=1;
 				}else{
 					//droneID is not valid, remove the file
-					remove("fs/microsd/log/ParamChangePerm.txt");
+					remove("/fs/microsd/log/ParamChangePerm.txt");
 					goto ParamInuse_way;
 				}
 			}else{
 				//remove the file
-				remove("fs/microsd/log/ParamChangePerm.txt");
+				remove("/fs/microsd/log/ParamChangePerm.txt");
 				goto ParamInuse_way;
 			}
 
@@ -427,13 +427,13 @@ if(para_set==0){
 		//use the already made ParamInuse.txt in the RFM to set parameters
 		//check the presence of ParamInuse.txt
 		FILE *fptr_ParamInuse;
-		fptr_ParamInuse=fopen("fs/microsd/log/ParamInuse.txt","r");
+		fptr_ParamInuse=fopen("/fs/microsd/log/ParamInuse.txt","r");
 		if(fptr_ParamInuse!=NULL){
 			// validate ParamInuse.txt
 			//and then set the param and values accordingly
 			char DroneID_container_4[30];
 			char TAG_DRONE_ID_4[10]="DroneID";
-			char PARAM_IN_FILE[30]="fs/microsd/log/ParamInuse.txt";
+			char PARAM_IN_FILE[30]="/fs/microsd/log/ParamInuse.txt";
 			int check_validity_DroneID_3=call_file_read(PARAM_IN_FILE,TAG_DRONE_ID_4,DroneID_container_4,0);
 			// if non tampered -->then continue
 			if(check_validity_DroneID_3==1){
@@ -447,14 +447,14 @@ if(para_set==0){
 				}else{
 					//droneID is not valid, remove the file
 					//ParamInuse.txt is for another drone
-					remove("fs/microsd/log/ParamInuse.txt");
+					remove("/fs/microsd/log/ParamInuse.txt");
 					mavlink_log_critical(mavlink_log_pub, "Authentic Parameter file missing");
 
 
 				}
 			}else{
 				//ParamInuse.txt file is not valid, you need to remove it
-				remove("fs/microsd/log/ParamInuse.txt");
+				remove("/fs/microsd/log/ParamInuse.txt");
 				mavlink_log_critical(mavlink_log_pub, "Authentic Parameter file missing");
 
 			}
@@ -477,7 +477,7 @@ if(para_set==0){
 
 
 
-/*
+
 
 //function 4 : recentPA.txt for flight log management.
 //check for recentPA.txt:::: this is for bundling purpose, do we need to start bundling or not
@@ -557,6 +557,7 @@ if(recentPA_presence){
 
 // Tackling first thing : 1) Check for valid PA
 //static int checky0=0;
+
 static int checky1=0;
 static int tampercheck=0;
 //int time_verification=0;
@@ -570,7 +571,7 @@ if(!checky1)
 	if((time_since_boot > 10_s))
 	{
 		FILE *file;
-		file = fopen("fs/microsd/log/permission_artifact_breach.xml", "r");// ./log/ for posix /log/ for nuttx
+		file = fopen("/fs/microsd/log/permission_artifact_breach.xml", "r");// ./log/ for posix /log/ for nuttx
 		if (file){
 
 			fclose(file);
@@ -578,14 +579,97 @@ if(!checky1)
 			{
 
 				verification=Is_PA_VAlid();// if pa
+				//char file_name[]="/fs/microsd/log/permission_artifact_breach.xml";
+				//char Tag_Digest_value0[12]="DigestValue";
+				//char *Digest_Value0=(char*) malloc(100*sizeof(char));
+			/*	char *Reference_canonilized=(char*) malloc(5000*sizeof(char));
+				char *xmlExeclusive=(char*) malloc(5000*sizeof(char));
+  				char *output=(char*) malloc(5000*sizeof(char));
+				char *Sha_of_Reference=(char*) malloc(300*sizeof(char));
+				Reference_canon(file_name,Reference_canonilized);
+                                cleanerXML(Reference_canonilized,output);
+                                xmlExeclusiveCanon(output,xmlExeclusive);
+				free(Reference_canonilized);
+                                free(output);
+                                Sha256_implement(xmlExeclusive,Sha_of_Reference);
+				free(Sha_of_Reference);
+				free(xmlExeclusive);
+				char *SignedInfo_canonilized=(char*) malloc(5000*sizeof(char));
+                                char *outputS=(char*) malloc(5000*sizeof(char));
+                                char *Sha_of_SignedInfo=(char*) malloc(5000*sizeof(char));
+				SignedInfo_canon(file_name,SignedInfo_canonilized);
+        			cleanerXML(SignedInfo_canonilized,outputS);
+        			//printf("\nSigned Info :%s\n",SignedInfo_canonilized);
+				//free(outputS);
+        			free(SignedInfo_canonilized);
+				Sha256_implement(outputS,Sha_of_SignedInfo);
+				free(Sha_of_SignedInfo);
 
+                                char Tag_Digest_value0[12]="DigestValue";
+				char *Digest_Value0=(char*) malloc(100*sizeof(char));
+				char *Digest_Value_in_hex=(char*) malloc(300*sizeof(char));
+				getTagvalue(Tag_Digest_value0,Digest_Value0,file_name);
+
+				base64decoder(Digest_Value0, Digest_Value_in_hex);
+
+				free(Digest_Value0);
+				free(Digest_Value_in_hex);*/
+
+				// storing Signed value
+				/* char Tag_Signed_Value0[17]="SignatureValue";
+
+				//  char Signature_Value0[550];// in base 64
+				char *Signature_Value0=(char*) malloc(550*sizeof(char));
+				char Signature_Value_in_hex[500];//;=(char*) malloc(500*sizeof(char));
+				getTagvalue(Tag_Signed_Value0,Signature_Value0, file_name);
+
+				base64decoder(Signature_Value0, Signature_Value_in_hex);
+
+				free(Signature_Value0);
+				//free( Signature_Value_in_hex);
+
+  int cb;
+   mp_int message,modulus,public_key,Decrypted;
+   cb= mp_init_multi(&message,&modulus,&public_key,&Decrypted,NULL);
+   cb= mp_read_radix(&message,Signature_Value_in_hex,16);
+  // free(Signature_Value_in_hex);
+
+   /// Public key of dgca: This has to be taken from a reserved file in directory./ firmware update
+
+ //  mp_int ;
+    char Modulus[513]="d6912a773335d3a193c742071762794e26bcac49d78b6b65a784e1c18d18f2f88b9f13d7fc41a5b9e11e3d75905b0f8373dbac5658962940d104711467814b7319774014644df82e9764b4e852cb7547d56de3224aada000db231b1356ffe86391b3eca2ddf67d44f40ea6e84092cc67387db3a2042487b8dacfe5b588738973a59f5fa813a33e4bb8fbafa407794db990a307201b0a0fbd92ddd181a868a6cfa64625353714e9b1de6f81f3addbf5b202030dbd9e51385db9314591f01af01f07cc92f18ebe60545cea53eb54438e251fd88e7380b5a0612c29ccb7dfd88f7a7d7f0dd07a9b596923602798ad9f1bbb89fffd3cdb8fb94c48640d27fa681e47";
+  // char Modulus[513]="ab9d5c8d1fe67207749d63b7dcedd233ce32bb70d175a1bc38c612ab33e2c58e51f83f2788e4d52d9bceb5a1513929de3f526650071a067e6c161b05c60a495fc3ba79ed26f4fa8b2fe2ca8dec44b39759f39206f06a85f9424005a29f05e4cf3a0239340c28c993c1a61cf1b2b6b57c7d8e576ae86827f812b327625baec9ecbf55f1651d35600b9f955f6c2f3bea3aa5852ecdd36a0af818c19acc1030979bed3c89993faa92e0aa0502413b3ca86bbf63477f12ac069aff7137cb72c57f886da79033bbb3b4df0f6cc7fcc18e343aa76036681a566311e267c03b65c98abc91e58f090020c67f776199c0eb76d7e6363687475d3da36ff050f85275607fdd";
+  cb= mp_read_radix(&modulus,Modulus,16);
+
+  // mp_int ;
+  cb= mp_read_radix(&public_key,"65537",10);
+
+   //mp_int ;
+  //cb= mp_exptmod(&message, &public_key,&modulus,&Decrypted);   //                       this part for decrypting encrypted text
+  if(cb!=0){
+          mavlink_log_critical(mavlink_log_pub, "Problem in bignum ");
+  }*/
+  // char message_string_hex[513];
+  // mp_to_hex(&Decrypted,message_string_hex,sizeof(message_string_hex));
+  // free(message_string_hex);
+  // mp_clear_multi(&message,&modulus,&public_key,&Decrypted,NULL);
+
+
+
+				//getTagvalue(Tag_Digest_value0,Digest_Value0,file_name);
+				//free(Digest_Value0);
+				//char Reference_canonilized[2000]="patlee";//=(char*) malloc(15000*sizeof(char));
+				//printf("Refer %s",Reference_canonilized);
+
+				//Reference_canon(file_name,Reference_canonilized);
+				//free(Reference_canonilized);
 				if (verification==1)
 				{
 					//printf("bale bale\n");
 					mavlink_log_info(mavlink_log_pub," Permission Artefact is non tampered (valid)");
 					tampercheck=1;
 					checky1=1;
-					fetching_publish_padata();
+					//fetching_publish_padata();
 					//data_fetch_delete();
 					//checky0=1;
 				}else if(verification==2)
@@ -668,8 +752,8 @@ if(!checky1)
 
 }
 
-/*
-static int verification=1;
+
+/*static int verification=1;
 if(verification==1){
 data_fetch_delete();
 verification=0;

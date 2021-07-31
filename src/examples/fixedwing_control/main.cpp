@@ -67,21 +67,55 @@
 #include <uORB/topics/vehicle_rates_setpoint.h>
 #include <uORB/topics/vehicle_status.h>
 
+////////////////
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include<inttypes.h>
+
+#include <uORB/topics/takeoff_status.h>
+#include <uORB/topics/home_position.h>
+#include <uORB/topics/vehicle_command.h>
+#include <uORB/topics/vehicle_land_detected.h>
+#include <uORB/topics/vehicle_global_position.h>
+#include <uORB/topics/vehicle_gps_position.h>
+#include <uORB/topics/vehicle_status.h>
+#include <uORB/topics/pa_data.h>
+#include <uORB/topics/indi_prc.h>
+#include <drivers/drv_hrt.h>
+#include<motion_planning/main_utility.hpp>
+#include<motion_planning/print_hello.hpp>
+
+/////////////
+
+#include <px4_platform_common/px4_config.h>
+#include <px4_platform_common/tasks.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <math.h>
+#include <poll.h>
+
+#include <uORB/Subscription.hpp>
+#include <uORB/SubscriptionInterval.hpp>
+
+#include <examples/logging_json/logging_json.hpp>
+
+#include <uORB/topics/parameter_update.h>
+#include <parameters/param.h>
+#include <lib/ecl/geo/geo.h>
+#include <perf/perf_counter.h>
+#include <systemlib/err.h>
+#include <matrix/math.hpp>
+
+
+////////////////
+
 using namespace time_literals;
-
-/* Prototypes */
-
-/**
- * Initialize all parameter handles and values
- *
- */
-extern "C" int parameters_init(struct param_handles *h);
-
-/**
- * Update all parameters
- *
- */
-extern "C" int parameters_update(const struct param_handles *h, struct params *p);
 
 /**
  * Daemon management function.
@@ -104,227 +138,309 @@ int fixedwing_control_thread_main(int argc, char *argv[]);
  */
 static void usage(const char *reason);
 
-
-/**
- * Control roll and pitch angle.
- *
- * This very simple roll and pitch controller takes the current roll angle
- * of the system and compares it to a reference. Pitch is controlled to zero and yaw remains
- * uncontrolled (tutorial code, not intended for flight).
- *
- * @param att_sp The current attitude setpoint - the values the system would like to reach.
- * @param att The current attitude. The controller should make the attitude match the setpoint
- * @param rates_sp The angular rate setpoint. This is the output of the controller.
- */
-void control_attitude(const struct vehicle_attitude_setpoint_s *att_sp, const struct vehicle_attitude_s *att,
-		      struct vehicle_rates_setpoint_s *rates_sp,
-		      struct actuator_controls_s *actuators);
-
-/**
- * Control heading.
- *
- * This very simple heading to roll angle controller outputs the desired roll angle based on
- * the current position of the system, the desired position (the setpoint) and the current
- * heading.
- *
- * @param pos The current position of the system
- * @param sp The current position setpoint
- * @param att The current attitude
- * @param att_sp The attitude setpoint. This is the output of the controller
- */
-void control_heading(const struct vehicle_global_position_s *pos, const struct position_setpoint_s *sp,
-		     const struct vehicle_attitude_s *att, struct vehicle_attitude_setpoint_s *att_sp);
-
 /* Variables */
+static int deamon_task;				/**< Handle of deamon task / thread */
+
+
 static bool thread_should_exit = false;		/**< Daemon exit flag */
 static bool thread_running = false;		/**< Daemon status flag */
-static int deamon_task;				/**< Handle of deamon task / thread */
-static struct params p;
-static struct param_handles ph;
-
-void control_attitude(const struct vehicle_attitude_setpoint_s *att_sp, const struct vehicle_attitude_s *att,
-		      struct vehicle_rates_setpoint_s *rates_sp,
-		      struct actuator_controls_s *actuators)
-{
-
-	/*
-	 * The PX4 architecture provides a mixer outside of the controller.
-	 * The mixer is fed with a default vector of actuator controls, representing
-	 * moments applied to the vehicle frame. This vector
-	 * is structured as:
-	 *
-	 * Control Group 0 (attitude):
-	 *
-	 *    0  -  roll   (-1..+1)
-	 *    1  -  pitch  (-1..+1)
-	 *    2  -  yaw    (-1..+1)
-	 *    3  -  thrust ( 0..+1)
-	 *    4  -  flaps  (-1..+1)
-	 *    ...
-	 *
-	 * Control Group 1 (payloads / special):
-	 *
-	 *    ...
-	 */
-
-	/*
-	 * Calculate roll error and apply P gain
-	 */
-
-	matrix::Eulerf att_euler = matrix::Quatf(att->q);
-	matrix::Eulerf att_sp_euler = matrix::Quatf(att_sp->q_d);
-
-	float roll_err = att_euler.phi() - att_sp_euler.phi();
-	actuators->control[0] = roll_err * p.roll_p;
-
-	/*
-	 * Calculate pitch error and apply P gain
-	 */
-	float pitch_err = att_euler.theta() - att_sp_euler.theta();
-	actuators->control[1] = pitch_err * p.pitch_p;
-}
-
-void control_heading(const struct vehicle_global_position_s *pos, const struct position_setpoint_s *sp,
-		     const struct vehicle_attitude_s *att, struct vehicle_attitude_setpoint_s *att_sp)
-{
-
-	/*
-	 * Calculate heading error of current position to desired position
-	 */
-
-	float bearing = get_bearing_to_next_waypoint(pos->lat, pos->lon, sp->lat, sp->lon);
-
-	matrix::Eulerf att_euler = matrix::Quatf(att->q);
-
-	/* calculate heading error */
-	float yaw_err = att_euler.psi() - bearing;
-	/* apply control gain */
-	float roll_body = yaw_err * p.hdng_p;
-
-	/* limit output, this commonly is a tuning parameter, too */
-	if (roll_body < -0.6f) {
-		roll_body = -0.6f;
-
-	} else if (att_sp->roll_body > 0.6f) {
-		roll_body = 0.6f;
-	}
-
-	matrix::Eulerf att_spe(roll_body, 0, bearing);
-	matrix::Quatf(att_spe).copyTo(att_sp->q_d);
-}
-
-int parameters_init(struct param_handles *handles)
-{
-	/* PID parameters */
-	handles->hdng_p 	=	param_find("EXFW_HDNG_P");
-	handles->roll_p 	=	param_find("EXFW_ROLL_P");
-	handles->pitch_p 	=	param_find("EXFW_PITCH_P");
-
-	return 0;
-}
-
-int parameters_update(const struct param_handles *handles, struct params *parameters)
-{
-	param_get(handles->hdng_p, &(parameters->hdng_p));
-	param_get(handles->roll_p, &(parameters->roll_p));
-	param_get(handles->pitch_p, &(parameters->pitch_p));
-
-	return 0;
-}
-
 
 /* Main Thread */
 int fixedwing_control_thread_main(int argc, char *argv[])
 {
-	/* read arguments */
-	bool verbose = false;
+	Geo_tag content_holder[10];
+	memset(&content_holder[0],0,sizeof(content_holder));
 
-	for (int i = 1; i < argc; i++) {
-		if (strcmp(argv[i], "-v") == 0 || strcmp(argv[i], "--verbose") == 0) {
-			verbose = true;
-		}
-	}
+	//this is for knowing current time
+	struct vehicle_gps_position_s vgps;
+	memset(&vgps,0,sizeof(vgps));
 
-	/* welcome user (warnx prints a line, including an appended\n, with variable arguments */
-	warnx("[example fixedwing control] started");
+	//vehicle global postion: got after estimation
+	// this will be compared with the coordinates taken from recentPA.txt
+	// (2x(lat,long), alt)
+	struct vehicle_global_position_s vgp;
+	memset(&vgp, 0, sizeof(vgp));
 
-	/* initialize parameters, first the handles, then the values */
-	parameters_init(&ph);
-	parameters_update(&ph, &p);
+	//home position : this is to take reference ground level,
+	//later helpful for knowing geofence area and allowed time
+	// later helpful for altitude comparison
+	struct pa_data_s pad;
+	memset(&pad, 0, sizeof(pad));
 
-
-	/*
-	 * PX4 uses a publish/subscribe design pattern to enable
-	 * multi-threaded communication.
-	 *
-	 * The most elegant aspect of this is that controllers and
-	 * other processes can either 'react' to new data, or run
-	 * at their own pace.
-	 *
-	 * PX4 developer guide:
-	 * https://pixhawk.ethz.ch/px4/dev/shared_object_communication
-	 *
-	 * Wikipedia description:
-	 * http://en.wikipedia.org/wiki/Publish–subscribe_pattern
-	 *
-	 */
+	//takeoff status: to note down the instance at takeoff
+	//to know when take off is taking place
+	struct takeoff_status_s TO_status;
+	memset(&TO_status, 0, sizeof(TO_status));
 
 
+	//vehicle land detected : to note down the instance at landing
+	// to know when landing is taking place
+	struct vehicle_land_detected_s VLD;
+	memset(&VLD, 0, sizeof(VLD));
+
+	// this is to initiate RTL when geo breach/time breach is experienced
+	//
+	//struct vehicle_command_s v_cmd;
+	//memset(&v_cmd, 0, sizeof(v_cmd));
 
 
-	/*
-	 * Declare and safely initialize all structs to zero.
-	 *
-	 * These structs contain the system state and things
-	 * like attitude, position, the current waypoint, etc.
-	 */
-	struct vehicle_attitude_s att;
-	memset(&att, 0, sizeof(att));
-	struct vehicle_attitude_setpoint_s att_sp;
-	memset(&att_sp, 0, sizeof(att_sp));
-	struct vehicle_rates_setpoint_s rates_sp;
-	memset(&rates_sp, 0, sizeof(rates_sp));
-	struct vehicle_global_position_s global_pos;
-	memset(&global_pos, 0, sizeof(global_pos));
-	struct manual_control_setpoint_s manual_control_setpoint;
-	memset(&manual_control_setpoint, 0, sizeof(manual_control_setpoint));
-	struct vehicle_status_s vstatus;
-	memset(&vstatus, 0, sizeof(vstatus));
-	struct position_setpoint_s global_sp;
-	memset(&global_sp, 0, sizeof(global_sp));
-
-	/* output structs - this is what is sent to the mixer */
-	struct actuator_controls_s actuators;
-	memset(&actuators, 0, sizeof(actuators));
 
 
-	/* publish actuator controls with zero values */
-	for (unsigned i = 0; i < actuator_controls_s::NUM_ACTUATOR_CONTROLS; i++) {
-		actuators.control[i] = 0.0f;
-	}
 
 	/*
-	 * Advertise that this controller will publish actuator
-	 * control values and the rate setpoint
-	 */
-	orb_advert_t actuator_pub = orb_advertise(ORB_ID_VEHICLE_ATTITUDE_CONTROLS, &actuators);
-	orb_advert_t rates_pub = orb_advertise(ORB_ID(vehicle_rates_setpoint), &rates_sp);
+	 * Later used to Advertise RTL vehicle command
+	 * */
+	//orb_advert_t v_cmd_pub = orb_advertise(ORB_ID(vehicle_command), &v_cmd);
 
+        static int pas_time=0;
 	/* subscribe to topics. */
-	int att_sub = orb_subscribe(ORB_ID(vehicle_attitude));
-	int global_pos_sub = orb_subscribe(ORB_ID(vehicle_global_position));
-	int manual_control_setpoint_sub = orb_subscribe(ORB_ID(manual_control_setpoint));
-	int vstatus_sub = orb_subscribe(ORB_ID(vehicle_status));
-	int global_sp_sub = orb_subscribe(ORB_ID(position_setpoint_triplet));
+	int vgp_sub = orb_subscribe(ORB_ID(vehicle_global_position));
 
-	uORB::SubscriptionInterval parameter_update_sub{ORB_ID(parameter_update), 1_s};
+	int vgps_sub = orb_subscribe(ORB_ID(vehicle_gps_position));
 
+	int pad_sub = orb_subscribe(ORB_ID(pa_data));
+
+	int TO_status_sub = orb_subscribe(ORB_ID(takeoff_status));
+
+	int VLD_sub = orb_subscribe(ORB_ID(vehicle_land_detected));
+
+	orb_set_interval(vgp_sub,1000);
+	orb_set_interval(vgps_sub,1000);
 	/* Setup of loop */
 
 	struct pollfd fds[1] {};
-	fds[0].fd = att_sub;
+
+	fds[0].fd = vgp_sub;
+
 	fds[0].events = POLLIN;
 
+usleep(10000000);
+pa_validation();
+key key_rfm;
+FILE *fptr1;
+fptr1=fopen("/fs/microsd/debug.txt","w");
+get_RFM_Key(&key_rfm);
+fprintf(fptr1,"\n%s\n",key_rfm.modulus);
+fprintf(fptr1,"\n%s\n",key_rfm.private_exponent);
+
+char f[60]="/fs/microsd/log/recentPA.txt";
+int valid_status=Validating_File(f,key_rfm,fptr1);
+
+fprintf(fptr1,"\n \n status :%d\n",valid_status);
+
+
+fclose(fptr1);				
+ /*FILE *fptr;
+      fptr=fopen("/fs/microsd/result.txt","w");
+
+      char file_name[]="/fs/microsd/log/permission_artifact_breach.xml";
+      char *Digest_Value0=(char*) malloc(100*sizeof(char));
+      char Sha_of_Reference[70];
+      char Sha_of_SignedInfo[70];
+      valid_chunk_refe(fptr,Sha_of_Reference,1);
+      fprintf(fptr,"\n\n%s\n",Sha_of_Reference);
+
+      valid_chunk_refe(fptr,Sha_of_SignedInfo,2);
+      fprintf(fptr,"\n\n%s\n",Sha_of_SignedInfo);
+
+      char Tag_Digest_value0[12]="DigestValue";
+      getTagvalue(Tag_Digest_value0,Digest_Value0,file_name);
+	  fprintf(fptr,"\n\n Digest value %s\n",Digest_Value0);
+
+      char *Digest_Value_in_hex=(char*) malloc(100*sizeof(char));
+      base64decoder(Digest_Value0, Digest_Value_in_hex);
+      fprintf(fptr,"\n\n Digest value %s\n",Digest_Value_in_hex);
+      free(Digest_Value0);
+
+
+
+         char Signature_Value_in_hex[515];//;=(char*) malloc(500*sizeof(char));
+         char Modulus[514];
+            //  mp_int ; dgca public key modulus
+				strcpy(Modulus,"d6912a773335d3a193c742071762794e26bcac49d78b6b65a784e1c18d18f2f88b9f13d7fc41a5b9e11e3d75905b0f8373dbac5658962940d104711467814b7319774014644df82e9764b4e852cb7547d56de3224aada000db231b1356ffe86391b3eca2ddf67d44f40ea6e84092cc67387db3a2042487b8dacfe5b588738973a59f5fa813a33e4bb8fbafa407794db990a307201b0a0fbd92ddd181a868a6cfa64625353714e9b1de6f81f3addbf5b202030dbd9e51385db9314591f01af01f07cc92f18ebe60545cea53eb54438e251fd88e7380b5a0612c29ccb7dfd88f7a7d7f0dd07a9b596923602798ad9f1bbb89fffd3cdb8fb94c48640d27fa681e47");
+				// char Modulus[513]="ab9d5c8d1fe67207749d63b7dcedd233ce32bb70d175a1bc38c612ab33e2c58e51f83f2788e4d52d9bceb5a1513929de3f526650071a067e6c161b05c60a495fc3ba79ed26f4fa8b2fe2ca8dec44b39759f39206f06a85f9424005a29f05e4cf3a0239340c28c993c1a61cf1b2b6b57c7d8e576ae86827f812b327625baec9ecbf55f1651d35600b9f955f6c2f3bea3aa5852ecdd36a0af818c19acc1030979bed3c89993faa92e0aa0502413b3ca86bbf63477f12ac069aff7137cb72c57f886da79033bbb3b4df0f6cc7fcc18e343aa76036681a566311e267c03b65c98abc91e58f090020c67f776199c0eb76d7e6363687475d3da36ff050f85275607fdd";
+            // then processing is of PA
+          //  char file_name[]="/fs/microsd/log/permission_artifact_breach.xml";
+	         char Tag_Signed_Value0[17]="SignatureValue";
+				//  char Signature_Value0[550];// in base 64
+				char *Signature_Value0=(char*) malloc(550*sizeof(char));
+
+				getTagvalue(Tag_Signed_Value0,Signature_Value0, file_name);
+ fprintf(fptr,"\n\n Digest value %s\n",Signature_Value0);
+				base64decoder(Signature_Value0, Signature_Value_in_hex);
+ fprintf(fptr,"\n\n Digest value %s\n",Signature_Value_in_hex);
+				free(Signature_Value0);
+
+				int cb;
+				mp_int message,modulus,public_key,Decrypted;
+				cb= mp_init_multi(&message,&modulus,&public_key,&Decrypted,NULL);
+				cb= mp_read_radix(&message,Signature_Value_in_hex,16);
+				// free(Signature_Value_in_hex);
+
+				/// Public key of dgca: This has to be taken from a reserved file in directory./ firmware update
+
+				cb= mp_read_radix(&modulus,Modulus,16);
+
+				// mp_int ;
+				cb= mp_read_radix(&public_key,"65537",10);
+
+				//mp_int ;
+				cb= mp_exptmod(&message, &public_key,&modulus,&Decrypted);   //                       this part for decrypting encrypted text
+				printf("%d",cb);
+            char message_string_hex[513];
+            mp_to_hex(&Decrypted,message_string_hex,sizeof(message_string_hex));
+            mp_clear_multi(&message,&modulus,&public_key,&Decrypted,NULL);
+
+              fprintf(fptr,"\n\n Digest mesa %s\n",message_string_hex);
+      char *Extracted_sha_from_Signature_value=(char*) malloc(100*sizeof(char));
+      char *messa=(char*) malloc(750*sizeof(char));
+
+     check_debug_mp(messa);
+
+	 fprintf(fptr,"\n\n Digest mesa 2 %s\n",messa);
+	 char padding_SHA256[447]="1ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff003031300d060960864801650304020105000420";
+      for(int o=0;o<444;o++){
+            if(padding_SHA256[o]!=small_letter(messa[o])){
+               //return 2;
+               fprintf(fptr,"%s","\n Bad SIGN \n");
+               break;
+            }
+      }
+
+      fprintf(fptr,"%s","\n SIGN is good \n");
+      int k_cout=0;
+      for(int i2=445;messa[i2]!='\0';i2++){
+            Extracted_sha_from_Signature_value[k_cout]=small_letter(messa[i2]);
+            k_cout++;
+         // printf("%c",message_string_hex[i]);
+      }
+      Extracted_sha_from_Signature_value[k_cout]='\0';//
+      fprintf(fptr,"\n%s\n",Extracted_sha_from_Signature_value);
+      if(strcmp(Extracted_sha_from_Signature_value,Sha_of_SignedInfo)==0){
+
+         if(strcmp(Sha_of_Reference,Digest_Value_in_hex)==0){
+                  fprintf(fptr,"%s","\n 100000000000PA is valid and non tampered \n");
+
+            }else{
+                  fprintf(fptr,"%s","\n PA is not valid\n");
+
+            }
+
+         }else{
+            fprintf(fptr,"%s","\n PA is not valid \n");
+         //  PX4_INFO("PA is valid???????????");
+
+         }
+      free(Extracted_sha_from_Signature_value);
+      free(messa);
+      free(Digest_Value_in_hex);
+    
+
+	 fclose(fptr);*/
+/*
+      char padding_SHA256[447]="1ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff003031300d060960864801650304020105000420";
+      for(int o=0;o<444;o++){
+            if(padding_SHA256[o]!=small_letter(message[o])){
+               //return 2;
+               fprintf(fptr,"%s","\n Bad SIGN \n");
+               break;
+            }
+      }
+
+      fprintf(fptr,"%s","\n SIGN is good \n");
+      int k_cout=0;
+      for(int i2=445;message[i2]!='\0';i2++){
+            Extracted_sha_from_Signature_value[k_cout]=small_letter(message[i2]);
+            k_cout++;
+         // printf("%c",message_string_hex[i]);
+      }
+      Extracted_sha_from_Signature_value[k_cout]='\0';//
+      fprintf(fptr,"\n%s\n",Extracted_sha_from_Signature_value);
+      if(strcmp(Extracted_sha_from_Signature_value,Sha_of_SignedInfo)==0){
+
+         if(strcmp(Sha_of_Reference,Digest_Value_in_hex)==0){
+                  fprintf(fptr,"%s","\n 100000000000PA is valid and non tampered \n");
+
+            }else{
+                  fprintf(fptr,"%s","\n PA is not valid\n");
+
+            }
+
+         }else{
+            fprintf(fptr,"%s","\n PA is not valid \n");
+         //  PX4_INFO("PA is valid???????????");
+
+         }
+      free(Extracted_sha_from_Signature_value);
+      free(message);
+      free(Digest_Value_in_hex);
+      fclose(fptr);*/
+usleep(3000000);
+
+//fetching_publish_padata();
+/*struct indi_prc_s indi;
+memset(&indi, 0, sizeof(indi));
+orb_advert_t indi_pub = orb_advertise(ORB_ID(indi_prc), &indi);
+indi.valid=1;
+orb_publish(ORB_ID(indi_prc), indi_pub, &indi);*/
+
+/*FILE *fptr1;
+fptr1=fopen("/fs/microsd/gps_id.txt","w");
+int identity_check= RPAS_identifier(fptr1);
+fprintf(fptr1,"ide  %d",identity_check);
+fclose(fptr1);*/
+return 0;
+//////////////////////////////////////////////////////
+reset_check:
+	thread_should_exit=0;
+	int rtl_pass=0;
+	int geo_tag_count=0;
+	//memset(content_holder,0,1500);
+
+	// Now control will go into the  second loop only when two conditions are met, which are
+	// 1)pa_data is updated
+	// 2)takeoff_state is 5
+
+
+	while(1){
+		orb_copy(ORB_ID(pa_data),pad_sub,&pad);
+		orb_copy(ORB_ID(takeoff_status),TO_status_sub,&TO_status);
+		//printf(",hey patlee\n");
+
+		if((pad.updated==1)&&(TO_status.takeoff_state==5)){
+			break;
+		}
+		usleep(1000000);
+
+	}
+        printf("\n\nwhile loop break\n\n");
+
+	orb_copy(ORB_ID(takeoff_status),TO_status_sub,&TO_status);
+//phirse_check:
+	if(TO_status.takeoff_state==5){
+
+		orb_copy(ORB_ID(vehicle_global_position),vgp_sub,&vgp);// for lat,lon,altitude
+		orb_copy(ORB_ID(vehicle_gps_position),vgps_sub,&vgps);// for timestamp
+		// notedown the takeoff instance in log file
+		printf("\n\nwhile loop break  66\n\n");
+		content_holder[geo_tag_count].Entrytype=1;
+		content_holder[geo_tag_count].Timestamp=(vgps.time_utc_usec)/1000000;
+		content_holder[geo_tag_count].Lattitude=vgp.lat;
+		content_holder[geo_tag_count].Longitude=vgp.lon;
+		content_holder[geo_tag_count].Altitude=vgp.alt;
+		geo_tag_count++;
+		memset(&vgps,0,sizeof(vgps));
+		memset(&vgp,0,sizeof(vgp));
+
+
+	}/*else{
+		usleep(5000000);
+		goto phirse_check;
+		//px4_usleep(10000);
+
+	}*/
+	hrt_abstime then=hrt_absolute_time();
+       printf("\n\ntakeoff detected block passed %d\n\n",TO_status.takeoff_state);
 	while (!thread_should_exit) {
 
 		/*
@@ -337,7 +453,7 @@ int fixedwing_control_thread_main(int argc, char *argv[])
 		 * This design pattern makes the controller also agnostic of the attitude
 		 * update speed - it runs as fast as the attitude updates with minimal latency.
 		 */
-		int ret = poll(fds, 1, 500);
+		int ret = poll(fds, 1, 1000);
 
 		if (ret < 0) {
 			/*
@@ -350,83 +466,153 @@ int fixedwing_control_thread_main(int argc, char *argv[])
 			/* no return value = nothing changed for 500 ms, ignore */
 		} else {
 
-			// check for parameter updates
-			if (parameter_update_sub.updated()) {
-				// clear update
-				parameter_update_s pupdate;
-				parameter_update_sub.copy(&pupdate);
-
-				// if a param update occured, re-read our parameters
-				parameters_update(&ph, &p);
-			}
-
-			/* only run controller if attitude changed */
 			if (fds[0].revents & POLLIN) {
 
+				//this section runs  when a new estimate from vehicle_global_position arrives
 
-				/* Check if there is a new position measurement or position setpoint */
-				bool pos_updated;
-				orb_check(global_pos_sub, &pos_updated);
-				bool global_sp_updated;
-				orb_check(global_sp_sub, &global_sp_updated);
-				bool manual_control_setpoint_updated;
-				orb_check(manual_control_setpoint_sub, &manual_control_setpoint_updated);
+                                if (hrt_elapsed_time(&then)>1_s){
+					orb_copy(ORB_ID(vehicle_global_position),vgp_sub,&vgp);
+					orb_copy(ORB_ID(vehicle_gps_position),vgps_sub,&vgps);
+					orb_copy(ORB_ID(pa_data),pad_sub,&pad);
 
-				/* get a local copy of attitude */
-				orb_copy(ORB_ID(vehicle_attitude), att_sub, &att);
+					int geobreach_status=check_Geobreach(pad,vgp);
+					int timebreach_status=check_Timebreach(pad,vgps);
 
-				if (global_sp_updated) {
-					struct position_setpoint_triplet_s triplet;
-					orb_copy(ORB_ID(position_setpoint_triplet), global_sp_sub, &triplet);
-					memcpy(&global_sp, &triplet.current, sizeof(global_sp));
-				}
 
-				if (manual_control_setpoint_updated)
-					/* get the RC (or otherwise user based) input */
-				{
-					orb_copy(ORB_ID(manual_control_setpoint), manual_control_setpoint_sub, &manual_control_setpoint);
-				}
+					//check for geo_breach
+					if(geobreach_status==1){
+						pas_time++;
+						content_holder[geo_tag_count].Entrytype=0;
+						content_holder[geo_tag_count].Timestamp=(vgps.time_utc_usec)/1000000;
+						content_holder[geo_tag_count].Lattitude=vgp.lat;
+						content_holder[geo_tag_count].Longitude=vgp.lon;
+						content_holder[geo_tag_count].Altitude=vgp.alt;
+						geo_tag_count++;
 
-				/* check if the throttle was ever more than 50% - go later only to failsafe if yes */
-				if (PX4_ISFINITE(manual_control_setpoint.z) &&
-				    (manual_control_setpoint.z >= 0.6f) &&
-				    (manual_control_setpoint.z <= 1.0f)) {
-				}
-
-				/* get the system status and the flight mode we're in */
-				orb_copy(ORB_ID(vehicle_status), vstatus_sub, &vstatus);
-
-				/* publish rates */
-				orb_publish(ORB_ID(vehicle_rates_setpoint), rates_pub, &rates_sp);
-
-				/* sanity check and publish actuator outputs */
-				if (PX4_ISFINITE(actuators.control[0]) &&
-				    PX4_ISFINITE(actuators.control[1]) &&
-				    PX4_ISFINITE(actuators.control[2]) &&
-				    PX4_ISFINITE(actuators.control[3])) {
-					orb_publish(ORB_ID_VEHICLE_ATTITUDE_CONTROLS, actuator_pub, &actuators);
-
-					if (verbose) {
-						warnx("published");
 					}
+					//check for time breach
+					if(timebreach_status==1){
+						content_holder[geo_tag_count].Entrytype=2;
+						content_holder[geo_tag_count].Timestamp=(vgps.time_utc_usec)/1000000;
+						content_holder[geo_tag_count].Lattitude=vgp.lat;
+						content_holder[geo_tag_count].Longitude=vgp.lon;
+						content_holder[geo_tag_count].Altitude=vgp.alt;
+						geo_tag_count++;
+
+					}
+					//if(timebreach_status || geobreach_status){
+
+					memset(&vgps,0,sizeof(vgps));
+					memset(&vgp,0,sizeof(vgp));
+					memset(&pad,0,sizeof(pad));
+
+					//}
+					if((timebreach_status || geobreach_status) && (!rtl_pass) ){
+						//send RTL command
+
+						vehicle_command_s vcmd{};
+						//vcmd.command = vehicle_command_s::VEHICLE_CMD_NAV_RETURN_TO_LAUNCH;
+						vcmd.command =vehicle_command_s::VEHICLE_CMD_DO_SET_MODE;
+						vcmd.param1 = 1;
+						vcmd.param2 = 4;
+						vcmd.param3 = 5;
+
+
+						uORB::SubscriptionData<vehicle_status_s> vehicle_status_sub{ORB_ID(vehicle_status)};
+						vcmd.source_system = vehicle_status_sub.get().system_id;
+						vcmd.target_system = vehicle_status_sub.get().system_id;
+						vcmd.source_component = vehicle_status_sub.get().component_id;
+						vcmd.target_component = vehicle_status_sub.get().component_id;
+
+						uORB::Publication<vehicle_command_s> vcmd_pub{ORB_ID(vehicle_command)};
+						vcmd.timestamp = hrt_absolute_time();
+						vcmd_pub.publish(vcmd);
+						rtl_pass=1;
+					}
+					then=hrt_absolute_time();
 				}
+
+
+				// check if landing has taken place or not
+				orb_copy(ORB_ID(vehicle_land_detected), VLD_sub, &VLD);
+				char bnm[4]="hi";
+				if(VLD.landed){
+
+					orb_copy(ORB_ID(vehicle_global_position),vgp_sub,&vgp);// for lat,lon,altitude
+					orb_copy(ORB_ID(vehicle_gps_position),vgps_sub,&vgps);// for timestamp
+					// landing has taken place
+					//notedown the instance in log
+					/*content_holder[geo_tag_count].Entrytype=3;
+					content_holder[geo_tag_count].Timestamp=(vgps.time_utc_usec)/1000000;
+					content_holder[geo_tag_count].Lattitude=vgp.lat;
+					content_holder[geo_tag_count].Longitude=vgp.lon;
+					content_holder[geo_tag_count].Altitude=vgp.alt;*/
+					geo_tag_count++;
+
+					memset(&vgps,0,sizeof(vgps));
+					memset(&vgp,0,sizeof(vgp));
+                                        printf("\nhey its landing\n");
+
+					// exit from the loop
+					update_recentPA(1,bnm);
+					 printf("\nhey recent PA updaed after landing\n");
+					thread_should_exit=1;
+					// update the flight frequency
+
+
+				}
+				if(VLD.freefall){
+					// drone is in freefall state
+					// notedown the instance in log
+					orb_copy(ORB_ID(vehicle_global_position),vgp_sub,&vgp);// for lat,lon,altitude
+					orb_copy(ORB_ID(vehicle_gps_position),vgps_sub,&vgps);// for timestamp
+
+					//notedown the instance in log
+					/*content_holder[geo_tag_count].Entrytype=4;
+					content_holder[geo_tag_count].Timestamp=vgps.time_utc_usec;
+					content_holder[geo_tag_count].Lattitude=vgp.lat;
+					content_holder[geo_tag_count].Longitude=vgp.lon;
+					content_holder[geo_tag_count].Altitude=vgp.alt;*/
+					geo_tag_count++;
+
+					memset(&vgps,0,sizeof(vgps));
+					memset(&vgp,0,sizeof(vgp));
+
+
+
+					//exit from loop
+					thread_should_exit=1;
+					//updating the frequency
+					update_recentPA(1,bnm);
+				}
+				memset(&VLD,0,sizeof(VLD));
+
+
+
+
 			}
 		}
 	}
+        printf("\n\ncount geobreach :::::::%d\n\n",pas_time);
 
-	printf("[ex_fixedwing_control] exiting, stopping all motors.\n");
+      //  main_json_file_writing(content_holder,geo_tag_count);
+	//free(content_holder);
+
+	//Bundling_begins();
+
+	goto reset_check;
+
+
+
+
 	thread_running = false;
 
-	/* kill all outputs */
-	for (unsigned i = 0; i < actuator_controls_s::NUM_ACTUATOR_CONTROLS; i++) {
-		actuators.control[i] = 0.0f;
-	}
 
-	orb_publish(ORB_ID_VEHICLE_ATTITUDE_CONTROLS, actuator_pub, &actuators);
+
 
 	fflush(stdout);
 
-	return 0;
+	//return 0;
 }
 
 /* Startup Functions */
@@ -468,7 +654,7 @@ int ex_fixedwing_control_main(int argc, char *argv[])
 		deamon_task = px4_task_spawn_cmd("ex_fixedwing_control",
 						 SCHED_DEFAULT,
 						 SCHED_PRIORITY_MAX - 20,
-						 2048,
+						 20048,
 						 fixedwing_control_thread_main,
 						 (argv) ? (char *const *)&argv[2] : (char *const *)nullptr);
 		thread_running = true;

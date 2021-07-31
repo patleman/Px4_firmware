@@ -93,7 +93,29 @@
 #include "Utility/PreFlightChecker.hpp"
 #include <uORB/topics/takeoff_status.h>
 
+////////////////
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include<inttypes.h>
+
+#include <uORB/topics/takeoff_status.h>
+#include <uORB/topics/home_position.h>
+#include <uORB/topics/vehicle_command.h>
+#include <uORB/topics/vehicle_land_detected.h>
+#include <uORB/topics/vehicle_global_position.h>
+#include <uORB/topics/vehicle_status.h>
+#include <uORB/topics/pa_data.h>
+#include <drivers/drv_hrt.h>
+#include<motion_planning/main_utility.hpp>
+#include<motion_planning/print_hello.hpp>
+
+/////////////
+
 extern pthread_mutex_t ekf2_module_mutex;
+
+
 
 class EKF2 final : public ModuleParams, public px4::ScheduledWorkItem
 {
@@ -275,6 +297,8 @@ private:
 	//uORB::Publication<vehicle_command_s>		_cmd_pub{ORB_ID(vehicle_command)};// newly added on 7/7/21
 	int takeoff_status_sub = orb_subscribe(ORB_ID(takeoff_status));
 	int vehicle_land_detected_sub = orb_subscribe(ORB_ID(vehicle_land_detected));
+
+
 	PreFlightChecker _preflt_checker;
 
 	Ekf _ekf;

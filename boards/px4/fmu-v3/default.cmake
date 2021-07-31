@@ -73,12 +73,13 @@ px4_add_board(
 		load_mon
 		local_position_estimator
 		logger
+		#logging_json
+     		#initial_checks
 		mavlink
 		mc_att_control
 		mc_hover_thrust_estimator
 		mc_pos_control
 		mc_rate_control
-		logging_json
 		#micrortps_bridge
 		navigator
 		rc_update
@@ -122,14 +123,15 @@ px4_add_board(
 		work_queue
 	EXAMPLES
 		fake_gps
+		#logging_json
 		#fake_imu
 		#fake_magnetometer
-		#fixedwing_control # Tutorial code from https://px4.io/dev/example_fixedwing_control
-		#hello
+		fixedwing_control # Tutorial code from https://px4.io/dev/example_fixedwing_control
+		hello
 		#hwtest # Hardware test
 		#matlab_csv_serial
 		#px4_mavlink_debug # Tutorial code from http://dev.px4.io/en/debug/debug_values.html
-		#px4_simple_app # Tutorial code from http://dev.px4.io/en/apps/hello_sky.html
+		px4_simple_app # Tutorial code from http://dev.px4.io/en/apps/hello_sky.html
 		#rover_steering_control # Rover example app
 		#uuv_example_app
 		#work_item

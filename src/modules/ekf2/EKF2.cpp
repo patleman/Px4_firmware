@@ -1501,6 +1501,159 @@ void EKF2::UpdateGpsSample(ekf2_timestamps_s &ekf2_timestamps)
 
 
 		if (_vehicle_gps_position_sub.update(&vehicle_gps_position)) {
+/*			/////////////////////// code for log generation ////////////
+			// checking takeoff state and message update state
+			orb_copy(ORB_ID(pa_data),pad_sub,&pad);
+		        orb_copy(ORB_ID(takeoff_status),TO_status_sub,&TO_status);
+
+			// this is the main caondition to begin logging
+			// for stopping logging make a static int which gets on at landing
+
+                        if((pad.updated==1)&&(TO_status.takeoff_state==5) && (first_takeoff==0)){
+
+				orb_copy(ORB_ID(vehicle_global_position),vgp_sub,&vgp);// for lat,lon,altitude
+				orb_copy(ORB_ID(vehicle_gps_position),vgps_sub,&vgps);// for timestamp
+				// notedown the takeoff instance in log file
+				printf("\n\nnoting down takeoff instance.\n\n");
+				content_holder[geo_tag_count].Entrytype=1;
+				content_holder[geo_tag_count].Timestamp=(vgps.time_utc_usec)/1000000;
+				content_holder[geo_tag_count].Lattitude=vgp.lat;
+				content_holder[geo_tag_count].Longitude=vgp.lon;
+				content_holder[geo_tag_count].Altitude=vgp.alt;
+				geo_tag_count++;
+				memset(&vgps,0,sizeof(vgps));
+				memset(&vgp,0,sizeof(vgp));
+				first_takeoff==1;
+				then=hrt_absolute_time();
+
+
+			}
+			if(first_takeoff==1 && (landing==0)){
+
+				if (hrt_elapsed_time(&then)>1_s){
+					orb_copy(ORB_ID(vehicle_global_position),vgp_sub,&vgp);
+					orb_copy(ORB_ID(vehicle_gps_position),vgps_sub,&vgps);
+					orb_copy(ORB_ID(pa_data),pad_sub,&pad);
+
+					int geobreach_status=check_Geobreach(pad,vgp);
+					int timebreach_status=check_Timebreach(pad,vgps);
+
+
+					//check for geo_breach
+					if(geobreach_status==1){
+
+						content_holder[geo_tag_count].Entrytype=0;
+						content_holder[geo_tag_count].Timestamp=(vgps.time_utc_usec)/1000000;
+						content_holder[geo_tag_count].Lattitude=vgp.lat;
+						content_holder[geo_tag_count].Longitude=vgp.lon;
+						content_holder[geo_tag_count].Altitude=vgp.alt;
+						geo_tag_count++;
+
+					}
+					//check for time breach
+					if(timebreach_status==1){
+						content_holder[geo_tag_count].Entrytype=2;
+						content_holder[geo_tag_count].Timestamp=(vgps.time_utc_usec)/1000000;
+						content_holder[geo_tag_count].Lattitude=vgp.lat;
+						content_holder[geo_tag_count].Longitude=vgp.lon;
+						content_holder[geo_tag_count].Altitude=vgp.alt;
+						geo_tag_count++;
+
+					}
+					//if(timebreach_status || geobreach_status){
+
+					memset(&vgps,0,sizeof(vgps));
+					memset(&vgp,0,sizeof(vgp));
+					memset(&pad,0,sizeof(pad));
+
+					//}
+					if((timebreach_status || geobreach_status) && (!rtl_pass) ){
+						//send RTL command
+
+						vehicle_command_s vcmd{};
+						//vcmd.command = vehicle_command_s::VEHICLE_CMD_NAV_RETURN_TO_LAUNCH;
+						vcmd.command =vehicle_command_s::VEHICLE_CMD_DO_SET_MODE;
+						vcmd.param1 = 1;
+						vcmd.param2 = 4;
+						vcmd.param3 = 5;
+
+
+						uORB::SubscriptionData<vehicle_status_s> vehicle_status_sub{ORB_ID(vehicle_status)};
+						vcmd.source_system = vehicle_status_sub.get().system_id;
+						vcmd.target_system = vehicle_status_sub.get().system_id;
+						vcmd.source_component = vehicle_status_sub.get().component_id;
+						vcmd.target_component = vehicle_status_sub.get().component_id;
+
+						uORB::Publication<vehicle_command_s> vcmd_pub{ORB_ID(vehicle_command)};
+						vcmd.timestamp = hrt_absolute_time();
+						vcmd_pub.publish(vcmd);
+						rtl_pass=1;
+					}
+					then=hrt_absolute_time();
+				}
+
+
+
+				orb_copy(ORB_ID(vehicle_land_detected), VLD_sub, &VLD);
+				char bnm[4]="hi";
+				if(VLD.landed){
+
+					orb_copy(ORB_ID(vehicle_global_position),vgp_sub,&vgp);// for lat,lon,altitude
+					orb_copy(ORB_ID(vehicle_gps_position),vgps_sub,&vgps);// for timestamp
+					// landing has taken place
+					//notedown the instance in log
+					content_holder[geo_tag_count].Entrytype=3;
+					content_holder[geo_tag_count].Timestamp=(vgps.time_utc_usec)/1000000;
+					content_holder[geo_tag_count].Lattitude=vgp.lat;
+					content_holder[geo_tag_count].Longitude=vgp.lon;
+					content_holder[geo_tag_count].Altitude=vgp.alt;
+					geo_tag_count++;
+
+					memset(&vgps,0,sizeof(vgps));
+					memset(&vgp,0,sizeof(vgp));
+                                        printf("\nhey its landing\n");
+
+					// exit from the loop
+					update_recentPA(1,bnm);
+					printf("\nhey recent PA updaed after landing\n");
+					main_json_file_writing(content_holder,geo_tag_count);
+					landing=1;
+					// update the flight frequency
+
+
+				}
+				if(VLD.freefall){
+					// drone is in freefall state
+					// notedown the instance in log
+					orb_copy(ORB_ID(vehicle_global_position),vgp_sub,&vgp);// for lat,lon,altitude
+					orb_copy(ORB_ID(vehicle_gps_position),vgps_sub,&vgps);// for timestamp
+
+					//notedown the instance in log
+					content_holder[geo_tag_count].Entrytype=4;
+					content_holder[geo_tag_count].Timestamp=vgps.time_utc_usec;
+					content_holder[geo_tag_count].Lattitude=vgp.lat;
+					content_holder[geo_tag_count].Longitude=vgp.lon;
+					content_holder[geo_tag_count].Altitude=vgp.alt;
+					geo_tag_count++;
+
+					memset(&vgps,0,sizeof(vgps));
+					memset(&vgp,0,sizeof(vgp));
+
+
+
+					//exit from loop
+
+					//updating the frequency
+					update_recentPA(1,bnm);
+					main_json_file_writing(content_holder,geo_tag_count);
+					landing=1;
+				}
+
+				memset(&VLD,0,sizeof(VLD));
+
+			}
+*/
+			//////////////////////////////////////////////////////
 
 
 		/*	if(vehicle_gps_position.alt>490000 && (first_pass_rtl==0)){
@@ -1553,6 +1706,7 @@ void EKF2::UpdateGpsSample(ekf2_timestamps_s &ekf2_timestamps)
 			_gps_time_usec = gps_msg.time_usec;
 			_gps_alttitude_ellipsoid = vehicle_gps_position.alt_ellipsoid;
 		}
+
 	}
 }
 

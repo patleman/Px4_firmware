@@ -49,7 +49,7 @@
 #include <errno.h>
 #include <math.h>
 #include <poll.h>
-
+#include <uORB/topics/indi_prc.h>
 #include <uORB/Subscription.hpp>
 #include <uORB/SubscriptionInterval.hpp>
 
@@ -63,7 +63,7 @@
 //#include "json_support.h"
 
 /* process-specific header files */
-#include "logging_json.h"
+#include "logging_json.hpp"
 
 using namespace time_literals;
 
@@ -131,8 +131,8 @@ int logging_json_thread_main(int argc, char *argv[])
 	 */
 
 
-	Geo_tag *content_holder=(Geo_tag*) malloc(1500*sizeof(Geo_tag));
-
+	//Geo_tag *content_holder=(Geo_tag*) malloc(1500*sizeof(Geo_tag));
+        Geo_tag content_holder[10];
 
 
 	//this is for knowing current time
@@ -203,7 +203,7 @@ reset_check:
 	thread_should_exit=0;
 	int rtl_pass=0;
 	int geo_tag_count=0;
-	memset(content_holder,0,1500);
+	//memset(content_holder,0,1500);
 
 	// Now control will go into the  second loop only when two conditions are met, which are
 	// 1)pa_data is updated
@@ -218,6 +218,7 @@ reset_check:
 		if((pad.updated==1)&&(TO_status.takeoff_state==5)){
 			break;
 		}
+		usleep(2000000);
 
 	}
         printf("\n\nwhile loop break\n\n");
@@ -396,7 +397,7 @@ reset_check:
         printf("\n\ncount geobreach :::::::%d\n\n",pas_time);
 
         main_json_file_writing(content_holder,geo_tag_count);
-	free(content_holder);
+	//free(content_holder);
 
 	//Bundling_begins();
 
@@ -449,12 +450,22 @@ int logging_json_main(int argc, char *argv[])
 			/* this is not an error */
 			return 0;
 		}
-
+        usleep(10000000);
+	int indi_sub_fd = orb_subscribe(ORB_ID(indi_prc));
+        while(1){
+			struct indi_prc_s indi;
+			/* copy sensors raw data into local buffer */
+			orb_copy(ORB_ID(indi_prc), indi_sub_fd, &indi);
+			if(indi.valid==True){
+				break;
+			}
+			usleep(2000000);
+	}
 		thread_should_exit = false;
 		deamon_task = px4_task_spawn_cmd("logging_json",
 						 SCHED_DEFAULT,
 						 SCHED_PRIORITY_MAX - 20,
-						 3548,
+						 8048,
 						 logging_json_thread_main,
 						 (argv) ? (char *const *)&argv[2] : (char *const *)nullptr);
 		thread_running = true;

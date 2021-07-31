@@ -186,6 +186,7 @@ set(msg_files
 	wind.msg
 	yaw_estimator_status.msg
 	pa_data.msg
+	indi_prc.msg
 )
 
 if(NOT px4_constrained_flash_build)

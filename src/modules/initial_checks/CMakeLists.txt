@@ -32,10 +32,11 @@
 ############################################################################
 
 px4_add_module(
-	MODULE templates__logging_json
-	MAIN logging_json
-	STACK_MAIN 3500
-	SRCS
-		logging_json.cpp
+	MODULE modules__initial_checks
+	MAIN initial_checks
+	SRCS	initial_checks.hpp
+		initial_checks.cpp
+	DEPENDS
+		motion_planning
 	)
 
