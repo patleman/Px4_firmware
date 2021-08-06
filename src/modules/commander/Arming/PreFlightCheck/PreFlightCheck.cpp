@@ -45,7 +45,7 @@
 #include <lib/parameters/param.h>
 #include <systemlib/mavlink_log.h>
 #include <uORB/Subscription.hpp>
-
+#include <sys/random.h>
 #include <uORB/topics/vehicle_gps_position.h>
 #include <uORB/topics/sensor_gps.h>
 #include <dirent.h>
@@ -576,8 +576,7 @@ if(!checky1)
 
 			fclose(file);
 			if(tampercheck==0)
-			{
-
+			{	
 				verification=Is_PA_VAlid();// if pa
 				//char file_name[]="/fs/microsd/log/permission_artifact_breach.xml";
 				//char Tag_Digest_value0[12]="DigestValue";

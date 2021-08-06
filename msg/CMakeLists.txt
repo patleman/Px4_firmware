@@ -187,6 +187,7 @@ set(msg_files
 	yaw_estimator_status.msg
 	pa_data.msg
 	indi_prc.msg
+        initial_check_status.msg
 )
 
 if(NOT px4_constrained_flash_build)

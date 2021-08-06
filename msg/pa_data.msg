@@ -1,5 +1,9 @@
 bool updated  # to check if the values have been updated or not 
 
+
+#this message will go from log_management to PreflightCheck to know if bundling has to be done or not
+# this is done by comparing current time and (start, end time)   
+
 int32 start_hours   #start time begins
 int32 start_minutes
 int32 start_seconds
@@ -16,6 +20,10 @@ float64 lattitude1          #GPS begins geofence
 float64 longitude1
 float64 lattitude2         
 float64 longitude2
+
+
 float64 allowable_height     # maximum allowable attitude
 int32 home_altitude          #refference alitude(in meters)
+
+
 uint64 timestamp	    #time stamp

@@ -1,5 +1,16 @@
 #include "main_utility.hpp"
 #include <stdio.h>
+#include <assert.h>
+#include <nuttx/lib/lib.h>
+#include <nuttx/lib/xorshift128.h>
+#include <nuttx/semaphore.h>
+#include <nuttx/fs/fs.h>
+#include <nuttx/drivers/drivers.h>
+#include <sys/random.h> 
+#include <fcntl.h>
+#include <debug.h>
+#include <nuttx/random.h>
+#include <nuttx/crypto/blake2s.h>
 /* reverse an array, used for radix code */
 static void s_reverse(char *s, size_t len)
 {
@@ -3893,8 +3904,8 @@ LBL_ERR:
    if (MP_HAS(MP_REDUCE_IS_2K) && (dr == 0)) {
       dr = (mp_reduce_is_2k(P)) ? 2 : 0;
    }
-  // return s_mp_exptmod_fast(G, X, P, Y, dr);
-   return s_mp_exptmod(G, X, P, Y, 0);
+   return s_mp_exptmod_fast(G, X, P, Y, dr);
+   //return s_mp_exptmod(G, X, P, Y, 0);
    /* if the modulus is odd or dr != 0 use the montgomery method */
    if (MP_HAS(S_MP_EXPTMOD_FAST) && (mp_isodd(P) || (dr != 0))) {
       return s_mp_exptmod_fast(G, X, P, Y, dr);
@@ -5021,7 +5032,7 @@ static mp_err s_read_urandom(void *p, size_t n)
 {
    int fd;
    char *q = (char *)p;
-
+   
    do {
       fd = open(MP_DEV_URANDOM, O_RDONLY);
    } while ((fd == -1) && (errno == EINTR));
@@ -5041,10 +5052,14 @@ static mp_err s_read_urandom(void *p, size_t n)
    }
 
    close(fd);
+//   getrandom(p, n);
+
    return MP_OKAY;
 }
+////////////////////////////////
 
 
+////////////////////////////////////////////////
 //
 mp_err mp_rand(mp_int *a, int digits)
 {
@@ -5641,7 +5656,7 @@ mp_err mp_from_ubin(mp_int *a, const uint8_t *buf, size_t size)
 
 
 //function 1 (to generate prime)
-mp_err mp_prime_rand(mp_int *a, int t, int size, int flags)
+mp_err mp_prime_rand(mp_int *a, int t, int size, int flags,FILE *fptr)
 {
    uint8_t *tmp, maskAND, maskOR_msb, maskOR_lsb;
    int bsize, maskOR_msb_offset;
@@ -5688,7 +5703,7 @@ mp_err mp_prime_rand(mp_int *a, int t, int size, int flags)
    do {
       /* read the bytes */
       if ((err = s_read_urandom(tmp, (size_t)bsize)) != MP_OKAY) {
-        // printf("\nproblem lies in generating random number\n");
+         fprintf(fptr,"%s","\nproblem lies in generating random number\n");
          goto LBL_ERR;
       }
      // printf("\n%s\n",tmp);
@@ -5703,13 +5718,13 @@ mp_err mp_prime_rand(mp_int *a, int t, int size, int flags)
       /* read it in */
       /* TODO: casting only for now until all lengths have been changed to the type "size_t"*/
       if ((err = mp_from_ubin(a, tmp, (size_t)bsize)) != MP_OKAY) {
-        // printf("\nthe problem is in mp_from_ubin\n");
+         fprintf(fptr,"%s","\nthe problem is in mp_from_ubin\n");
          goto LBL_ERR;
       }
 
       /* is it prime? */
       if ((err = mp_prime_is_prime(a, t, &res)) != MP_OKAY) {
-        // printf("\nthe error is in mp_prime_is_prime function line 6603  %d\n",err);
+         fprintf(fptr,"%s","\nthe error is in mp_prime_is_prime function line 6603 \n");
          goto LBL_ERR;
       }
       if (!res) {
@@ -6251,158 +6266,120 @@ mp_clear(&Private_key);
 
 //////////
 
-
-
-
-
-
-
-
-
 // signs the content with signKey(a key) and puts the result inside result
-void signing_support(key signKey,char *content,char*result){
-    printf("\n\n%s\n\n",content);
-    char ch;
-    unsigned char *st=new unsigned char[3000];
-    unsigned int i_sha=0;
-    //// assigning char to unsigned char, this has to be done to implement sha256
-    int i_sha_a=0;
-    while(1){
+void signing_support(key *signKey,char *fptrN){
 
-	   ch=content[i_sha_a];
-      // printf("%c",ch);
-	   if(ch=='\0'){
-		   break;
-	   }
-       if(ch!='\n'){
-        *(st+i_sha)=ch;
-	//	printf("%c",*(st+i_sha));
-		i_sha++;}
-        i_sha_a++;
+   char HEX_format_Digest[70];
+   int index_count=0;
+   int err;
+   signed char ch;
+   FILE *fptr;
+   fptr=fopen(fptrN,"r");
+   while((ch=fgetc(fptr))!=EOF){
+      index_count=index_count+1;
+   }
+   fclose(fptr);
 
-    }
-    *(st+i_sha)='\0';
-    printf("ooooLLL\n\n%s\n\n",st);
+   fptr=fopen(fptrN,"r");
+   Sha256_implement(NULL,HEX_format_Digest,fptr,index_count);
+   fclose(fptr);
+   // modulus in public key
+   FILE *gh;
+   gh=fopen("/fs/microsd/debug_sign.txt","w");
 
-    SHA256 sha;
-
-	sha.update(st,i_sha);
-
-	uint8_t * digest = sha.digest();
-    //int it=0;//just an iterator
-
-    char HEX_format_Digest[65];
-
-    // code for making hex string
-    int hex_count=0;
-    for(int yui=0;yui<32;yui++){
-     //    printf("%d ",*(digest+yui)>>4||0x0f);
-         HEX_format_Digest[hex_count]=HEX_ele[*(digest+yui)>>4 & 0x0f];
-         hex_count++;
-         HEX_format_Digest[hex_count]=HEX_ele[*(digest+yui) & 0x0f];
-         hex_count++;
-      }
-   // delete[] digest;
-    //digest=NULL;
-    HEX_format_Digest[hex_count]='\0';
-static int pass=0;
-pass++;
-    printf("\nhere is the string %d:%s\n\n",pass,HEX_format_Digest);
-
-    //At this point we have got the string format for the digest
-
-
-    delete []st;
-    st=NULL;
-    ////////////////////
-
-    // modulus in public key
-
-    mp_int modulus;
-    mp_init(&modulus);
-    mp_read_radix(&modulus,signKey.modulus,10);
-
+   mp_int modulus;
+   
+   mp_init(&modulus);
+   
+   err=mp_read_radix(&modulus,signKey->modulus,10);
+    fprintf(gh,"status== %d",err);
+   
     //private key exponent
-    mp_int Private_key;
-    mp_init(&Private_key);
-    mp_read_radix(&Private_key,signKey.private_exponent,10);
-
+   
+   mp_int Private_key;
+   mp_init(&Private_key);
+   err=mp_read_radix(&Private_key,signKey->private_exponent,10);
+     // err=mp_read_radix(&Private_key,"65537",10);
+   
+   fprintf(gh,"status== %d\n",err);
    //making the signing process pkcs.1.15 compatible
-   char padding_SHA256[446]="1ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff003031300d060960864801650304020105000420";
+  // char padding_SHA256[546]="1ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff003031300d060960864801650304020105000420";
+   char padding_SHA256[546];
+   strcpy(padding_SHA256,"1ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff003031300d060960864801650304020105000420");
    strcat(padding_SHA256,HEX_format_Digest);
    //printf("\npadded sha digest :%s\n",padding_SHA256);
    mp_int hash_to_sign;
    mp_init(&hash_to_sign);
-   mp_read_radix(&hash_to_sign,padding_SHA256,16);
-   char aux_hash_ex[514];
+   err=mp_read_radix(&hash_to_sign,padding_SHA256,16);
+   fprintf(gh,"status== %d\n",err);
+  /* char aux_hash_ex[514];
    mp_to_hex(&hash_to_sign,aux_hash_ex,sizeof(aux_hash_ex));
-   printf("\n   hash to sign ===\n%s\n\n",aux_hash_ex);
+   printf("\n   hash to sign ===\n%s\n\n",aux_hash_ex);*/
 
    ////Signing begins
 
    mp_int cipher;
    mp_init(&cipher);
 
-   mp_exptmod(&hash_to_sign,&Private_key,&modulus,&cipher);
+   err=mp_exptmod(&hash_to_sign,&Private_key,&modulus,&cipher);
 
+   fprintf(gh,"status== %d\n",err);
    char cipher_string_hex[513];
-   mp_to_hex(&cipher,cipher_string_hex,sizeof(cipher_string_hex));
-   printf("\n%s\n",cipher_string_hex);//this is the encrypted message
-
-
-    base64Encoder(cipher_string_hex,strlen(cipher_string_hex),result);
-
-
-mp_clear(&hash_to_sign);
-mp_clear(&modulus);
-mp_clear(&cipher);
-mp_clear(&Private_key);
+   err=mp_to_hex(&cipher,cipher_string_hex,sizeof(cipher_string_hex));
+   fprintf(gh,"status== %d\n",err);
+   //printf("\n%s\n",cipher_string_hex);//this is the encrypted message
+   char result[400];//]=(char*) malloc(400*sizeof(char));
+   base64Encoder(cipher_string_hex,strlen(cipher_string_hex),result);
+fclose(gh);
+   fptr=fopen(fptrN,"a");
+ 
+  /* fprintf(fptr,"%d\n",index_count);
+     fprintf(fptr,"sha :%s\n",HEX_format_Digest);
+     fprintf(fptr,"sha :%s\n",cipher_string_hex);              for debug
+     fprintf(fptr,"sha :%s\n",padding_SHA256);
+     fprintf(fptr,"sha :%s\n",signKey->private_exponent);
+     fprintf(fptr,"sha :%s\n",signKey->modulus);*/
+   fprintf(fptr,"%s","<Sign>\n");
+   fprintf(fptr,"%s","<Signature=");
+   fprintf(fptr,"%s",result);
+   fprintf(fptr,"%s",">\n");
+   fprintf(fptr,"%s","</Sign>\0");
+   fclose(fptr);
+   mp_clear(&hash_to_sign);
+   mp_clear(&modulus);
+   mp_clear(&cipher);
+   mp_clear(&Private_key);
 
 }
 
-void pair_file_write(pair_set *ptr,int ptr_quant ,char *file_name , key Skey){
+void pair_file_write(pair_set *ptr,int ptr_quant ,char *file_name , key *Skey){
 
+   FILE *fptr;
+   fptr=fopen(file_name,"w");
+   char aux[100];
+   strcpy(aux,"<content>\n");
+   fprintf(fptr,"%s",aux);
+   memset(aux,0,sizeof(aux));
+   int i=0;
+   while(i<ptr_quant){
 
-    char content[6000];//=(char*) malloc(sizeof(char)*6000);
-    strcpy(content,"<content>\n");
-
-    int i=0;
-    while(i<ptr_quant){
-
-    strcat(content,"<");
-    strcat(content,ptr[i].tag);
-    strcat(content,"=");
-    strcat(content,ptr[i].value);
-    strcat(content,">\n");
-    i++;
-    }
-    strcat(content,"</content>\n");
-
-    strcat(content,"\0");
-
-    printf("\nINside pair_file_write %s \n",content);
-
+   strcpy(aux,"<");
+   strcat(aux,ptr[i].tag);
+   strcat(aux,"=");
+   strcat(aux,ptr[i].value);
+   strcat(aux,">\n");
+   fprintf(fptr,"%s",aux);
+   memset(aux,0,sizeof(aux));
+   i++;
+   }
+   fprintf(fptr,"%s","</content>\n\0");
+   fclose(fptr);
+  
+    
     // now signing takes place
-    char signature[2000];//=(char*) malloc(sizeof(char)*2000);
-    signing_support( Skey,content,signature);
-    content[int(strlen(content))-1]='\n';
-    strcat(content,"<Sign>\n");
-    strcat(content,"<Signature=");
-    strcat(content,signature);
-    strcat(content,">\n");
-    strcat(content,"</Sign>");
-    strcat(content,"\0");
-
-
-
-
-    ////////////////////
-
-    FILE *fptr1;
-    fptr1=fopen(file_name,"w");
-    fprintf(fptr1, "%s", content);
-    fclose(fptr1);
-    //free(content);
+  // char signature[2000];//=(char*) malloc(sizeof(char)*2000);
+   signing_support(Skey,file_name);
+   //free(content);
   //  free(signature);
 }
 
@@ -6586,15 +6563,15 @@ int Validating_File(char *file , key key, FILE *fptr_de){
     // base64 decoder
 
 
-   char hex[1000];//=(char*) malloc(sizeof(char)*(1000));
+   char hex[600];//=(char*) malloc(sizeof(char)*(1000));
 
    base64decoder(&signature[0],hex);
 
-   char decrypted_hex[1000];//=(char*) malloc(sizeof(char)*1000);
+   char decrypted_hex[600];//=(char*) malloc(sizeof(char)*1000);
 
- //  check_debug_mp(hex,decrypted_hex, &key);
+   check_debug_mp(hex,decrypted_hex, &key);
 
-   // printf("\n%s\n",hex);
+ /*  // printf("\n%s\n",hex);
    //mp_expmod function input 1)hex  output 1)useful_decrypted_hex
     mp_int HEX1;
     mp_init(&HEX1);
@@ -6610,10 +6587,10 @@ int Validating_File(char *file , key key, FILE *fptr_de){
     mp_init(&decrypted);
     mp_exptmod(&HEX1,&public_key,&modulus,&decrypted);
     mp_to_hex(&decrypted,decrypted_hex,sizeof(decrypted_hex));
-
+*/
     printf("\n%s\n",decrypted_hex);//this is the encrypted message
 
-    char useful_decrypted_hex[100];//=(char*) malloc(sizeof(char)*400);
+    char useful_decrypted_hex[70];//=(char*) malloc(sizeof(char)*400);
 
     int i=445;
     int i_counter=0;
@@ -6629,9 +6606,9 @@ int Validating_File(char *file , key key, FILE *fptr_de){
   //  free(decrypted_hex);
    // free(useful_decrypted_hex);
   // mp_clear(&HEX1);
-   //mp_clear(&modulus);
-   //mp_clear(&public_key);
-   //mp_clear(&decrypted);
+  // mp_clear(&modulus);
+  // mp_clear(&public_key);
+  // mp_clear(&decrypted);
 fprintf(fptr_de,"\n\nHEX format %s\n\n",HEX_format_Digest);
 fprintf(fptr_de,"\n\n from mp_exptmod  %s\n\n",useful_decrypted_hex);
    if (strcmp(useful_decrypted_hex,HEX_format_Digest)==0){
@@ -6647,96 +6624,33 @@ fprintf(fptr_de,"\n\n from mp_exptmod  %s\n\n",useful_decrypted_hex);
 
 
 
-int Validating_File(char *file , key key){
+int Validating_File(char *file , key *key){
 
-    char tag1[30]="</content>";
-    char tag2[30]="Signature";
-    printf("%s",tag2);
-    FILE *fptr;
-    fptr=fopen(file,"r");
-/*    signed char ch;
-    char file_content[3000];//=(char*) malloc(sizeof(char)*3000);
-    int i=0;
-
-    while((ch=fgetc(fptr))!=EOF)
-    {
-        file_content[i]=ch;
-        i++;
-    }
-
-    file_content[i]='\0';
-   fclose(fptr);*/
-
-    int index=isSubstring(tag1,NULL,fptr);
-    fclose(fptr);
-    fptr=fopen(file,"r");
-
-    index=index+int(strlen(tag1));
-
-
-/// sha256 implemenrtion begins input should be a file pointer(this only for custom made files, for pa, scenario is different
-//   second input should be  (index+1)
-//  output should be 64 long hash.
-    /*unsigned char *st=new unsigned char[2000];
-    unsigned int i_sha=0;
-    //// assigning char to unsigned char, this has to be done to implement sha256
-    int i_sha_a=0;
-    while(i_sha_a<index+1)
-    {
-
-	   ch=file_content[i_sha_a];
-      // printf("%c",ch);
-
-       if(ch!='\n'){
-        *(st+i_sha)=ch;
-	//	printf("%c",*(st+i_sha));
-		i_sha++;}
-        i_sha_a++;
-
-    }
-
-
-
-   SHA256 sha;
-
-	sha.update(st,i_sha);
-   delete [] st;
-   st=NULL;
-
-	uint8_t * digest = sha.digest();
-   // int it=0;//just an iterator
-
-    char HEX_format_Digest[65];
-
-    // code for making hex string
-    int hex_count=0;
-    for(int yui=0;yui<32;yui++)
-    {
-        // printf("%d ",*(digest+yui)>>4||0x0f);
-         HEX_format_Digest[hex_count]=HEX_ele[*(digest+yui)>>4 & 0x0f];
-         hex_count++;
-         HEX_format_Digest[hex_count]=HEX_ele[*(digest+yui) & 0x0f];
-         hex_count++;
-    }
-    HEX_format_Digest[hex_count]='\0';
-    */
-    char HEX_format_Digest[65];
-
-    Sha256_implement(NULL,HEX_format_Digest,fptr,index+1);// implemented using file pointer
-    fclose(fptr);
+   char tag1[30]="</content>";
+   char tag2[30]="Signature";
+  // printf("%s",tag2);
+   FILE *fptr;
+   fptr=fopen(file,"r");
+   int index=isSubstring(tag1,NULL,fptr);
+   fclose(fptr);
+   fptr=fopen(file,"r");
+   index=index+int(strlen(tag1));
+   char HEX_format_Digest[65];
+   Sha256_implement(NULL,HEX_format_Digest,fptr,index+1);// implemented using file pointer
+   fclose(fptr);
 
     
-    static int pass=0;
-    pass++;
-    printf("\nhere is the     string %d: %s\n\n",pass,HEX_format_Digest);
+   static int pass=0;
+   pass++;
+   printf("\nhere is the     string %d: %s\n\n",pass,HEX_format_Digest);
    // delete []st;
-    //st=NULL;
+   //st=NULL;
 
    char signature[500];//=(char*) malloc(sizeof(char)*500);
    fetch_tag(NULL,tag2,signature,file);
    
    // free(file_content);
-    printf("signature\n%s\n",signature);
+   printf("signature\n%s\n",signature);
     // base64 decoder
 
 
@@ -6750,42 +6664,37 @@ int Validating_File(char *file , key key){
 
    // printf("\n%s\n",hex);
    //mp_expmod function input 1)hex  output 1)useful_decrypted_hex
-    mp_int HEX1;
-    mp_init(&HEX1);
+   mp_int HEX1;
+   mp_init(&HEX1);
     //mp_read_radix(&HEX1,"6676CB59FC89868EB6F2EF269CEF076E265C963779DE44B9E2E234A3391043B10E7667892400753214A9B1FD51AB7F48A429BD6AE73B0EC894785CCE3E0EFD735C4BBD54D2B9F7709629BC6C5A635F1AF52BBEBA1352D876154EDFA8EF4F1C58D4EFF9ADAB3EB81AF329B35595BA94B98505B67EBB814963B71C35312CA2904BA56CC2A4DDBD53D161BB900A74B5CF647531476A343293895433F70A0A35E7110EC220299A9F685BF6A98685925C3DA603BFC11EE0BF6E2216F47873DEF58EDB0CFB4CAE158F70E60E6233B09542CAA1F21722CAC5F24A8C09E4A32AFD34B879C8CA68E0DBD4CBE65F30A793333D5983B006EB91CC5FD86549939D526EBB3CE6",16);
-    mp_read_radix(&HEX1,hex,16);
-    mp_int modulus;
-    mp_init(&modulus);
-    mp_read_radix(&modulus,key.modulus,10);
-    mp_int public_key;
-    mp_init(&public_key);
-    mp_read_radix(&public_key,"65537",10);
-    mp_int decrypted;
-    mp_init(&decrypted);
-    mp_exptmod(&HEX1,&public_key,&modulus,&decrypted);
-    mp_to_hex(&decrypted,decrypted_hex,sizeof(decrypted_hex));
+   mp_read_radix(&HEX1,hex,16);
+   mp_int modulus;
+   mp_init(&modulus);
+   mp_read_radix(&modulus,key->modulus,10);
+   mp_int public_key;
+   mp_init(&public_key);
+   mp_read_radix(&public_key,"65537",10);
+   mp_int decrypted;
+   mp_init(&decrypted);
+   mp_exptmod(&HEX1,&public_key,&modulus,&decrypted);
+   mp_to_hex(&decrypted,decrypted_hex,sizeof(decrypted_hex));
 
-    printf("\n%s\n",decrypted_hex);//this is the encrypted message
+   printf("\n%s\n",decrypted_hex);//this is the encrypted message
 
-    char useful_decrypted_hex[100];//=(char*) malloc(sizeof(char)*400);
+   char useful_decrypted_hex[100];//=(char*) malloc(sizeof(char)*400);
 
-    int i=445;
-    int i_counter=0;
-    while(i<int(strlen(decrypted_hex))){
-        useful_decrypted_hex[i_counter]=small_letter(decrypted_hex[i]);
-        i++;
-        i_counter++;
-    }
-    useful_decrypted_hex[i_counter]='\0';
-
-  //  printf("heloo\n\n%s\n\n %s\n\n",useful_decrypted_hex,HEX_format_Digest);
-
-  //  free(decrypted_hex);
-   // free(useful_decrypted_hex);
-  // mp_clear(&HEX1);
-   //mp_clear(&modulus);
-   //mp_clear(&public_key);
-   //mp_clear(&decrypted);
+   int i=445;
+   int i_counter=0;
+   while(i<int(strlen(decrypted_hex))){
+      useful_decrypted_hex[i_counter]=small_letter(decrypted_hex[i]);
+      i++;
+      i_counter++;
+     }
+   useful_decrypted_hex[i_counter]='\0';
+   mp_clear(&HEX1);
+   mp_clear(&modulus);
+   mp_clear(&public_key);
+   mp_clear(&decrypted);
 
    if (strcmp(useful_decrypted_hex,HEX_format_Digest)==0){
        return 1;// valid
@@ -6798,71 +6707,76 @@ int Validating_File(char *file , key key){
 }
 
 // this function is for encrypting files that has to be remained inside the RFM
-void encrypting_File(char *content, key key, char *fname)
+void encrypting_File( key *key, char *fname,char *input_fname)
 {
+   // fname is the files name where encrypted content will get copied
+   FILE *encrypt;
+   encrypt=fopen(fname,"w");
+   FILE *inputF;
+   inputF=fopen(input_fname,"r");
+
+   int i=0;
+   char buf[50];
+   int aux;
+   mp_int public_key,private_key,modulus,aux_int,aux_int_result;
+   mp_init_multi(&public_key,&private_key,&modulus,&aux_int,&aux_int_result,NULL);
+   mp_read_radix(&public_key,"65537",10);//
+   //mp_int ;
+   //mp_init(&private_key);
+   mp_read_radix(&private_key,key->private_exponent,10);//
+   //mp_int modulus;
+   //mp_init(&modulus);
+   mp_read_radix(&modulus,key->modulus,10);//
+
+   //char encrypted_content[30000];//=(char*) malloc(sizeof(char)*20000);
+   //mp_int aux_int;
+   //mp_init(&aux_int);
+   //mp_int aux_int_result;
+   //mp_init(&aux_int_result);
+   char snum[10];
+   signed char ch;
+   while((ch=fgetc(inputF))!=EOF){
+      //aux=int(content[i]);
+      aux=int(ch);
+      sprintf(snum, "%d",aux );
+      mp_read_radix(&aux_int, snum,10);
+   // printf("\n %c  %d \n",content[i],aux);
+      mp_exptmod(&aux_int,&private_key,&modulus,&aux_int_result);
+
+      mp_to_decimal(&aux_int_result,buf,sizeof(buf));
+   //  printf("\n modulus product==\n%s\n\n",buf);
+   //  break;
+
+      if(i==0){
+      fprintf(encrypt,"%s;",buf);
+      // strcpy(encrypted_content,buf);
+      //strcat(encrypted_content,";");
+      }else{
+         fprintf(encrypt,"%s;",buf);
+         //  strcat(encrypted_content,buf);
+         //strcat(encrypted_content,";");
+      }
 
 
-int i=0;
-char buf[50];
-int aux;
-mp_int public_key,private_key,modulus,aux_int,aux_int_result;
-mp_init_multi(&public_key,&private_key,&modulus,&aux_int,&aux_int_result,NULL);
-mp_read_radix(&public_key,"65537",10);//
-//mp_int ;
-//mp_init(&private_key);
-mp_read_radix(&private_key,key.private_exponent,10);//
-//mp_int modulus;
-//mp_init(&modulus);
-mp_read_radix(&modulus,key.modulus,10);//
 
-char encrypted_content[30000];//=(char*) malloc(sizeof(char)*20000);
-//mp_int aux_int;
-//mp_init(&aux_int);
-//mp_int aux_int_result;
-//mp_init(&aux_int_result);
-char snum[10];
-while(content[i]!='\0'){
-    aux=int(content[i]);
-    sprintf(snum, "%d",aux );
-    mp_read_radix(&aux_int, snum,10);
-  // printf("\n %c  %d \n",content[i],aux);
-    mp_exptmod(&aux_int,&private_key,&modulus,&aux_int_result);
-
-    mp_to_decimal(&aux_int_result,buf,sizeof(buf));
-  //  printf("\n modulus product==\n%s\n\n",buf);
-  //  break;
-
-    if(i==0){
-    strcpy(encrypted_content,buf);
-    strcat(encrypted_content,";");
-    }else{
-        strcat(encrypted_content,buf);
-        strcat(encrypted_content,";");
-    }
+      i=i+1;
 
 
+      }
+      //strcat(encrypted_content,"\0");
+      mp_clear_multi(&public_key,&private_key,&modulus,&aux_int,&aux_int_result,NULL);
 
-    i=i+1;
+      fclose(encrypt);
 
-
-}
-strcat(encrypted_content,"\0");
-mp_clear_multi(&public_key,&private_key,&modulus,&aux_int,&aux_int_result,NULL);
-FILE *fptr_encrypted;
-
-fptr_encrypted=fopen(fname,"w");
-fprintf(fptr_encrypted,"%s",encrypted_content);
-fclose(fptr_encrypted);
-
-//mp_clear(&aux_int_result);
-//mp_clear(&modulus);
-//mp_clear(&public_key);
-//mp_clear(&private_key);
+      //mp_clear(&aux_int_result);
+      //mp_clear(&modulus);
+      //mp_clear(&public_key);
+      //mp_clear(&private_key);
 
 }
 
 // this function is for decrypting files that has to be remained inside the RFM
-void decrypting_File(char *file , key key, char *result){
+void decrypting_File(char *file , key *key, char *result){
     FILE *fptr;
     fptr=fopen(file,"r");
 
@@ -6873,10 +6787,10 @@ void decrypting_File(char *file , key key, char *result){
     mp_read_radix(&public_key,"65537",10);//
     mp_int private_key;
     mp_init(&private_key);
-    mp_read_radix(&private_key,key.private_exponent,10);//
+    mp_read_radix(&private_key,key->private_exponent,10);//
     mp_int modulus;
     mp_init(&modulus);
-    mp_read_radix(&modulus,key.modulus,10);//
+    mp_read_radix(&modulus,key->modulus,10);//
     mp_int aux_int;
     mp_init(&aux_int);
     mp_int aux_int_result;
@@ -6941,18 +6855,29 @@ void fetch_tag(char *content, char *target, char *result, char *fptr){
       }
     result[i]='\0';
     }else{
+      
       FILE *fptr_yu;
+      
       fptr_yu=fopen("/fs/microsd/debug_fetch.txt","w");
+      
       FILE *f_aux;
+      
       f_aux=fopen(fptr,"r");
+
       index=isSubstring(TAG,NULL,f_aux);
+      
       fclose(f_aux);
+      
       f_aux=fopen(fptr,"r");
 
       index=index+int(strlen(TAG))+1;
+      
       fprintf(fptr_yu,"\n\n%d",index);
+      
       signed char ch;
+      
       int check_count=0;
+      
       while((ch=fgetc(f_aux))!=EOF){
          
          if(check_count>=index){
@@ -7013,92 +6938,106 @@ void DroneIDcreation( ){
 
  // RFM_public_key: needs to be fetched from PublicPrivateInuse.txt(which is kept encrypted)
  // inside the rfm, decrypted using decrypting key.
-    key RFM_private_key;
+    
+   key Inside_RFM;
+   get_RFM_Key(&Inside_RFM);
 
-    char aux_fname[100];
-    strcpy(aux_fname,dir);
-    char fname[60]="/log/PublicPrivateInuse.txt";//"./log/PublicPrivateInuse.txt";
-    strcat(aux_fname,fname);
-    memset(fname,0,sizeof(fname));
-    strcpy(fname,aux_fname);
+   char rfm_key0[30]="RFM_public_key_modulus";
+   char rfm_key1[30]="RFM_public_key_exponent";
 
-    key Inside_RFM;
-    strcpy(Inside_RFM.modulus,"180919775566931");
-    strcpy(Inside_RFM.private_exponent,"32102716896161");
-
-    char content[5000];//=(char*) malloc(sizeof(char)*5000);
-
-    decrypting_File(fname , Inside_RFM, content);
-   // printf("\n\nThe content of decrypted file is :\n\n%s\n",content);
-
-    char target0[30]="Modulus";
-    char target1[30]="PrivateKey";
-
-    char value_modulus[2000];//=(char*) malloc(sizeof(char)*2000);
-    char value_private[800];//=(char*) malloc(sizeof(char)*800);
-
-    //fetch_tag(content,target0,value_modulus,NULL);
-    fetch_tag(content,target0,value_modulus);
-    //fetch_tag(content,target1,value_private,NULL);
-    fetch_tag(content,target1,value_private);
-    strcpy(RFM_private_key.private_exponent,value_private);
-    strcpy(RFM_private_key.modulus,value_modulus);
-
-
-
-
-    //printf("vadd %s",value_modulus);
-   // free(content);
-
-    char rfm_key0[30]="RFM_public_key_modulus";
-    char rfm_key1[30]="RFM_public_key_exponent";
-
-
+   char fileName[40]="/fs/microsd/DroneID.txt";
 
  //    this value is just for writing into the file
-    char DigitalSky_public_key[1020]="MIIC8TCCAdmgAwIBAgIJAJRDnqfLydHvMA0GCSqGSIb3DQEBCwUAMA8xDTALBgNVBAMMBHRlc3QwHhcNMTkwMzI2MDcxMTQzWhcNMjkwMzIzMDcxMTQzWjAPMQ0wCwYDVQQDDAR0ZXN0MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq51cjR/mcgd0nWO33O3SM84yu3DRdaG8OMYSqzPixY5R+D8niOTVLZvOtaFROSneP1JmUAcaBn5sFhsFxgpJX8O6ee0m9PqLL+LKjexEs5dZ85IG8GqF+UJABaKfBeTPOgI5NAwoyZPBphzxsra1fH2OV2roaCf4ErMnYluuyey/VfFlHTVgC5+VX2wvO+o6pYUuzdNqCvgYwZrMEDCXm+08iZk/qpLgqgUCQTs8qGu/Y0d/EqwGmv9xN8tyxX+IbaeQM7uztN8PbMf8wY40OqdgNmgaVmMR4mfAO2XJiryR5Y8JACDGf3dhmcDrdtfmNjaHR109o2/wUPhSdWB/3QIDAQABo1AwTjAdBgNVHQ4EFgQUR4p2KJJXG5cZ8STI66RG6l2o7yowHwYDVR0jBBgwFoAUR4p2KJJXG5cZ8STI66RG6l2o7yowDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAV3uurlHMtyopefBpdGj59eLWCrpRYJLKbDtLFCj+tY1/uiwogUMNsEEHEBeEdwM+PIPuzWZ4tSYQ+SvdCCt4/6e9x+c2/1mZKhnRzL/s9o70RyWZXQO+Dz43B5aIIy/qARUhLxU2NVL42q90pInIh/ltT02IVkcibwDnsM4XJhsSyvQlRyYXdPzDeBjEOVYFpafLbC/7a5FBuNwfNKEMWhOj6AELnC8fWb3maNevhjSH5amGU2XrUp6yIdWUL2HuW7ReSer93Lg6iYujd/aaqk+pWE5bQsC+r2kHpNcpntHJLsd9E1cwzWCJiEM9zK4GXqKV/QDUdPC6FYfEf+ti9A==";
+   char DigitalSky_public_key[1020]="MIIC8TCCAdmgAwIBAgIJAJRDnqfLydHvMA0GCSqGSIb3DQEBCwUAMA8xDTALBgNVBAMMBHRlc3QwHhcNMTkwMzI2MDcxMTQzWhcNMjkwMzIzMDcxMTQzWjAPMQ0wCwYDVQQDDAR0ZXN0MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq51cjR/mcgd0nWO33O3SM84yu3DRdaG8OMYSqzPixY5R+D8niOTVLZvOtaFROSneP1JmUAcaBn5sFhsFxgpJX8O6ee0m9PqLL+LKjexEs5dZ85IG8GqF+UJABaKfBeTPOgI5NAwoyZPBphzxsra1fH2OV2roaCf4ErMnYluuyey/VfFlHTVgC5+VX2wvO+o6pYUuzdNqCvgYwZrMEDCXm+08iZk/qpLgqgUCQTs8qGu/Y0d/EqwGmv9xN8tyxX+IbaeQM7uztN8PbMf8wY40OqdgNmgaVmMR4mfAO2XJiryR5Y8JACDGf3dhmcDrdtfmNjaHR109o2/wUPhSdWB/3QIDAQABo1AwTjAdBgNVHQ4EFgQUR4p2KJJXG5cZ8STI66RG6l2o7yowHwYDVR0jBBgwFoAUR4p2KJJXG5cZ8STI66RG6l2o7yowDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAV3uurlHMtyopefBpdGj59eLWCrpRYJLKbDtLFCj+tY1/uiwogUMNsEEHEBeEdwM+PIPuzWZ4tSYQ+SvdCCt4/6e9x+c2/1mZKhnRzL/s9o70RyWZXQO+Dz43B5aIIy/qARUhLxU2NVL42q90pInIh/ltT02IVkcibwDnsM4XJhsSyvQlRyYXdPzDeBjEOVYFpafLbC/7a5FBuNwfNKEMWhOj6AELnC8fWb3maNevhjSH5amGU2XrUp6yIdWUL2HuW7ReSer93Lg6iYujd/aaqk+pWE5bQsC+r2kHpNcpntHJLsd9E1cwzWCJiEM9zK4GXqKV/QDUdPC6FYfEf+ti9A==";
 
-    char Firmware_version[4]="1.0";
-
-    pair_set pairset[7];
-
-    strcpy(pairset[0].tag,"DroneID");
-    strcpy(pairset[0].value,DroneID);
+   char Firmware_version[4]="1.0";
+   
+   FILE *fptr;
+   fptr=fopen(fileName,"w");
 
 
-    strcpy(pairset[1].tag,"RFM_version");
-    strcpy(pairset[1].value,RFM_version);
+   fprintf(fptr,"%s","<content>\n");
 
-    strcpy(pairset[2].tag,"RPAS_category");
-    strcpy(pairset[2].value,RPAS_category);
+   //pair_set pairset[7];
 
-    strcpy(pairset[3].tag,"Firmware_version");
-    strcpy(pairset[3].value,Firmware_version);
-
-    strcpy(pairset[4].tag,"DigitalSky_public_key");
-    strcpy(pairset[4].value,DigitalSky_public_key);
-
-    strcpy(pairset[5].tag,rfm_key0);
-    strcpy(pairset[5].value,value_modulus);
-
-    strcpy(pairset[6].tag,rfm_key1);
-    strcpy(pairset[6].value,"65537");
-
-    char fileName[100]="/log/DroneID.txt";
-
-      //char aux_fname[100];
-      strcpy(aux_fname,dir);
-      strcat(aux_fname,fileName);
-      memset(fileName,0,sizeof(fileName));
-      strcpy(fileName,aux_fname);
+  /* strcpy(pairset[0].tag,"DroneID");
+   strcpy(pairset[0].value,DroneID);
 
 
+   strcpy(pairset[1].tag,"RFM_version");
+   strcpy(pairset[1].value,RFM_version);
 
+   strcpy(pairset[2].tag,"RPAS_category");
+   strcpy(pairset[2].value,RPAS_category);
+
+   strcpy(pairset[3].tag,"Firmware_version");
+   strcpy(pairset[3].value,Firmware_version);
+
+   strcpy(pairset[4].tag,"DigitalSky_public_key");
+   strcpy(pairset[4].value,DigitalSky_public_key);
+
+   strcpy(pairset[5].tag,rfm_key0);
+   strcpy(pairset[5].value,Inside_RFM.modulus);
+
+   strcpy(pairset[6].tag,rfm_key1);
+   strcpy(pairset[6].value,"65537");*/
+
+
+   fprintf(fptr,"%s","<");
+   fprintf(fptr,"%s","DroneID");
+   fprintf(fptr,"%s","=");
+   fprintf(fptr,"%s",DroneID);
+   fprintf(fptr,"%s",">\n");
+
+   fprintf(fptr,"%s","<");
+   fprintf(fptr,"%s","RFM_version");
+   fprintf(fptr,"%s","=");
+   fprintf(fptr,"%s",RFM_version);
+   fprintf(fptr,"%s",">\n");
+
+   fprintf(fptr,"%s","<");
+   fprintf(fptr,"%s","RPAS_category");
+   fprintf(fptr,"%s","=");
+   fprintf(fptr,"%s",RPAS_category);
+   fprintf(fptr,"%s",">\n");
+
+   fprintf(fptr,"%s","<");
+   fprintf(fptr,"%s","Firmware_version");
+   fprintf(fptr,"%s","=");
+   fprintf(fptr,"%s",Firmware_version);
+   fprintf(fptr,"%s",">\n");
+
+   fprintf(fptr,"%s","<");
+   fprintf(fptr,"%s","DigitalSky_public_key");
+   fprintf(fptr,"%s","=");
+   fprintf(fptr,"%s",DigitalSky_public_key);
+   fprintf(fptr,"%s",">\n");
+
+
+   fprintf(fptr,"%s","<");
+   fprintf(fptr,"%s",rfm_key0);
+   fprintf(fptr,"%s","=");
+   fprintf(fptr,"%s",Inside_RFM.modulus);
+   fprintf(fptr,"%s",">\n");
+
+
+
+
+   fprintf(fptr,"%s","<");
+   fprintf(fptr,"%s",rfm_key1);
+   fprintf(fptr,"%s","=");
+   fprintf(fptr,"%s","65537");
+   fprintf(fptr,"%s",">\n");
+   fprintf(fptr,"%s","</content>\n\0");
+
+   fclose(fptr);
+
+
+   signing_support(&Inside_RFM,fileName);
+ 
   //  free(value_modulus);
 
-    pair_file_write(pairset,7,fileName,RFM_private_key);
-
-
+ //  pair_file_write(pairset,5,fileName,&Inside_RFM);
 
 
 
@@ -7126,26 +7065,7 @@ void HardwareInuseCreation(int gps){
 
 
     key Inside_RFM;
-    strcpy(Inside_RFM.modulus,"180919775566931");
-    strcpy(Inside_RFM.private_exponent,"32102716896161");
-
-    char content[5000];//=(char*) malloc(sizeof(char)*5000);
-
-    decrypting_File(fname , Inside_RFM, content);
-    //printf("\n\nThe content of decrypted file is :\n\n%s\n",content);
-
-    char target0[30]="Modulus";
-    char target1[30]="PrivateKey";
-
-    char value_modulus[2000];//=(char*) malloc(sizeof(char)*2000);
-    char value_private[800];//=(char*) malloc(sizeof(char)*800);
-
-   // fetch_tag(content,target0,value_modulus,NULL);
-    fetch_tag(content,target0,value_modulus);
-   // fetch_tag(content,target1,value_private,NULL);
-    fetch_tag(content,target1,value_private);
-    strcpy(RFM_private_key.private_exponent,value_private);
-    strcpy(RFM_private_key.modulus,value_modulus);
+    get_RFM_Key(&Inside_RFM);
    /// RFM private key fetched
 
 
@@ -7187,7 +7107,7 @@ void HardwareInuseCreation(int gps){
 
    // free(value_modulus);
 
-    pair_file_write(pairset,4,fileName,RFM_private_key);
+    pair_file_write(pairset,4,fileName,&RFM_private_key);
 }
 
 
@@ -7195,19 +7115,14 @@ void HardwareInuseCreation(int gps){
 void get_RFM_Key(key *key1){
     char fname[100]="/fs/microsd/log/PublicPrivateInuse.txt";
 
-    /*char aux_fname[100];
-    strcpy(aux_fname,dir);
-    strcat(aux_fname,fname);
-    memset(fname,0,sizeof(fname));
-    strcpy(fname,aux_fname);*/
-
+   
     key Inside_RFM;
     strcpy(Inside_RFM.modulus,"180919775566931");
     strcpy(Inside_RFM.private_exponent,"32102716896161");
 
-    char content[2000];//=(char*) malloc(sizeof(char)*5000);
+    char *content=(char*) malloc(sizeof(char)*2000);
 
-    decrypting_File(fname , Inside_RFM, content);
+    decrypting_File(fname , &Inside_RFM, content);
    // printf("\n\nThe content of decrypted file is :\n\n%s\n",content);
 
     char target0[30]="Modulus";
@@ -7222,6 +7137,7 @@ void get_RFM_Key(key *key1){
     fetch_tag(content,target1,key1->private_exponent);
    // strcpy(key1->private_exponent,value_private);
     //strcpy(key1->modulus,value_modulus);
+    free(content);
 
 }
 
@@ -7232,9 +7148,8 @@ int file_read(char *fname,char *tag,char *result,int file_type){
     //if 1 : file is genuine
     //if 0 : file is not genuine
     // if 2: file is not present
-    key *RFM_key;
-    key RFM_KEY;
-    RFM_key=&RFM_KEY;
+    key Key;
+  
 
     FILE *checking_presence;
     checking_presence=fopen(fname,"r");
@@ -7243,16 +7158,17 @@ int file_read(char *fname,char *tag,char *result,int file_type){
     }
     fclose(checking_presence);
 
-    get_RFM_Key(RFM_key);
+    
 
     //file_type 0,1
     //0 = this is for file needing RFM key pair to get validated
     //1= this for file needing FMP key pair to get validated
     if (file_type==0){
+        get_RFM_Key(&Key);
         // RFM key pair needed to validate
-        int validation_stats=Validating_File(fname,RFM_KEY);
+        int validation_stats=Validating_File(fname,&Key);
         if (validation_stats==1){
-            FILE *fptr;
+            /*FILE *fptr;
             signed char ch;
             fptr=fopen(fname,"r");
             char *content=(char*) malloc(sizeof(char)*3000);
@@ -7262,10 +7178,11 @@ int file_read(char *fname,char *tag,char *result,int file_type){
                 i++;
             }
             content[i]='\0';
-            fclose(fptr);
+            fclose(fptr);*/
             // Now fetch the tag value
-            fetch_tag(content,tag,result);
-            free(content);
+         //   fetch_tag(content,tag,result);
+            fetch_tag(NULL, tag,result, fname);
+          //  free(content);
             return 1;
         }
         else{
@@ -7277,12 +7194,12 @@ int file_read(char *fname,char *tag,char *result,int file_type){
 
     else{
         //FMP_key defined here
-        key FMP_key;
-        strcpy(FMP_key.modulus,"26730675313584941186560749178137844398391258151106035922104564996357015594451047759599219270560135549941477603738118115764757775734508251718265058999430985835716076462248377819064664881403774398289832625702128624297432579628718638031709818597981265137629684514491781630727683626461964227525538709626953674033997874387729484132040534464656945770393501502839625253132645954405219070308408708085422661840555555025926057125687490593846474404214169083806088065122913843606434120163765097852620800693096123077396800135201599717234897499796697020907623367339541602816939734869450634288165688491010942289888232437040231818827");
-        strcpy(FMP_key.private_exponent,"9531141503697955439637938672730292016747896920442587354131856429724746943118117766243718142643838557319261617775490854466802870185757493113087536791411008697514583743073684985212980285161716284529911482024006922693782207314400981636708958923930393575173268043008437266686673344571206800262703336536043051327018493439267232775893284980747319937113655022770270510978884647411012877253041625079190653496682971178532563034737589582352362760267741512014615969164270535601279273456871641667043609413678452331175640797803872310658739384463477457294633079275692433997764390282891429002147156439862257036670607929361882536897");
-        int validation_stats=Validating_File(fname,FMP_key);
+       // key FMP_key;
+        strcpy(Key.modulus,"26730675313584941186560749178137844398391258151106035922104564996357015594451047759599219270560135549941477603738118115764757775734508251718265058999430985835716076462248377819064664881403774398289832625702128624297432579628718638031709818597981265137629684514491781630727683626461964227525538709626953674033997874387729484132040534464656945770393501502839625253132645954405219070308408708085422661840555555025926057125687490593846474404214169083806088065122913843606434120163765097852620800693096123077396800135201599717234897499796697020907623367339541602816939734869450634288165688491010942289888232437040231818827");
+        strcpy(Key.private_exponent,"9531141503697955439637938672730292016747896920442587354131856429724746943118117766243718142643838557319261617775490854466802870185757493113087536791411008697514583743073684985212980285161716284529911482024006922693782207314400981636708958923930393575173268043008437266686673344571206800262703336536043051327018493439267232775893284980747319937113655022770270510978884647411012877253041625079190653496682971178532563034737589582352362760267741512014615969164270535601279273456871641667043609413678452331175640797803872310658739384463477457294633079275692433997764390282891429002147156439862257036670607929361882536897");
+        int validation_stats=Validating_File(fname,&Key);
          if (validation_stats==1){
-            FILE *fptr;
+            /*FILE *fptr;
             signed char ch;
             fptr=fopen(fname,"r");
             char *content=(char*) malloc(sizeof(char)*3000);
@@ -7292,10 +7209,11 @@ int file_read(char *fname,char *tag,char *result,int file_type){
                 i++;
             }
             content[i]='\0';
-            fclose(fptr);
+            fclose(fptr);*/
             // Now fetch the tag value
-            fetch_tag(content,tag,result);
-            free(content);
+           // fetch_tag(content,tag,result);
+            fetch_tag(NULL, tag,result, fname);
+            //free(content);
             return 1;
         }
         else{
@@ -7309,146 +7227,112 @@ int file_read(char *fname,char *tag,char *result,int file_type){
 
 //amendment in KeyLog.txt with fileID of a file
 void KeyLog_Regen(char *fileID){
-    FILE *fptr;
-
-    char fileName[100]="/log/KeyLog.txt";
-
-    char aux_fname[100];
-    strcpy(aux_fname,dir);
-    strcat(aux_fname,fileName);
-    memset(fileName,0,sizeof(fileName));
-    strcpy(fileName,aux_fname);
-
-    fptr = fopen(fileName,"r");
-    signed char ch;
-    char *content=(char*) malloc(sizeof(char)*3000);
-    int i=0;
-    while((ch=fgetc(fptr))!=EOF){
-        content[i]=ch;
-        i++;
+   
+   char fileName[35]="/fs/microsd/KeyLog.txt";
+   FILE *fp;
+   fp = fopen(fileName,"r");
+    if(fp==NULL){
+        printf("file not opening\n");
     }
-    content[i]='\0';
-    printf("\n\n%s\n\n",content);
-    char Number_Keyrotation[4];
-    char tag_changes[20]="No_Changes";
-    char tag_changes1[20]="<No_Changes=";
-    fetch_tag(content,tag_changes,Number_Keyrotation);
+    fclose(fp);
+   char Number_Keyrotation[4];
+   char tag_changes[20]="No_Changes";
+   char tag_changes1[20]="<No_Changes=";
+    printf("file not opening\n");
+   fetch_tag(NULL,tag_changes,Number_Keyrotation,fileName);
+    printf("file not opening\n");
+   int change_aux=atoi(Number_Keyrotation);
+    //printf("\n%d\n",change_aux);
+   int buff_count_fileIDS=change_aux;
+   change_aux++;// this is the number of new lines and file ids.
 
-    int change_aux=atoi(Number_Keyrotation);
-    printf("\n%d\n",change_aux);
-    change_aux++;
+   char changeAux[3];
+   sprintf(changeAux,"%hu",(unsigned short)change_aux);////change1
+   FILE *fptr;
+   fptr=fopen(fileName,"r");
 
-    char changeAux[3];
-    sprintf(changeAux,"%hu",(unsigned short)change_aux);////change1
-    printf("\n\n%s\n\n",changeAux);
-    // number of new lines char
-    int index= isSubstring(tag_changes1,content);
-    printf("\n\n\n%d\n\n\n",index);
-    char* content2=(char*) malloc(3000*sizeof(char));
+   int index=isSubstring(tag_changes1,NULL,fptr);
+   fclose(fptr);
 
-    int i_count=0;
-    while(i_count<index+int(strlen(tag_changes1)))
-    {
-        content2[i_count]=content[i_count];
-        i_count++;
+   index=index+int(strlen(tag_changes1));
+
+   fptr=fopen(fileName,"r");
+   signed char ch;
+   int count=0;// this is the character count
+   int newline_count=0;
+  // char **aux_fileIDS=(char**)  malloc(sizeof(char*)*change_aux);
+   int startFetch=0;
+   char aux_fileIDs[10][10];
+   int  aux_i=0;
+   while((ch=fgetc(fptr))!=EOF)
+   {  
+      if(count>index){
+
+         if(ch=='\n'){
+            newline_count++;
+            if(newline_count>buff_count_fileIDS){
+               break;
+            }else{
+               continue;
+            }
+         }
+         if(newline_count>=1)
+         {
+
+               if(ch=='<'){
+                     // start fetching file ID
+                     startFetch=1;
+                     continue;
+               }
+
+               if(ch=='>'){
+                  startFetch=0;
+               }
+
+               if(startFetch==1){
+                  aux_fileIDs[newline_count-1][aux_i]=ch;
+                  aux_i++;
+               }
+               if(startFetch==0){
+                  aux_fileIDs[newline_count-1][aux_i]='\0';
+                   aux_i=0;
+               }
+
+         }
+        
+
+
+      }
+      count++;
+
+   }
+   fclose(fptr);
+
+   FILE *fptr1;
+   fptr1=fopen(fileName,"w");
+   fprintf(fptr1,"%s","<content>\n<DroneID=ABBDDJEDNDJK>\n<RFM_version=0>\n<RPAS_category=Small>\n");
+   // type number of changes with value
+    fprintf(fptr1,"%s",tag_changes1);
+    fprintf(fptr1,"%d",change_aux);
+    fprintf(fptr1,"%s",">\n");
+    for(int k=0;k<change_aux-1;k++){
+      fprintf(fptr1,"%s","<");
+      fprintf(fptr1,"%s",aux_fileIDs[k]);
+      fprintf(fptr1,"%s",">\n");
     }
-    int i_count_separate=i_count;
+     fprintf(fptr1,"%s","<");
+      fprintf(fptr1,"%s",fileID);
+      fprintf(fptr1,"%s",">\n");
+      fprintf(fptr1,"%s","</content>\n");
+      fclose(fptr1);
+   // write using loop fetching from buff
 
-
-    strcat(content2,changeAux);
-
-    i_count_separate=i_count_separate+int(strlen(changeAux));
-    while(1){
-        if(content[i_count]!='>'){
-            printf("\n\nsign :%c\n\n",content[i_count]);
-        i_count++;}
-        else{
-            break;
-        }
-    }
-
-    content2[i_count_separate]=content[i_count];
-    i_count++;
-    i_count_separate++;
-    content2[i_count_separate]=content[i_count];
-    i_count++;
-    i_count_separate++;
-   // content2[i_count_separate]=content[i_count];
-   //     i_count++;
-    //    i_count_separate++;
-    int new_line_count=0;
-    while(1){
-        if(content[i_count]=='\n'){
-            new_line_count++;
-        }
-        if(new_line_count>=(change_aux-1)){
-            break;
-        }
-        content2[i_count_separate]=content[i_count];
-        i_count++;
-        i_count_separate++;
-    }
-    free(content);
-    if((change_aux-1)==0){
-    printf("\n\n\n%s\n\n\n",content2);
-    strcat(content2,"<");
-    strcat(content2,fileID);
-    strcat(content2,">\n");
-    strcat(content2,"</content>\0");
-    printf("\n\n\n%s\n\n\n",content2);}
-    else{
-        printf("\n\n\n%s\n\n\n",content2);
-    strcat(content2,"\n<");
-    strcat(content2,fileID);
-    strcat(content2,">\n");
-    strcat(content2,"</content>\0");
-    printf("\n\n\n%s\n\n\n",content2);
-
-    }
-
-    char *signature=(char*) malloc(sizeof(char)*3000);
-    key RFM_key;
-   // char dd[]="1ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff003031300d060960864801650304020105000420";
-  //  strcpy(RFM_key.modulus,"26495127767604337655831691918113833077956334480395285962585476150242592943334533493300410596845191511956515492348526447864429111984398076478393159921716146324008099192785429713391158778980470576914436564260777828713503499078118282954851831718742193757807790192236071369965695862117529898068098551948463482032984966019192036825055149445334134853954472696975028748893285534653718791714099153590644093991103487859923770318942338310035808291238607889065040628342091199251953687656515817829870399170890472577591915379199888970387732102895345522222635522973211224211091186930411354449072698100145010326153546937615803429429");
-  //  strcpy(RFM_key.private_exponent,"24021354375322558781058142276736617999389802434596138079632937453577588041977071136990155131350955784632074057774459381406055342415566243621056270140966629267130220147961070276489248399064064585487617556117107847879807603464052857723291974564966716033712609329726458163489658005940146657360121454440603066594695330718634482791509166056105316975123379501455703860598165895993179884232993174716442550760635024519308123321406513256918808853580242186763289628649427009957647963922327454796638500088631677702805825426368000585849292006901367973110968487920147218164610608698409129440488923014780703396073978252084600942649");
-    get_RFM_Key(&RFM_key);
-    signing_support(RFM_key,content2,signature);
-    //content2[int(strlen(content2))-1]='\n';
-    strcat(content2,"\n<Sign>\n");
-    strcat(content2,"<Signature=");
-    strcat(content2,signature);
-    strcat(content2,">\n");
-    strcat(content2,"</Sign>");
-    strcat(content2,"\0");
-
-    fclose(fptr);
-
-   char fileName1[100]="/log/KeyLog.txt";
-    //char aux_fname[100];
-    strcpy(aux_fname,dir);
-    strcat(aux_fname,fileName1);
-    memset(fileName1,0,sizeof(fileName));
-    strcpy(fileName1,aux_fname);
-    remove(fileName1);
-
-    printf("\n\n%s\n\n",content2);
-    char aux_copy[3000];
-    strcpy(aux_copy,content2);
-    free(content2);
-    FILE *fptr2;
-
-    char filename2[100]="/log/KeyLog.txt";
-    strcpy(aux_fname,dir);
-    strcat(aux_fname,filename2);
-    memset(filename2,0,sizeof(filename2));
-    strcpy(filename2,aux_fname);
-
-    fptr2=fopen(filename2,"w");
-    fprintf(fptr2,"%s",aux_copy);
-
-    fclose(fptr2);
-
-
+   // close with content
+   fclose(fptr1);
+  key KEY;
+  get_RFM_Key(&KEY);
+   // sign it using signing support.
+   signing_support(&KEY,fileName);
 
 
 }
@@ -7660,24 +7544,20 @@ return : 3 :: invalid recentPA.txt file, someone is trying to hack
 
 retunr
 */
-int check_recentPA(char *paID){
-    char filename[100]="/log/recentPA.txt";
+int check_recentPA(){
+    char filename[30]="/fs/microsd/recentPA.txt";
 
-    char aux_fname[100];
-    strcpy(aux_fname,dir);
-    strcat(aux_fname,filename);
-    memset(filename,0,sizeof(filename));
-    strcpy(filename,aux_fname);
 
     key RFM_key;
     get_RFM_Key(&RFM_key);
-    int valid_status= Validating_File(filename , RFM_key);
+    int valid_status= Validating_File(filename , &RFM_key);
+
     if(valid_status!=1){
         //file is not valid
         return 3;
     }
     // file is valid and can be further used
-    FILE *fptr;
+    /*FILE *fptr;
     fptr=fopen(filename,"r");
     int i=0;
     signed char aux;
@@ -7687,7 +7567,8 @@ int check_recentPA(char *paID){
         i++;
     }
     content[i]='\0';
-    fclose(fptr);
+    fclose(fptr);*/
+    /* doing in time check in preflight_check.cpp
     //tags to be fetched are:
     //1) start time and end time
     //2) allowable frequency
@@ -7709,19 +7590,33 @@ int check_recentPA(char *paID){
     if(check_status!=1){
          // not in time :: start bundling
         return 0;
-    }
+    }*/
     // at this point it is sure that current time is in limits
 
     // now check for frequency
     // two frequencies need to be fetched :1) allowable 2)done_flights
+
+
+    char bundle_tag[25]="bundling_required";
+    char bundle_req[4];
+
+    fetch_tag(NULL,bundle_tag,bundle_req,filename);
+      int aux = strtol(bundle_req,NULL,10);
+      if(aux==1){
+         // fetching is required
+         return 0;
+      }
+    
+
+
     char allow_frequency_tag[50]="allowable_frequency";
     char done_frequency_tag[50]="done_frequency";
 
     char allow_freq_content[60];
     char done_freq_content[60];
 
-    fetch_tag(content,allow_frequency_tag,allow_freq_content);
-    fetch_tag(content,done_frequency_tag,done_freq_content);
+    fetch_tag(NULL,allow_frequency_tag,allow_freq_content,filename);
+    fetch_tag(NULL,done_frequency_tag,done_freq_content,filename);
 
     if(strcmp(allow_freq_content,done_freq_content)==0){
         return 1;
@@ -7738,121 +7633,101 @@ int check_recentPA(char *paID){
 
 ////////////////////////////  PA_EXTRACT.cpp
 
-ParsedData parse_artifact()
+void parse_artifact(char *xmlExeclusive,ParsedData *result)
 {
+   char file_name[100]="/fs/microsd/log/permission_artifact_breach.xml"; // read mode
+ 
+
+   char  start_time[70];
+   char end_time[70];//,long_lat_coords[20][20];
+
+   char tag_flight_start[100]="flightStartTime=";
+
+   char tag_flight_end[100]="flightEndTime=";
+   printf("\ncanon part %s\n",xmlExeclusive);
+   int index_start_flight=isSubstring(tag_flight_start,xmlExeclusive);
+   printf("\nindex start %d\n",index_start_flight);
+   index_start_flight=index_start_flight+int(strlen(tag_flight_start))+1;
+   printf("\nstart char %c\n",xmlExeclusive[index_start_flight]);
+   int aux_fetch1=0;
+
+   while(xmlExeclusive[index_start_flight]!='\"')
+   {
+
+      start_time[aux_fetch1]=xmlExeclusive[index_start_flight];
+      index_start_flight++;
+      aux_fetch1++;
+
+   }
+   start_time[aux_fetch1]='\0';
+   printf("\n\nstart time is :%s\n\n",start_time);
 
 
-    ParsedData result{};
-
-    char file_name[100]="/log/permission_artifact_breach.xml"; // read mode
-    char aux_fname[100];
-    strcpy(aux_fname,dir);
-    strcat(aux_fname,file_name);
-    memset(file_name,0,sizeof(file_name));
-    strcpy(file_name,aux_fname);
-
-    char  start_time[200], end_time[200];//,long_lat_coords[20][20];
-
-    char Reference_canonilized[5000];// variable to hold canonicalized reference section
-
-    char xmlExeclusive[5000];
-    char outputih[5000];
-        // This function will extract the reference section out of the xml file (PA)
-	    //and willl perform canonicalization step over it
-    Reference_canon(file_name,Reference_canonilized);
-    xmlExeclusiveCanon(Reference_canonilized,outputih);
-    cleanerXML(outputih,xmlExeclusive);
-
-    char tag_flight_start[100]="flightStartTime=";
-
-    char tag_flight_end[100]="flightEndTime=";
-    printf("\ncanon part %s\n",xmlExeclusive);
-    int index_start_flight=isSubstring(tag_flight_start,xmlExeclusive);
-    printf("\nindex start %d\n",index_start_flight);
-    index_start_flight=index_start_flight+int(strlen(tag_flight_start))+1;
-    printf("\nstart char %c\n",xmlExeclusive[index_start_flight]);
-    int aux_fetch1=0;
-    while(xmlExeclusive[index_start_flight]!='\"'){
+   int index_end_flight=isSubstring(tag_flight_end,xmlExeclusive);
+   printf("\nindex start %d\n",index_end_flight);
+   index_end_flight=index_end_flight+int(strlen(tag_flight_end))+1;
+   aux_fetch1=0;
+   while(xmlExeclusive[index_end_flight]!='\"'){
+      
+      end_time[aux_fetch1]=xmlExeclusive[index_end_flight];
+      aux_fetch1++;
+      index_end_flight++;
+   }
+   end_time[aux_fetch1]='\0';
+   printf("\n\nend time is :%s\n\n",end_time);
 
 
-        start_time[aux_fetch1]=xmlExeclusive[index_start_flight];
-        index_start_flight++;
-        aux_fetch1++;
+   strcpy(result->start_time,start_time);
+   printf("\nstart time inside parseartifact:%s\n",start_time);
+   strcpy(result->end_time , end_time);
 
-    }
-    start_time[aux_fetch1]='\0';
-    printf("\n\nstart time is :%s\n\n",start_time);
+   char tag_coordinates[60]="<Coordinates>";
 
+   char tag_coordinates_end[60]="</Coordinates>";
 
-    int index_end_flight=isSubstring(tag_flight_end,xmlExeclusive);
-       printf("\nindex start %d\n",index_end_flight);
-    index_end_flight=index_end_flight+int(strlen(tag_flight_end))+1;
-    aux_fetch1=0;
-    while(xmlExeclusive[index_end_flight]!='\"'){
+   int index_coordinates_start=isSubstring(tag_coordinates,xmlExeclusive);
 
+   int index_coordinates_end=isSubstring(tag_coordinates_end,xmlExeclusive);
 
-        end_time[aux_fetch1]=xmlExeclusive[index_end_flight];
-        aux_fetch1++;
-        index_end_flight++;
-    }
-    end_time[aux_fetch1]='\0';
-    printf("\n\nend time is :%s\n\n",end_time);
+   index_coordinates_start=index_coordinates_start+int(strlen(tag_coordinates));
 
+   int co_ind= index_coordinates_start;
+   tag_value geo_coordinate[10];
+   int number_of_tags=0;
+   int start1=0;
+   int start2=0;
+   int end1=0;
+   int end2=0;
+   char aux_tag[100];
+   char aux_value[100];
+   printf("\nhelllloooo\n");
+   while(co_ind<index_coordinates_end){
 
-    strcpy(result.start_time,start_time);
-    printf("\nstart time inside parseartifact:%s\n",start_time);
-    strcpy(result.end_time , end_time);
+      if(xmlExeclusive[co_ind]==' ')
+      {
+         //space arrived
+         while(xmlExeclusive[co_ind]!='>')
+         {
+               start1=co_ind+1;
+               while(xmlExeclusive[co_ind]!='='){
+                  co_ind++;
+               }
+               end1=co_ind-1;
+               start2=co_ind+2;
+               co_ind=co_ind+2;
+               while(xmlExeclusive[co_ind]!='\"'){
+                  co_ind++;
+               }
+               end2=co_ind-1;
+               co_ind++;
 
-    char tag_coordinates[60]="<Coordinates>";
-
-    char tag_coordinates_end[60]="</Coordinates>";
-
-    int index_coordinates_start=isSubstring(tag_coordinates,xmlExeclusive);
-
-    int index_coordinates_end=isSubstring(tag_coordinates_end,xmlExeclusive);
-
-    index_coordinates_start=index_coordinates_start+int(strlen(tag_coordinates));
-
-    int co_ind= index_coordinates_start;
-    tag_value geo_coordinate[10];
-    int number_of_tags=0;
-    int start1=0;
-    int start2=0;
-    int end1=0;
-    int end2=0;
-    char aux_tag[100];
-    char aux_value[100];
-     printf("\nhelllloooo\n");
-    while(co_ind<index_coordinates_end){
-
-        if(xmlExeclusive[co_ind]==' ')
-        {
-            //space arrived
-            while(xmlExeclusive[co_ind]!='>')
-            {
-                start1=co_ind+1;
-                while(xmlExeclusive[co_ind]!='='){
-                    co_ind++;
-                }
-                end1=co_ind-1;
-                start2=co_ind+2;
-                co_ind=co_ind+2;
-
-                while(xmlExeclusive[co_ind]!='\"'){
-                    co_ind++;
-                }
-                end2=co_ind-1;
-                co_ind++;
+               formPairstrings(aux_tag,aux_value,start1,start2,end1,end2,xmlExeclusive);
 
 
-                formPairstrings(aux_tag,aux_value,start1,start2,end1,end2,xmlExeclusive);
-
-
-                strcpy(geo_coordinate[number_of_tags].tag,aux_tag);
-                strcpy(geo_coordinate[number_of_tags].value,aux_value);
-                memset(aux_tag, ' ', (end1-start1)*sizeof(char));
-                memset(aux_value, ' ', (end2-start2)*sizeof(char));
-
+               strcpy(geo_coordinate[number_of_tags].tag,aux_tag);
+               strcpy(geo_coordinate[number_of_tags].value,aux_value);
+               memset(aux_tag, ' ', (end1-start1)*sizeof(char));
+               memset(aux_value, ' ', (end2-start2)*sizeof(char));
 
 
                 //printf("%s %s\n",value_aux,tag_aux);
@@ -7861,10 +7736,10 @@ ParsedData parse_artifact()
 
                 number_of_tags++;
             }
-
-        }
+ 
+         }
         co_ind++;
-    }
+   }
 /*
     for(int i=0;i<number_of_tags;i++){
         printf("\n%s\n",geo_coordinate[i].tag);
@@ -7873,16 +7748,13 @@ ParsedData parse_artifact()
     }
 
 */
-    for(int i = 1; i<=4;i++)
-        {
-            result.long_lat_coords[i-1][0] = atof(geo_coordinate[2*i-2].value);
-            result.long_lat_coords[i-1][1] = atof(geo_coordinate[2*i-1].value);
-        }
+   for(int i = 1; i<=4;i++)
+      {
+         result->long_lat_coords[i-1][0] = atof(geo_coordinate[2*i-2].value);
+         result->long_lat_coords[i-1][1] = atof(geo_coordinate[2*i-1].value);
+      }
 
 
-
-
-    return result;
 }
 
 
@@ -8005,7 +7877,14 @@ return 0;
 }
 
 
-void data_fetch_delete(){
+void write_recentPA(char *tag,char *content, FILE *fptr){
+
+   fprintf(fptr,"<%s=%s>\n",tag,content);
+
+}
+
+
+void data_fetch_delete(char *can){
     // this function is called when pa has been validated for time, place, sign and drone ID
     // data that needs to be entered in recentPA.txt
     // 1)time : start time and end time
@@ -8013,160 +7892,127 @@ void data_fetch_delete(){
     // 3)frequency upto which drone can make flights
     // 4)pa_id
     // 5)maximum altitude
-    // 6) number of flghts done
+    // 6) number of flights done
     // 7)previous log hash
+    // 8)fetch_required
+    // 9)bundling_required
+    // 10)signing previous log
+   ParsedData data;
+   parse_artifact(can,&data);
 
-    ParsedData data= parse_artifact();
-    FILE *fptr;
-    char fileName[100]="/log/permission_artifact_breach.xml";
-    char aux_fname[100];
-    strcpy(aux_fname,dir);
-    strcat(aux_fname,fileName);
-    memset(fileName,0,sizeof(fileName));
-    strcpy(fileName,aux_fname);
+   FILE *fptr;
+   char fileName[60]="/fs/microsd/log/permission_artifact_breach.xml";
+   char fileName1[50]="/fs/microsd/log/recentPA.txt";
+   fptr=fopen(fileName1,"w");
 
-    fptr=fopen(fileName,"r");
-    char content[5000];
-    signed char ch;
-    int i=0;
-    while((ch=fgetc(fptr))!=EOF){
-        content[i]=ch;
-        i++;
-    }
-    content[i]='\0';
-    fclose(fptr);
    // printf("\ndata fetch delete:::%s\n",content);
     // fetching frequency
-    char tag_frequency[30]="frequency=";
-    char tag_freq[30]="frequency_allowable";
-    int index_frequency=isSubstring(tag_frequency,content);
-
-    index_frequency=index_frequency+int(strlen(tag_frequency))+1;
-
-    char tag_content_freq[30];
-
-    i=0;
-    while(content[index_frequency]!='\"'){
-        tag_content_freq[i]=content[index_frequency];
-        index_frequency++;
-        i++;
-    }
-    tag_content_freq[i]='\0';//frequencies fetched.
-
+   char tag_frequency[20]="frequency=";
+   char tag_freq[20]="frequency_allowable";
+   char tag_content_freq[30];
+   fetch_tag_pa(tag_frequency,tag_content_freq,fileName);
+ 
 
 
     // fetching maximum altitude
-    char tag_maxalt[30]="maxAltitude=";
-    char tag_max[30]="maxAltitude";
-    int index_maxalt=isSubstring(tag_maxalt,content);
-
-    index_maxalt=index_maxalt+int(strlen(tag_maxalt))+1;
-
-    char tag_content_maxalt[30];
-
-    i=0;
-    while(content[index_maxalt]!='\"'){
-        tag_content_maxalt[i]=content[index_maxalt];
-        index_maxalt++;
-        i++;
-    }
-    tag_content_maxalt[i]='\0';//frequencies fetched.
+   char tag_maxalt[30]="maxAltitude=";
+   char tag_max[30]="maxAltitude";
+   char tag_content_maxalt[30];
+    fetch_tag_pa(tag_maxalt,tag_content_maxalt,fileName);
 
 
     // fetching PA ID
-    char tag_paID[70]="permissionArtifactId=";
-    char tag_PAid[70]="permissionArtifactId";
-    int index_paID=isSubstring(tag_paID,content);
-
-    index_paID=index_paID+int(strlen(tag_paID))+1;
-
+    char tag_paID[30]="permissionArtifactId=";
+    char tag_PAid[30]="permissionArtifactId";
     char tag_content_paID[70];
+    fetch_tag_pa(tag_paID,tag_content_paID,fileName);
 
-    i=0;
-    while(content[index_paID]!='\"'){
-        tag_content_paID[i]=content[index_paID];
-        index_paID++;
-        i++;
-    }
-    tag_content_paID[i]='\0';//frequencies fetched.
-    printf("\n\ntag_content_paID::::%s\n\n",tag_content_paID);
-    pair_set pairset[14];
+   
+   
+   write_recentPA(tag_PAid,tag_content_paID,fptr);
 
-    strcpy(pairset[0].tag,tag_PAid);
-    strcpy(pairset[0].value,tag_content_paID);
+   write_recentPA(tag_freq,tag_content_freq,fptr);
+ 
+   write_recentPA(tag_freq,tag_content_freq,fptr);
+
+   write_recentPA(tag_max,tag_content_maxalt,fptr);
 
 
-    strcpy(pairset[1].tag,tag_freq);
-    strcpy(pairset[1].value,tag_content_freq);
 
-    strcpy(pairset[2].tag,tag_max);
-    strcpy(pairset[2].value,tag_content_maxalt);
+   char aux_float[40];
 
 
-   // int fetch_i=0;
-   // char start_time[60];
-    //char end_time[60];
-    char aux_float[40];
-   // sprintf(aux_float,"%f",data.start_time);
-
-
-    //// start time
-
-    strcpy(pairset[3].tag,"Start_time");
-    strcpy(pairset[3].value,data.start_time);
+   char start_t[12]="Start_time";
+   write_recentPA(start_t,data.start_time,fptr);
 
     //// end time
-    strcpy(pairset[4].tag,"End_time");
-    strcpy(pairset[4].value,data.end_time);
+   char end_t[12]="End_time"; 
+   write_recentPA(end_t,data.end_time,fptr);
 
-    sprintf(aux_float,"%f",data.long_lat_coords[0][0]);
-    //char *f1=gcvt(data.long_lat_coords[0][0], 8, aux_float);
-    //printf("\n%s\n",f1);
-    printf("\n mainnf %s\n",aux_float);
+
+   sprintf(aux_float,"%f",data.long_lat_coords[0][0]);
+   
     //lattitude1
-    strcpy(pairset[5].tag,"lattitude1");
-    strcpy(pairset[5].value,aux_float);
-    memset(aux_float,' ',sizeof(aux_float));
+   char lat_1[15]="lattitude1";
+   write_recentPA(lat_1,aux_float,fptr);
+   memset(aux_float,' ',sizeof(aux_float));
 
-    //longitude1
-    sprintf(aux_float,"%f",data.long_lat_coords[0][1]);
-   //f1=gcvt(data.long_lat_coords[0][1], 8, aux_float);
-    //printf("\n%s\n",f1);
-    printf("\n mainnf %s\n",aux_float);
-    strcpy(pairset[6].tag,"longitude1");
-    strcpy(pairset[6].value,aux_float);
-    memset(aux_float,' ',sizeof(aux_float));
+   //longitude1
+   sprintf(aux_float,"%f",data.long_lat_coords[0][1]);
+   
+   char lon_1[15]="longitude1";
+   write_recentPA(lon_1,aux_float,fptr);
+   memset(aux_float,' ',sizeof(aux_float));
 
-    //lattitude2
-    sprintf(aux_float,"%f",data.long_lat_coords[1][0]);
-   // f1=gcvt(data.long_lat_coords[1][0], 8, aux_float);
-   //printf("\n%s\n",f1);
-    printf("\n mainnf %s\n",aux_float);
-    strcpy(pairset[7].tag,"lattitude2");
-    strcpy(pairset[7].value,aux_float);
-    memset(aux_float,' ',12*sizeof(char));
+   //lattitude2
+   sprintf(aux_float,"%f",data.long_lat_coords[1][0]);
+   char lat_2[15]="lattitude2";
+   write_recentPA(lat_2,aux_float,fptr);
+   memset(aux_float,' ',12*sizeof(char));
 
     //longitude2
    // printf("printitng %d",int((10^7)*data.long_lat_coord)s[2][1]));
-    sprintf(aux_float,"%f",data.long_lat_coords[2][1]);
+   sprintf(aux_float,"%f",data.long_lat_coords[2][1]);
    // f1=gcvt(data.long_lat_coords[2][1], 8, aux_float);
-    printf("\n mainnf %f %s\n",data.long_lat_coords[2][1],aux_float);
+  //  printf("\n mainnf %f %s\n",data.long_lat_coords[2][1],aux_float);
    // printf("\n%s\n",f1);
-    strcpy(pairset[8].tag,"longitude2");
-    strcpy(pairset[8].value,aux_float);
-    memset(aux_float,' ',sizeof(aux_float));
-
-    strcpy(pairset[9].tag,"frequencies_done");
-    strcpy(pairset[9].value,"0");
+   char lon_2[15]="longitude2";
+   write_recentPA(lon_2,aux_float,fptr);
+   memset(aux_float,' ',12*sizeof(char));
 
 
-    strcpy(pairset[10].tag,"fetch_required");
-    strcpy(pairset[10].value,"0");
+   strcpy(aux_float,"0");
+   char tag_freq_d[25]="frequencies_done";
+   write_recentPA(tag_freq_d,aux_float,fptr);
+   memset(aux_float,' ',12*sizeof(char));
 
 
-   strcpy(pairset[11].tag,"previous_log_hash");
-   strcpy(pairset[11].value,"None");
+   strcpy(aux_float,"0");
+   char tag_fetch[25]="fetch_required";
+   write_recentPA(tag_fetch,aux_float,fptr);
+   memset(aux_float,' ',12*sizeof(char));
 
+
+   strcpy(aux_float,"None");
+   char tag_log_d[25]="previous_log_hash";
+   write_recentPA(tag_log_d,aux_float,fptr);
+   memset(aux_float,' ',12*sizeof(char));
+   
+
+
+
+   fprintf(fptr,"<%s=0>\n","bundling_required");
+     
+   fprintf(fptr,"<%s=None>\n","s_previous_log");
+   fprintf(fptr,"%s","</content>");
+
+   fclose(fptr);
+
+   key RFM_private_key;
+
+   get_RFM_Key(&RFM_private_key);
+
+   signing_support(&RFM_private_key,fileName1);
 
    //publishing Permission Artefact information to pa_data.msg
 
@@ -8215,28 +8061,7 @@ void data_fetch_delete(){
 
 
 
-   char fileName1[100]="/fs/microsd/log/recentPA.txt";
-
-    //char aux_fname[100];
-    /*strcpy(aux_fname,dir);
-    strcat(aux_fname,fileName1);
-    memset(fileName1,0,sizeof(fileName1));
-    strcpy(fileName1,aux_fname);*/
-
-
-
-
-
-   key RFM_private_key;
-
-   get_RFM_Key(&RFM_private_key);
-
   //  free(value_modulus);
-
-   pair_file_write(pairset,12,fileName1,RFM_private_key);
-
-
-
 
    // remove("./log/permission_artifact_breach.xml");
 
@@ -8449,48 +8274,63 @@ int date_time_extract_and_check()
 	}
 }
 
+
+void fetch_tag_pa(char *tag, char *content, char *fname){
+   FILE *pa;
+   pa=fopen(fname,"r");
+   int index=isSubstring(tag,NULL,pa);
+   fclose(pa);
+   pa=fopen(fname,"r");
+   signed char ch;
+   int countch=0;
+   int i=0;
+   int start=0;
+   while((ch=fgetc(pa))!=EOF){
+      
+      if(countch>=index){
+         if(ch=='='){
+            start=1;
+            countch++;
+            continue;
+         }
+         if(start==1 && ch=='\"'){
+            start=2;
+            countch++;
+            continue;
+         }
+         if(start==2){
+            if(ch=='\"'){
+               break;
+            }
+            content[i]=ch;
+            i++;
+         }
+      }
+
+      countch++;
+
+   }
+  
+    content[i]='\0';
+    fclose(pa);
+    
+}
+
 int DroneIDverification(char *paID){
-    char file_name[100]="/log/permission_artifact_breach.xml";
+    char file_name[100]="/fs/microsd/log/permission_artifact_breach.xml";
+  
+   if(paID!=NULL){
+         char paID_tag[70]="permissionArtifactId";
+         char paID_contains[100];
+         fetch_tag_pa(paID_tag,paID_contains,file_name);
+         if(strcmp(paID_contains,paID)!=0){
+            return 2;
+         }
+   }
 
-    char aux_fname[100];
-    strcpy(aux_fname,dir);
-    strcat(aux_fname,file_name);
-    memset(file_name,0,sizeof(file_name));
-    strcpy(file_name,aux_fname);
-
-    char Reference_canonilized[5000];// variable to hold canonicalized reference section
-
-    char content[5000];
-    char outputih[5000];
-        // This function will extract the reference section out of the xml file (PA)
-	    //and willl perform canonicalization step over it
-    Reference_canon(file_name,Reference_canonilized);
-    xmlExeclusiveCanon(Reference_canonilized,outputih);
-    cleanerXML(outputih,content);
-
-    char paID_tag[70]="permissionArtifactId";
-    char paID_contains[100];
-    fetch_tag(content,paID_tag,paID_contains);
-    if(strcmp(paID_contains,paID)!=0){
-        return 2;
-    }
     char tag[30]="UUID=";
     char tag_content[50];
-    int index=isSubstring(tag,content);
-    int i=index;
-    while(content[i]!='='){
-        i++;
-    }
-    i=i+2;
-    int k=0;
-    while(content[i]!='\"'){
-        tag_content[k]=content[i];
-        i++;
-        k++;
-    }
-    tag_content[k]='\0';
-    printf("\n%s\n",content);
-    printf("\n%s\n",tag_content);
+    fetch_tag_pa(tag,tag_content,file_name);
     char dro[40]="ABBDDJEDNDJK";
     if(strcmp(tag_content,dro)==0){
         return 1;
@@ -8792,7 +8632,6 @@ void Sha256_implement(char *Input, char *output, FILE *fptr, int index_count){
       //  unsigned char st_arr[3000];
 	   unsigned char *st=(unsigned char*) malloc(2000*sizeof(unsigned char));
       unsigned int iff=0;
-
         // assigning char to unsigned char (this is done to have asci value in 8 bits rather than 7 bits)
       while(1)
       {
@@ -8802,13 +8641,8 @@ void Sha256_implement(char *Input, char *output, FILE *fptr, int index_count){
 		      break;
 	      }
          *(st+iff)=ch;
-	      //	printf("%c",*(st+iff));
 		   iff++;
       }
-
-
-      //printf("\n");
-      //printf("\n");
 
       SHA256 sha;
 
@@ -8850,18 +8684,6 @@ void Sha256_implement(char *Input, char *output, FILE *fptr, int index_count){
       output[count_digest]='\0';
    }
 
-
-   /*int it=0;//just an iterator
-	//printing digest
-	printf("\n");
-
-   while(it<32){
-		printf("%02x",*(digest+it));
-		it++;
-	}*/
-
-
-//   printf("\nSha of reference section that has been canonicalized :%s\n",Sha_of_Reference);
 }
 
 
@@ -9908,10 +9730,11 @@ void Reference_canon(char *file_name, char *res){
 
 
 
-    char *content=(char*) malloc(sizeof(char)*5000);
+    char *content=(char*) malloc(sizeof(char)*4000);
     //char content[5000];
     int stop_variable=0;
    // int stop_variabletype2=0;
+   
     while(1)
     {
 
@@ -10067,15 +9890,23 @@ void SignedInfo_canon(char *file_name, char *res)
     fp=fopen(file_name,"r");
     if(fp)
     {
-
-
-    char *content=(char*) malloc(sizeof(char)*10000);
+     /*char tag0[]="<SignedInfo>";
+     char tag1[]="</SignedInfo>";
+     int index0=isSubstring(tag0,NULL,fp);
+     fclose(fp);
+      fp=fopen(file_name,"r");
+      int index1=isSubstring(tag1,NULL,fp);
+      fclose(fp);
+      index1=index1+int(strlen(tag1));
+   fp=fopen(file_name,"r");*/
+    char *content=(char*) malloc(sizeof(char)*4000);
 
     signed char ch;
     char aux_copy[300];
     int count=0;
     int flag_ini=0;
     int flag_end=0;
+    int content_filter=0;
      int *ptr_count_result;
 
     int res_count=0;
@@ -10084,14 +9915,16 @@ void SignedInfo_canon(char *file_name, char *res)
 
     while(1)
     {
+      ch=fgetc(fp);
+      if(ch==EOF){
+         break;
+      }
+      if(ch!='\n'){
+         content[count]=ch;
+         count++;
+      }
+      content_filter++;
 
-        ch=fgetc(fp);
-        if(ch==EOF){
-            break;
-        }
-        if(ch!='\n'){
-        content[count]=ch;
-        count++;}
     }
 
     stack dde;
@@ -10431,7 +10264,7 @@ int RPAS_identifier(FILE *fptr1){
                        //the strings are same
                        //start the modification of HardwareInuse.txt
                        remove("/fs/microsd/log/HardwareInuse.txt");
-                       HardwareInuseCreation(deviceID);//new HardwareInuse.txt file created
+                     //  HardwareInuseCreation(deviceID);//new HardwareInuse.txt file created
                        // and return 1
                        return 1;
                    }else{
@@ -10477,9 +10310,8 @@ void   call_DroneIDcreation(){
 
 
 int call_file_read(char *fname,char *tag,char *result,int file_type){
-    printf("\ninside call file read \n");
-    int return_value=file_read(fname,tag,result,file_type);
-    return return_value;
+   int return_value=file_read(fname,tag,result,file_type);
+   return return_value;
 
 }
 
@@ -10489,7 +10321,7 @@ int CHECK_REUSAGE(char *file_id){
     //check the given id in file KeyLog.txt
     //return types 1=file_id is beng reused, dont do key rotation
     //             0=file_id is fresh , start key rotation and amend KeyLog.txt
-    char fname[100]="/fs/microsd/log/KeyLog.txt";
+    char fname[100]="/fs/microsd/KeyLog.txt";
     FILE *fptr;
     fptr=fopen(fname,"r");
     if(fptr!=NULL){
@@ -10498,13 +10330,13 @@ int CHECK_REUSAGE(char *file_id){
        // strcpy(RFM_key.modulus,"26495127767604337655831691918113833077956334480395285962585476150242592943334533493300410596845191511956515492348526447864429111984398076478393159921716146324008099192785429713391158778980470576914436564260777828713503499078118282954851831718742193757807790192236071369965695862117529898068098551948463482032984966019192036825055149445334134853954472696975028748893285534653718791714099153590644093991103487859923770318942338310035808291238607889065040628342091199251953687656515817829870399170890472577591915379199888970387732102895345522222635522973211224211091186930411354449072698100145010326153546937615803429429");
        // strcpy(RFM_key.private_exponent,"24021354375322558781058142276736617999389802434596138079632937453577588041977071136990155131350955784632074057774459381406055342415566243621056270140966629267130220147961070276489248399064064585487617556117107847879807603464052857723291974564966716033712609329726458163489658005940146657360121454440603066594695330718634482791509166056105316975123379501455703860598165895993179884232993174716442550760635024519308123321406513256918808853580242186763289628649427009957647963922327454796638500088631677702805825426368000585849292006901367973110968487920147218164610608698409129440488923014780703396073978252084600942649");
         get_RFM_Key(&RFM_key);
-       int valid_status= Validating_File(fname,RFM_key);
+       int valid_status= Validating_File(fname,&RFM_key);
 
        if (valid_status==1){
            //file is valid it can searched for current file_id
             FILE *fptr1;
             fptr1=fopen(fname,"r");
-            signed char aux_c;
+            /*signed char aux_c;
             char *content=(char*) malloc(sizeof(char)*3000);
             int i=0;
             while((aux_c=fgetc(fptr1))!=EOF){
@@ -10512,9 +10344,10 @@ int CHECK_REUSAGE(char *file_id){
                 i++;
             }
             content[i]='\0';
-            fclose(fptr1);
-           int prescence=isSubstring(file_id,content);
-           free(content);
+            fclose(fptr1);*/
+           int prescence=isSubstring(file_id,NULL,fptr1);
+           fclose(fptr1);
+           //free(content);
            if(prescence!=-1){
                return 0;
            }else{
@@ -10543,33 +10376,49 @@ void call_KeyLog_Regen(char *fileID){
 //1)PublicKeyNew.txt: later sent to MS
 //2)PublicPrivateNew.txt:kept inside RFM encrypted
 void Key_rotation_start(char *file_id){
+   // two files will be made one with only public key, other would be kept encrypted
   /// NOW prime number generation begins for KEY pair creation
+  
+    char inputFname[40]="/fs/microsd/PublicPrivateNew_aux.txt";
+  FILE *file;
+  file=fopen(inputFname,"w");
+  fprintf(file,"%s","<content>\n<DroneID=ABBDDJEDNDJK>\n<RFM_version=0>\n<RPAS_category=Small>\n");
+ 
+  FILE *file2;
+  file2=fopen("/fs/microsd/PublicKeyNew.txt","w");
+  fprintf(file2,"%s","<content>\n<DroneID=ABBDDJEDNDJK>\n<RFM_version=0>\n<RPAS_category=Small>\n");
+ 
+   fprintf(file,"%s","<KEY_ID=");
+   fprintf(file,"%s\n",file_id);
+   fprintf(file,"%s",">\n");
+
+   fprintf(file2,"%s","<KEY_ID=");
+   fprintf(file2,"%s\n",file_id);
+   fprintf(file2,"%s",">\n");
     mp_int  p1, q1;
-    char Prime1[1000];
-    char Prime2[1000];
-    char    buf[4096];
-    char PrivateKey[1000];
-    char Modulus[1000];
-    char PublicKey[20];
+   
+    char    buf[1000];
 
     //mp_int z,r;
     mp_init(&p1);
     mp_init(&q1);
-
+    int err;
     // mp_prime_rand(&p1,1,90,MP_PRIME_SAFE);
-    mp_prime_rand(&p1,1,1024,MP_PRIME_2MSB_ON);
-    mp_to_decimal(&p1,Prime1,sizeof(Prime1));
+   err= mp_prime_rand(&p1,1,1024,MP_PRIME_2MSB_ON,file);
+    mp_to_decimal(&p1,buf,sizeof(buf));
+    fprintf(file,"Prime 1 :%s\n",buf);
+    memset(buf,0,sizeof(buf));
     //printf("\nprime1 == %s \n",buf);
 
     printf("\n Key Generation...... \n");
     //mp_prime_rand(&q1,1,90,MP_PRIME_SAFE);
-    mp_prime_rand(&q1,1,1024,MP_PRIME_2MSB_ON);
-    mp_to_decimal(&q1,Prime2,sizeof(Prime2));
-    //mp_clear(&p1);
-   // mp_clear(&q1);
+   err= mp_prime_rand(&q1,1,1024,MP_PRIME_2MSB_ON,file);
+    mp_to_decimal(&q1,buf,sizeof(buf));
 
-   // printf("\n prime2 == %s \n",buf);
-    printf("\n Key Generation...... \n");
+    fprintf(file,"Prime 2 :%s\n",buf);
+    memset(buf,0,sizeof(buf));
+
+    printf("\n Key Generation......%d \n",err);
     //phi(n)=(p1-1)*(q1-1)
     mp_int s1,s2,product_p1_q1;
     mp_init_multi(&s1,&s2,&product_p1_q1,NULL);
@@ -10583,7 +10432,7 @@ void Key_rotation_start(char *file_id){
   //  printf("\n\ns1 == %s\n", buf);//p1-1
     printf("\n Key Generation...... \n");
     mp_sub_d(&q1, 1uL, &s2);
-    mp_to_decimal(&s2, buf, sizeof(buf));
+   // mp_to_decimal(&s2, buf, sizeof(buf));
    // printf("\n\ns2 == %s\n", buf);//q1-1
     printf("\n Key Generation...... \n");
     mp_int product_s1_s2,e,d;
@@ -10595,30 +10444,33 @@ void Key_rotation_start(char *file_id){
     mp_invmod(&e,&product_s1_s2,&d);
 
     //writing public key
-    mp_to_decimal(&e,PublicKey,sizeof(PublicKey));
+    mp_to_decimal(&e,buf,sizeof(buf));
+     fprintf(file,"<PublicKey=%s>\n",buf);
+     fprintf(file2,"<PublicKey=%s>\n",buf);
+     memset(buf,0,sizeof(buf));
    // printf("\n Public key : e===\n%s\n\n",buf);
     printf("\n Key Generation...... \n");
 
 
 
     ///writing private key
-    mp_to_decimal(&d,PrivateKey,sizeof(PrivateKey));
+    mp_to_decimal(&d,buf,sizeof(buf));
+   fprintf(file,"<PrivateKey=%s>\n",buf);
+    memset(buf,0,sizeof(buf));
   //  printf("\n Private key : d==\n%s\n\n",buf);
     printf("\n Key Generation...... \n");
-
-
-
-
-
-    mp_to_decimal(&p1,buf,sizeof(buf));
+   // mp_to_decimal(&p1,buf,sizeof(buf));
   //  printf("\n prime number 1: p1==\n%s\n\n",buf);
-    mp_to_decimal(&q1,buf,sizeof(buf));
+  //  mp_to_decimal(&q1,buf,sizeof(buf));
   //  printf("\n prime number 2: q1==\n%s\n\n",buf);
-
-
-
     //writing modulus in file
-    mp_to_decimal(&product_p1_q1,Modulus,sizeof(Modulus));
+   mp_to_decimal(&product_p1_q1,buf,sizeof(buf));
+   fprintf(file,"<Modulus=%s>\n",buf);
+   fprintf(file,"</content>");
+
+   fprintf(file2,"<Modulus=%s>\n",buf);
+   fprintf(file2,"</content>");
+   memset(buf,0,sizeof(buf));
   //  printf("\n modulus product==\n%s\n\n",buf);
     printf("\n Key Generation...... \n");
 
@@ -10631,8 +10483,17 @@ void Key_rotation_start(char *file_id){
     mp_clear(&s2);
     mp_clear(&product_p1_q1);
 
+     fclose(file);
+     fclose(file2);
 
+   key Inside_RFM;
+   char fname[42]="/fs/microsd/log/PublicPrivateNew.txt";
+   strcpy(Inside_RFM.modulus,"180919775566931");
+   strcpy(Inside_RFM.private_exponent,"32102716896161");
+ 
+   encrypting_File(&Inside_RFM,fname,inputFname);
 
+/*
     char DroneID[]="ABBDDJEDNDJK";//any string
     char RFM_version[2]="0";
     char RPAS_category[10]="Small";
@@ -10715,7 +10576,7 @@ void Key_rotation_start(char *file_id){
     encrypting_File(content,Inside_RFM,fname);
     char decrypting[3000];
     decrypting_File(fname,Inside_RFM,decrypting);
-    printf("\n\n%s\n\n",decrypting);
+    printf("\n\n%s\n\n",decrypting);*/
   //  free(content);
     // new key is encrypted and saved inside the file
 
@@ -10735,21 +10596,22 @@ The process invloves 1)decrypting of PublicPrivateNew.txt
 */
 void KEY_CHANGE_INITIATION(){
 
-    char fname[60]="/fs/microsd/log/PublicPrivateNew.txt";
+    char fname[60]="/fs/microsd/PublicPrivateNew.txt";
+    
     key Inside_RFM;
     strcpy(Inside_RFM.modulus,"180919775566931");
     strcpy(Inside_RFM.private_exponent,"32102716896161");
 
-    char content[5000];//=(char*) malloc(sizeof(char)*5000);
+    char content[1500];//=(char*) malloc(sizeof(char)*5000);
 
-    decrypting_File(fname , Inside_RFM, content);
+    decrypting_File(fname , &Inside_RFM, content);
    // printf("\n\nThe content of decrypted file is :\n\n%s\n",content);
 
     char target0[30]="Modulus";
     char target1[30]="PrivateKey";
 
-    char value_modulus[2000];//=(char*) malloc(sizeof(char)*2000);
-    char value_private[800];//=(char*) malloc(sizeof(char)*800);
+    char value_modulus[650];//=(char*) malloc(sizeof(char)*2000);
+    char value_private[650];//=(char*) malloc(sizeof(char)*800);
 
     fetch_tag(content,target0,value_modulus);
     fetch_tag(content,target1,value_private);
@@ -10763,37 +10625,36 @@ void KEY_CHANGE_INITIATION(){
     strcpy(pair_key[1].tag,"Privatekey");
     strcpy(pair_key[1].value,value_private);*/
 
-
-    char content1[5000];
-
-    char Content_Start[10]="<content>";
-    strcpy(content1,Content_Start);
-    strcat(content1,"\n");
-
-    char tag_private[20]="<PrivateKey=";
-    strcat(content1,tag_private);
-    strcat(content1,value_private);
-    strcat(content,">\n");
-
-    char tag_modulus[20]="<Modulus=";
-    strcat(content1,tag_modulus);
-    strcat(content1,value_modulus);
-    strcat(content1,">\n");
+    char fname_aux[30]="/fs/microsd/aux_keys_change";
+    FILE *fptrinput;
+    fptrinput=fopen(fname_aux,"w");
 
 
-    char Content_End[12]="</content>";
-    strcat(content1,Content_End);
-    strcat(content1,"\0");
-    //remove("./log/PublicPrivateInuse.txt");
-    char key_file_name[40]="/fs/microsd/log/PublicPrivateInuse.txt";
-    encrypting_File(content1,Inside_RFM,key_file_name);
-    // at this point new PublicPrivateInuse.txt is formed
-    remove("/fs/microsd/log/PublicPrivateNew.txt");
-    remove("/fs/microsd/log/KeyChangePerm.txt");
-    remove("/fs/microsd/log/PublicKeyNew.txt");
+    fprintf(fptrinput,"%s","<content>\n");
 
 
+    fprintf(fptrinput,"<PrivateKey=%s>\n",value_private);
+   
+    fprintf(fptrinput,"<Modulus=%s>\n",value_modulus);
 
+    
+    fprintf(fptrinput,"</content>");
+
+    fclose(fptrinput);
+   
+   key Inside_RFM;
+   char fname[42]="/fs/microsd/log/PublicPrivateNew.txt";
+   strcpy(Inside_RFM.modulus,"180919775566931");
+   strcpy(Inside_RFM.private_exponent,"32102716896161");
+
+   //remove("./log/PublicPrivateInuse.txt");
+   char key_file_name[40]="/fs/microsd/PublicPrivateInuse.txt";
+   encrypting_File(&Inside_RFM,key_file_name,fname_aux);
+   
+   // at this point new PublicPrivateInuse.txt is formed
+   remove("/fs/microsd/log/PublicPrivateNew.txt");
+   remove("/fs/microsd/log/KeyChangePerm.txt");
+   remove("/fs/microsd/log/PublicKeyNew.txt");
 }
 
 
@@ -11018,7 +10879,7 @@ void ParamInuseModify(){
 
     get_RFM_Key(&RFM_key);
 
-    pair_file_write(param_value,param_value_count,file_name_inuse,RFM_key);
+    pair_file_write(param_value,param_value_count,file_name_inuse,&RFM_key);
 
     remove("/fs/microsd/log/ParamChangePerm.txt");
 
@@ -11135,13 +10996,19 @@ freq_done         1
 previous_log_hash 2
 */
 void update_recentPA(int type,char *value){
+   char fileName[30]="/fs/microsd/recentPA_aux.txt";
+  FILE *f_aux;
+  f_aux=fopen(fileName,"w");
+   char filename[30]="/fs/microsd/recentPA.txt";
+  
    FILE *fptr;
 
-    fptr=fopen("/fs/microsd/log/recentPA.txt","r");
+    fptr=fopen(filename,"r");
     if(fptr==NULL){
        printf("\nproblem in opening file.\n");
     }
-    signed char ch;
+    fclose(fptr);
+    /*signed char ch;
     int i=0;
 
     char content[10000];
@@ -11152,7 +11019,7 @@ void update_recentPA(int type,char *value){
     }
     content[i]='\0';
    printf("\ndata_fetched\n");
-   fclose(fptr);
+   fclose(fptr);*/
    // type == 0,1,2;
    // first fetching all the constant tags
  /*permissionArtifactId
@@ -11164,160 +11031,274 @@ void update_recentPA(int type,char *value){
    longitude1
    lattitude2
    longitude2*/
-   pair_set pairset[14];
+ //  pair_set pairset[14];
 
    //permissionArtifactId
+   fprintf(f_aux,"%s\n","<content>");
    char tag_PAid[70]="permissionArtifactId";
    char tag_content_paID[100];
-   fetch_tag(content,tag_PAid,tag_content_paID);
-   strcpy(pairset[0].tag,tag_PAid);
-   strcpy(pairset[0].value,tag_content_paID);
+   
+   fetch_tag(NULL,tag_PAid,tag_content_paID,filename);
+   fprintf(f_aux,"<%s=%s>\n",tag_PAid,tag_content_paID);
+ //  strcpy(pairset[0].tag,tag_PAid);
+   //strcpy(pairset[0].value,tag_content_paID);
 
    // frequency allowable
    char tag_freq[70]="frequency_allowable";
    char tag_content_freq[100];
-   fetch_tag(content,tag_freq,tag_content_freq);
-   strcpy(pairset[1].tag,tag_freq);
-   strcpy(pairset[1].value,tag_content_freq);
+   fetch_tag(NULL,tag_freq,tag_content_freq,filename);
+   fprintf(f_aux,"<%s=%s>\n",tag_freq,tag_content_freq);
+   
+ 
 
    //    maxAltitude
    char tag_max[70]="maxAltitude";
    char tag_content_max[100];
-   fetch_tag(content,tag_max,tag_content_max);
-   strcpy(pairset[2].tag,tag_max);
-   strcpy(pairset[2].value,tag_content_max);
+   fetch_tag(NULL,tag_max,tag_content_max,filename);
+   fprintf(f_aux,"<%s=%s>\n",tag_max,tag_content_max);
+
 
 
 
     //// start time
    char tag_st[70]="Start_time";
    char tag_content_st[100];
-   fetch_tag(content,tag_st,tag_content_st);
-   strcpy(pairset[3].tag,tag_st);
-   strcpy(pairset[3].value,tag_content_st);
+   fetch_tag(NULL,tag_st,tag_content_st,filename);
+    fprintf(f_aux,"<%s=%s>\n",tag_st,tag_content_st);
+ 
 
 
     //// end time
    char tag_et[70]="End_time";
    char tag_content_et[100];
-   fetch_tag(content,tag_et,tag_content_et);
-   strcpy(pairset[4].tag,tag_et);
-   strcpy(pairset[4].value,tag_content_et);
+   fetch_tag(NULL,tag_et,tag_content_et,filename);
+    fprintf(f_aux,"<%s=%s>\n",tag_et,tag_content_et);
+
 
    printf("\nproblem at 9950\n");
    //lattitude1
    char tag_lat1[70]="lattitude1";
    char tag_content_lat1[100];
-   fetch_tag(content,tag_lat1,tag_content_lat1);
-   strcpy(pairset[5].tag,tag_lat1);
-   strcpy(pairset[5].value,tag_content_lat1);
+   fetch_tag(NULL,tag_lat1,tag_content_lat1,filename);
+   fprintf(f_aux,"<%s=%s>\n",tag_lat1,tag_content_lat1);
+
+
 
 
    //longitude1
    char tag_lon1[70]="longitude1";
    char tag_content_lon1[100];
-   fetch_tag(content,tag_lon1,tag_content_lon1);
-   strcpy(pairset[6].tag,tag_lon1);
-   strcpy(pairset[6].value,tag_content_lon1);
+   fetch_tag(NULL,tag_lon1,tag_content_lon1,filename);
+   fprintf(f_aux,"<%s=%s>\n",tag_lon1,tag_content_lon1);
+
+  
 
    //lattitude2
    char tag_lat2[70]="lattitude2";
    char tag_content_lat2[100];
-   fetch_tag(content,tag_lat2,tag_content_lat2);
-   strcpy(pairset[7].tag,tag_lat2);
-   strcpy(pairset[7].value,tag_content_lat2);
+   fetch_tag(NULL,tag_lat2,tag_content_lat2,filename);
+   fprintf(f_aux,"<%s=%s>\n",tag_lon1,tag_content_lon1);
+  
 
 
    //longitude2
    char tag_lon2[70]="longitude2";
    char tag_content_lon2[100];
-   fetch_tag(content,tag_lon2,tag_content_lon2);
-   strcpy(pairset[8].tag,tag_lon2);
-   strcpy(pairset[8].value,tag_content_lon2);
+   fetch_tag(NULL,tag_lon2,tag_content_lon2,filename);
+   fprintf(f_aux,"<%s=%s>\n",tag_lon2,tag_content_lon2);
 
+////////////////////////////////////////////////////////////////////////////
+   char tag_freq_done[70]="frequencies_done";
+   char tag_fetch[70]="fetch_required";
+   char tag_prev_log_hash[70]="previous_log_hash";
+   char tag_bundle[35]="bundling_required";
+   char tag_prev_log_s[70]="s_previous_log";
+
+
+  /////////////////////////// buffers
 
    printf("\nproblem at 9982\n");
-   if(type==0){
+   if(type==0)
+   {
       // changing fetch_required
 
-      char tag_freq_done[70]="frequencies_done";
+     
       char tag_content_freq_done[100];
-      fetch_tag(content,tag_freq_done,tag_content_freq_done);
-      strcpy(pairset[9].tag,tag_freq_done);
-      strcpy(pairset[9].value,tag_content_freq_done);
+      fetch_tag(NULL,tag_freq_done,tag_content_freq_done,filename);
+      fprintf(f_aux,"<%s=%s>\n",tag_lon2,tag_content_lon2);
+   
+     // strcpy(pairset[9].tag,tag_freq_done);
+      //strcpy(pairset[9].value,tag_content_freq_done);
 
-printf("\nproblem at 9992\n");
-      char tag_fetch[70]="fetch_required";
-      //char tag_content_fetch[100];
-      //fetch_tag(content,tag_fetch,tag_content_fetch);
-      strcpy(pairset[10].tag,tag_fetch);
-      strcpy(pairset[10].value,value);
+   printf("\nproblem at 9992\n");
+    
+       fprintf(f_aux,"<%s=%s>\n",tag_fetch,value);
+    
 
-      char tag_prev_log_hash[70]="previous_log_hash";
-      char tag_content_prev_log_hash[100];
-      fetch_tag(content,tag_prev_log_hash,tag_content_prev_log_hash);
-      strcpy(pairset[11].tag,tag_prev_log_hash);
-      strcpy(pairset[11].value,tag_content_prev_log_hash);
+      
+      char tag_content_prev_log_hash[70];
+      fetch_tag(NULL,tag_prev_log_hash,tag_content_prev_log_hash,filename);
+      fprintf(f_aux,"<%s=%s>\n",tag_prev_log_hash,tag_content_prev_log_hash);
+ 
+           
+   
+      char tag_content_bundle[10];
+      fetch_tag(NULL,tag_bundle,tag_content_bundle,filename);
+      fprintf(f_aux,"<%s=%s>\n",tag_bundle,tag_content_bundle);
+
+
+      
+      char tag_content_prev_log_s[100];
+      fetch_tag(NULL,tag_prev_log_s,tag_content_prev_log_s,filename);
+      fprintf(f_aux,"<%s=%s>\n",tag_prev_log_s,tag_content_prev_log_s);
 
 
    }else if(type==1){
       //changing freq_done
 
-      char tag_freq_done[70]="frequencies_done";
+     
       char tag_content_freq_done[100];
-      fetch_tag(content,tag_freq_done,tag_content_freq_done);
+      fetch_tag(NULL,tag_freq_done,tag_content_freq_done,filename);
       int aux;
       char aux1[20];
       aux=strtol(tag_content_freq_done,NULL,10);
       aux=aux+1;
       sprintf(aux1,"%d",aux);
-      printf("\n\n%s %s %d\n\n",tag_content_freq_done,aux1,aux);
-      strcpy(pairset[9].tag,tag_freq_done);
-      strcpy(pairset[9].value,aux1);
+      fprintf(f_aux,"<%s=%s>\n",tag_content_freq_done,aux1);
+     // strcpy(pairset[9].tag,tag_freq_done);
+      //strcpy(pairset[9].value,aux1);
 
-      char tag_fetch[70]="fetch_required";
+     
       char tag_content_fetch[100];
-      fetch_tag(content,tag_fetch,tag_content_fetch);
-      strcpy(pairset[10].tag,tag_fetch);
-      strcpy(pairset[10].value,tag_content_fetch);
+      fetch_tag(NULL,tag_fetch,tag_content_fetch,filename);
+      fprintf(f_aux,"<%s=%s>\n",tag_fetch,tag_content_fetch);
+     // strcpy(pairset[10].tag,tag_fetch);
+      //strcpy(pairset[10].value,tag_content_fetch);
 
-      char tag_prev_log_hash[70]="previous_log_hash";
+    
       char tag_content_prev_log_hash[100];
-      fetch_tag(content,tag_prev_log_hash,tag_content_prev_log_hash);
-      strcpy(pairset[11].tag,tag_prev_log_hash);
-      strcpy(pairset[11].value,tag_content_prev_log_hash);
+      fetch_tag(NULL,tag_prev_log_hash,tag_content_prev_log_hash,filename);
+      fprintf(f_aux,"<%s=%s>\n",tag_prev_log_hash,tag_content_prev_log_hash);
+    //  strcpy(pairset[11].tag,tag_prev_log_hash);
+      //strcpy(pairset[11].value,tag_content_prev_log_hash);
 
+
+        
+      char tag_content_bundle[100];
+      fetch_tag(NULL,tag_bundle,tag_content_bundle,filename);
+      fprintf(f_aux,"<%s=%s>\n",tag_bundle,tag_content_bundle);
+
+
+     
+      char tag_content_prev_log_s[100];
+      fetch_tag(NULL,tag_prev_log_s,tag_content_prev_log_s,filename);
+      fprintf(f_aux,"<%s=%s>\n",tag_prev_log_s,tag_content_prev_log_s);
+
+   }else if(type==3){
+      //changing bundling_req
+
+
+    
+      char tag_content_freq_done[100];
+      fetch_tag(NULL,tag_freq_done,tag_content_freq_done,filename);
+      fprintf(f_aux,"<%s=%s>\n",tag_lon2,tag_content_lon2);
+
+
+      char tag_content_fetch[100];
+      fetch_tag(NULL,tag_fetch,tag_content_fetch,filename);
+      fprintf(f_aux,"<%s=%s>\n",tag_fetch,tag_content_fetch);
+     // strcpy(pairset[10].tag,tag_fetch);
+      //strcpy(pairset[10].value,tag_content_fetch);
+
+
+      char tag_content_prev_log_hash[100];
+      fetch_tag(NULL,tag_prev_log_hash,tag_content_prev_log_hash,filename);
+      fprintf(f_aux,"<%s=%s>\n",tag_prev_log_hash,tag_content_prev_log_hash);
+      
+    
+      fprintf(f_aux,"<%s=%s>\n",tag_bundle,value);
+
+      char tag_content_prev_log_s[100];
+      fetch_tag(NULL,tag_prev_log_s,tag_content_prev_log_s,filename);
+      fprintf(f_aux,"<%s=%s>\n",tag_prev_log_s,tag_content_prev_log_s);
+      
+   
+   }else if(type==4){
+      //signing s_previous_log  required
+
+
+   
+      char tag_content_freq_done[100];
+      fetch_tag(NULL,tag_freq_done,tag_content_freq_done,filename);
+      fprintf(f_aux,"<%s=%s>\n",tag_lon2,tag_content_lon2);
+
+
+      char tag_content_fetch[100];
+      fetch_tag(NULL,tag_fetch,tag_content_fetch,filename);
+      fprintf(f_aux,"<%s=%s>\n",tag_fetch,tag_content_fetch);
+     // strcpy(pairset[10].tag,tag_fetch);
+      //strcpy(pairset[10].value,tag_content_fetch);
+
+     
+      char tag_content_prev_log_hash[100];
+      fetch_tag(NULL,tag_prev_log_hash,tag_content_prev_log_hash,filename);
+      fprintf(f_aux,"<%s=%s>\n",tag_prev_log_hash,tag_content_prev_log_hash);
+
+   
+      char tag_content_bundle[100];
+      fetch_tag(NULL,tag_bundle,tag_content_bundle,filename);
+      fprintf(f_aux,"<%s=%s>\n",tag_bundle,tag_content_bundle);
+      
+
+      fprintf(f_aux,"<%s=%s>\n",tag_prev_log_s,value);
+      
+   
+   
    }else{
       // changing previous_log_hash
-      char tag_freq_done[70]="frequencies_done";
+  
       char tag_content_freq_done[100];
-      fetch_tag(content,tag_freq_done,tag_content_freq_done);
-      strcpy(pairset[9].tag,tag_freq_done);
-      strcpy(pairset[9].value,tag_content_freq_done);
+      fetch_tag(NULL,tag_freq_done,tag_content_freq_done,filename);
+      fprintf(f_aux,"<%s=%s>\n",tag_lon2,tag_content_lon2);
 
-
-      char tag_fetch[70]="fetch_required";
+     
       char tag_content_fetch[100];
-      fetch_tag(content,tag_fetch,tag_content_fetch);
-      strcpy(pairset[10].tag,tag_fetch);
-      strcpy(pairset[10].value,tag_content_fetch);
+      fetch_tag(NULL,tag_fetch,tag_content_fetch,filename);
+      fprintf(f_aux,"<%s=%s>\n",tag_fetch,tag_content_fetch);
 
-      char tag_prev_log_hash[70]="previous_log_hash";
+
+      fprintf(f_aux,"<%s=%s>\n",tag_prev_log_hash,value);
       //char tag_content_fetch[100];
       //fetch_tag(content,tag_fetch,tag_content_fetch);
-      strcpy(pairset[11].tag,tag_prev_log_hash);
-      strcpy(pairset[11].value,value);
+      //strcpy(pairset[11].tag,tag_prev_log_hash);
+      //strcpy(pairset[11].value,value);
+
+      
+      char tag_content_bundle[100];
+      fetch_tag(NULL,tag_bundle,tag_content_bundle,filename);
+      fprintf(f_aux,"<%s=%s>\n",tag_bundle,tag_content_bundle);
+
+
+ 
+      char tag_content_prev_log_s[100];
+      fetch_tag(NULL,tag_prev_log_s,tag_content_prev_log_s,filename);
+      fprintf(f_aux,"<%s=%s>\n",tag_prev_log_s,tag_content_prev_log_s);
    }
 
-
-   char fileName[100]="/fs/microsd/log/recentPA.txt";
+   fprintf(f_aux,"%s","</content>");
+   fclose(f_aux);
+  
    key RFM_private_key;
-
    get_RFM_Key(&RFM_private_key);
 
+   signing_support(&RFM_private_key,fileName);
+
+   remove(filename);
+
+   rename(fileName,filename);
   //  free(value_modulus);
 
-   pair_file_write(pairset,12,fileName,RFM_private_key);
+   
 }
 
 
@@ -11360,8 +11341,6 @@ void Bundling_begins(){
    strcpy(new_content[new_cont].tag,tag_num_logs);
    strcpy(new_content[new_cont].value,tag_logs_contain);
    new_cont++;
-
-
 
    char file_ini[30];
 
@@ -11442,7 +11421,7 @@ void Bundling_begins(){
 
 
    char filename[30]="/fs/microsd/log/bundled.txt";
-   pair_file_write(new_content,new_cont,filename,RFM_private_key);
+   pair_file_write(new_content,new_cont,filename,&RFM_private_key);
    free(new_content);
 }
 
@@ -11451,30 +11430,65 @@ int read_for_fetch(){
    char tag_fetch[30]="fetch_required";
    char tag_fetch_contain[20];
    char fname[40]="/fs/microsd/log/recentPA.txt";
-   int status = call_file_read(fname,tag_fetch,tag_fetch_contain,0);
-   if(status==1){
-      // file is genuine
-      int aux = strtol(tag_fetch_contain,NULL,10);
-      if(aux==1){
+   fetch_tag(NULL,tag_fetch,tag_fetch_contain,fname);
+
+   int aux = strtol(tag_fetch_contain,NULL,10);
+
+   if(aux==1){
+         // fetching is required
+      return 1;
+   }else{
+         // fetching is not required
+      return 0;
+   }
+   
+
+}
+
+int check_for_sign(char *logname){
+   char tag_fetch[30]="s_previous_log";
+   char fname[40]="/fs/microsd/recentPA.txt";
+   fetch_tag(NULL,tag_fetch,logname,fname);
+  
+      if(strcmp(logname,"0")!=0){
+
          // fetching is required
          return 1;
       }else{
          // fetching is not required
-         return 2;
+         return 0;
       }
-
-   }else{
-      // file is not genuine
-      return 3;
-   }
-
 }
 
 
-/*
-int check_fetch(){
-   char fname[40]="./log/fetched.txt";
 
+int check_for_bundle(){
+    char tag_fetch[30]="bundling_required";
+   char logname[4];
+   char fname[40]="/fs/microsd/recentPA.txt";
+   fetch_tag(NULL,tag_fetch,logname,fname);
+  
+      // file is genuine
+      
+      if(strcmp(logname,"0")!=0){
+         // fetching is required
+         return 1;
+      }else{
+         // fetching is not required
+         return 0;
+      }
+
+}
+/*
+void get_MC_public(key *MC){
+  strcpy(MC->modulus,);
+  strcpy(MC->private_exponent,);
+
+}*/
+
+int check_fetch(){
+   char fname[40]="fs/microsd/fetched.txt";
+   char f_name[40]="/fs/microsd/recentPA.txt";
    FILE *fptr;
    fptr=fopen(fname,"r");
    if(fptr!=NULL){
@@ -11486,16 +11500,33 @@ int check_fetch(){
       get_MC_public(&MC_key_public);
 
 
-      int valid_status=Validating_File(fname,MC_key_public);
+      int valid_status=Validating_File(fname,&MC_key_public);
+      if(valid_status==1){
+         char pa_id[30]="permissionArtifactId";
+         char file_pa[100];
+         char  file_ID[100];
+         fetch_tag(NULL,pa_id,file_ID,f_name);
+         fetch_tag(NULL,pa_id,file_pa,fname);
+
+         if(strcmp(file_pa,file_ID)==0){
+            return 2;
+         }else{
+            return 1;
+         }
+
+      }else{
+         return 1;
+      }
       // match the pa_id
       //if matches then delete the recentPA.txt, log of logs and log files (leaving space)
 
    }else{
       // fetched.txt is not present
+      return 0;
    }
 
 }
-*/
+
 
 void update_log_of_logs(char *tag,char *value,char *done_freq,char *pa_id,char *start_file){
    // this file will keep track of the log file names with the their hash value
@@ -11571,7 +11602,7 @@ void update_log_of_logs(char *tag,char *value,char *done_freq,char *pa_id,char *
       get_RFM_Key(&RFM_private_key);
        printf("\nproblem at 10171\n");
 
-      pair_file_write(content,content_count,wr_filename,RFM_private_key);
+      pair_file_write(content,content_count,wr_filename,&RFM_private_key);
        printf("\nproblem at 10174\n");
       free(content);
 
@@ -11599,7 +11630,7 @@ void update_log_of_logs(char *tag,char *value,char *done_freq,char *pa_id,char *
 
       get_RFM_Key(&private_rfm_key);
 
-      pair_file_write(content_holder,3,filename,private_rfm_key);
+      pair_file_write(content_holder,3,filename,&private_rfm_key);
 
    }
 
@@ -11612,8 +11643,8 @@ void update_log_of_logs(char *tag,char *value,char *done_freq,char *pa_id,char *
 
 
 void fetching_publish_padata(){
-
-   FILE *fptr;
+   char fname[40]="/fs/microsd/log/recentPA.txt";
+  /* FILE *fptr;
    fptr=fopen("/fs/microsd/log/recentPA.txt","r");
    if(fptr!=NULL){
       signed char ch;
@@ -11626,48 +11657,48 @@ void fetching_publish_padata(){
 
       }
       content[i]='\0';
-     fclose(fptr);
+     fclose(fptr);*/
 
    //publishing Permission Artefact information to pa_data.msg
    struct pa_data_s pa_data_raw;
    memset(&pa_data_raw, 0, sizeof(pa_data_raw));
    orb_advert_t pa_data_raw_pub = orb_advertise(ORB_ID(pa_data), &pa_data_raw);
-      char lat1_tag[40]="lattitude1";
-      char lattitude1[40];
-      char lat2_tag[40]="lattitude2";
-      char lattitude2[40];
-      char long1_tag[40]="longitude1";
-      char longitude1[40];
-      char long2_tag[40]="longitude2";
-      char longitude2[40];
-      char st_tag[40]="Start_time";
+      char lat1_tag[15]="lattitude1";
+      char lattitude1[15];
+      char lat2_tag[15]="lattitude2";
+      char lattitude2[15];
+      char long1_tag[15]="longitude1";
+      char longitude1[15];
+      char long2_tag[15]="longitude2";
+      char longitude2[15];
+      char st_tag[15]="Start_time";
       char start_time[80];
-      char et_tag[40]="End_time";
+      char et_tag[15]="End_time";
       char end_time[80];
-      char max_alt_tag[80]="maxAltitude";
-      char maxalt[70];
+      char max_alt_tag[12]="maxAltitude";
+      char maxalt[12];
 
       //fetching lattitude and longitude
-      fetch_tag(content,lat1_tag,lattitude1);
+      fetch_tag(NULL,lat1_tag,lattitude1,fname);
       pa_data_raw.lattitude1=atof(lattitude1);
 
-      fetch_tag(content,long1_tag,longitude1);
+      fetch_tag(NULL,long1_tag,longitude1,fname);
       pa_data_raw.longitude1=atof(longitude1);
 
-      fetch_tag(content,lat2_tag,lattitude2);
+      fetch_tag(NULL,lat2_tag,lattitude2,fname);
       pa_data_raw.lattitude2=atof(lattitude2);
 
 
 
-      fetch_tag(content,long2_tag,longitude2);
+      fetch_tag(NULL,long2_tag,longitude2,fname);
       pa_data_raw.longitude2=atof(longitude2);
 
-      fetch_tag(content,max_alt_tag,maxalt);
+      fetch_tag(NULL,max_alt_tag,maxalt,fname);
       pa_data_raw.allowable_height=strtol(maxalt,NULL,10);
 
       //fetching start time and end time.
-      fetch_tag(content,st_tag,start_time);
-      fetch_tag(content,et_tag,end_time);
+      fetch_tag(NULL,st_tag,start_time,fname);
+      fetch_tag(NULL,et_tag,end_time,fname);
 
       Date_time startTime;
       Date_time endTime;
@@ -11702,10 +11733,6 @@ void fetching_publish_padata(){
       orb_publish(ORB_ID(pa_data), pa_data_raw_pub, &pa_data_raw);
 
 
-
-   }else{
-      printf("\nfile is not opening\n");
-   }
 
 }
 
@@ -12187,14 +12214,7 @@ void main_json_file_writing(Geo_tag *data_array, int length_dat){
 
     //array []
     char array_start='[';
-    //char array_end=']';
-    // ""
-   // char quote_start='"';
-   // char quote_end='"';
-    //colon :
-  //  char colon=':';
-    //comma
-   // char comma=',';
+ 
 
 
     // writting JSON flight log
@@ -12280,7 +12300,7 @@ void main_json_file_writing(Geo_tag *data_array, int length_dat){
     char PA_id[70];//="ABDHUBDUBBEBDIBWBID";
 
     get_PA_ID(PA_id);
-printf("\nproblem at 525\n");
+   printf("\nproblem at 525\n");
     char PA[]="PermissionArtefact";
     writingKey_Value(&buff[0],PA,&i,PA_id,0);
     printf("\nproblem at 528\n");
@@ -12683,14 +12703,64 @@ void check_debug_mp(char *res){
 }
 
 
-void valid_chunk_refe(FILE *fptr, char *re_sha, int type){
+void check_debug_mp(char *input,char *res,key *keyy){
+
+         char Signature_Value_in_hex[556];//;=(char*) malloc(500*sizeof(char));
+         char Modulus[554];
+         if(input==NULL){
+            //  mp_int ; dgca public key modulus
+				strcpy(Modulus,"d6912a773335d3a193c742071762794e26bcac49d78b6b65a784e1c18d18f2f88b9f13d7fc41a5b9e11e3d75905b0f8373dbac5658962940d104711467814b7319774014644df82e9764b4e852cb7547d56de3224aada000db231b1356ffe86391b3eca2ddf67d44f40ea6e84092cc67387db3a2042487b8dacfe5b588738973a59f5fa813a33e4bb8fbafa407794db990a307201b0a0fbd92ddd181a868a6cfa64625353714e9b1de6f81f3addbf5b202030dbd9e51385db9314591f01af01f07cc92f18ebe60545cea53eb54438e251fd88e7380b5a0612c29ccb7dfd88f7a7d7f0dd07a9b596923602798ad9f1bbb89fffd3cdb8fb94c48640d27fa681e47");
+				// char Modulus[513]="ab9d5c8d1fe67207749d63b7dcedd233ce32bb70d175a1bc38c612ab33e2c58e51f83f2788e4d52d9bceb5a1513929de3f526650071a067e6c161b05c60a495fc3ba79ed26f4fa8b2fe2ca8dec44b39759f39206f06a85f9424005a29f05e4cf3a0239340c28c993c1a61cf1b2b6b57c7d8e576ae86827f812b327625baec9ecbf55f1651d35600b9f955f6c2f3bea3aa5852ecdd36a0af818c19acc1030979bed3c89993faa92e0aa0502413b3ca86bbf63477f12ac069aff7137cb72c57f886da79033bbb3b4df0f6cc7fcc18e343aa76036681a566311e267c03b65c98abc91e58f090020c67f776199c0eb76d7e6363687475d3da36ff050f85275607fdd";
+            // then processing is of PA
+            char file_name[]="/fs/microsd/log/permission_artifact_breach.xml";
+	         char Tag_Signed_Value0[17]="SignatureValue";
+				//  char Signature_Value0[550];// in base 64
+				char *Signature_Value0=(char*) malloc(550*sizeof(char));
+
+				getTagvalue(Tag_Signed_Value0,Signature_Value0, file_name);
+
+				base64decoder(Signature_Value0, Signature_Value_in_hex);
+
+				free(Signature_Value0);
+         }else{
+            strcpy(Modulus,keyy->modulus);
+            strcpy(Signature_Value_in_hex,input);
+
+         }
+				//free( Signature_Value_in_hex);
+				int cb;
+				mp_int message,modulus,public_key,Decrypted;
+				cb= mp_init_multi(&message,&modulus,&public_key,&Decrypted,NULL);
+				cb= mp_read_radix(&message,Signature_Value_in_hex,16);
+				// free(Signature_Value_in_hex);
+
+				/// Public key of dgca: This has to be taken from a reserved file in directory./ firmware update
+
+				cb= mp_read_radix(&modulus,Modulus,16);
+
+				// mp_int ;
+				cb= mp_read_radix(&public_key,"65537",10);
+
+				//mp_int ;
+				cb= mp_exptmod(&message, &public_key,&modulus,&Decrypted);   //                       this part for decrypting encrypted text
+				printf("%d",cb);
+            char message_string_hex[513];
+            mp_to_hex(&Decrypted,message_string_hex,sizeof(message_string_hex));
+            mp_clear_multi(&message,&modulus,&public_key,&Decrypted,NULL);
+
+            strcpy(res,message_string_hex);
+         //   strcat(res,"/0");
+
+}
+
+
+void valid_chunk_refe(FILE *fptr, char *re_sha, int type,char *canon){
 
   // type 1== Reference section
   // type 2== Signed_info section
 
    char content_canonilized[2000];//=(char*) malloc(2000*sizeof(char));
-   char xmlExeclusive[2000];//=(char*) malloc(2000*sizeof(char));
-   char output[2000];//=(char*) malloc(2000*sizeof(char));
+   
    char Sha_of_Reference[100];//=(char*) malloc(300*sizeof(char));
    char file_name[]="/fs/microsd/log/permission_artifact_breach.xml";
 
@@ -12706,21 +12776,27 @@ void valid_chunk_refe(FILE *fptr, char *re_sha, int type){
 
    //free(Reference_canonilized);
    //fclose(fptr);
+  
+   char *output=(char*) malloc(2000*sizeof(char));
+
    cleanerXML(content_canonilized,output);
 
 
    fprintf(fptr,"\n%s\n",output);
    if(type==1){
+      char *xmlExeclusive=(char*) malloc(2000*sizeof(char));
       xmlExeclusiveCanon(output,xmlExeclusive);
       fprintf(fptr,"\nre %s\n",xmlExeclusive);
-   }
-
-   if(type==1){
       Sha256_implement(xmlExeclusive,Sha_of_Reference,NULL,0);
+      
+      if(canon!=NULL){
+         strcpy(canon,xmlExeclusive);
+      }
+      free(xmlExeclusive);
    }else{
       Sha256_implement(output,Sha_of_Reference,NULL,0);
    }
-
+   free(output);
 
    fprintf(fptr,"\n%s\n",Sha_of_Reference);
    strcpy(re_sha,Sha_of_Reference);
@@ -12747,69 +12823,439 @@ void valid_chunk_refe_2(FILE *fptr, char *re_sha){
 }*/
 
 
-void pa_validation(){
+int pa_validation(char *can){
 
       FILE *fptr;
-      fptr=fopen("/fs/microsd/result.txt","w");
+      fptr=fopen("/fs/microsd/debug_pa.txt","w");
 
       char file_name[]="/fs/microsd/log/permission_artifact_breach.xml";
       char *Digest_Value0=(char*) malloc(100*sizeof(char));
       char Sha_of_Reference[70];
       char Sha_of_SignedInfo[70];
-      valid_chunk_refe(fptr,Sha_of_Reference,1);
+      valid_chunk_refe(fptr,Sha_of_Reference,1,can);
       fprintf(fptr,"\n\n%s\n",Sha_of_Reference);
 
-      valid_chunk_refe(fptr,Sha_of_SignedInfo,2);
+      valid_chunk_refe(fptr,Sha_of_SignedInfo,2,NULL);
       fprintf(fptr,"\n\n%s\n",Sha_of_SignedInfo);
 
       char Tag_Digest_value0[12]="DigestValue";
       getTagvalue(Tag_Digest_value0,Digest_Value0,file_name);
       char *Digest_Value_in_hex=(char*) malloc(100*sizeof(char));
       base64decoder(Digest_Value0, Digest_Value_in_hex);
-      fprintf(fptr,"\n\n Digest value %s\n",Digest_Value_in_hex);
+
+      fprintf(fptr,"\n\n Digest value in PA (hexadecimal):\n %s\n",Digest_Value_in_hex);
       free(Digest_Value0);
 
       char *Extracted_sha_from_Signature_value=(char*) malloc(100*sizeof(char));
-      char *message=(char*) malloc(750*sizeof(char));
+      char *messa=(char*) malloc(750*sizeof(char));
 
-      check_debug_mp(message);
+      check_debug_mp(NULL,messa,NULL);
+
 
       char padding_SHA256[447]="1ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff003031300d060960864801650304020105000420";
       for(int o=0;o<444;o++){
-            if(padding_SHA256[o]!=small_letter(message[o])){
-               //return 2;
+            if(padding_SHA256[o]!=small_letter(messa[o])){
+              
                fprintf(fptr,"%s","\n Bad SIGN \n");
-               break;
+                return 2;
+              // break;
             }
       }
 
       fprintf(fptr,"%s","\n SIGN is good \n");
       int k_cout=0;
-      for(int i2=445;message[i2]!='\0';i2++){
-            Extracted_sha_from_Signature_value[k_cout]=small_letter(message[i2]);
+      for(int i2=445;messa[i2]!='\0';i2++){
+            Extracted_sha_from_Signature_value[k_cout]=small_letter(messa[i2]);
             k_cout++;
          // printf("%c",message_string_hex[i]);
       }
       Extracted_sha_from_Signature_value[k_cout]='\0';//
       fprintf(fptr,"\n%s\n",Extracted_sha_from_Signature_value);
+
+      int valid_status;
+
       if(strcmp(Extracted_sha_from_Signature_value,Sha_of_SignedInfo)==0){
-
+      
          if(strcmp(Sha_of_Reference,Digest_Value_in_hex)==0){
-                  fprintf(fptr,"%s","\n 100000000000PA is valid and non tampered \n");
-
+               fprintf(fptr,"%s","\n PA is valid and non tampered \n");
+               valid_status=1;
             }else{
                   fprintf(fptr,"%s","\n PA is not valid\n");
+                  valid_status=0;
 
             }
 
          }else{
             fprintf(fptr,"%s","\n PA is not valid \n");
+             valid_status=0;
          //  PX4_INFO("PA is valid???????????");
 
          }
       free(Extracted_sha_from_Signature_value);
-      free(message);
+      free(messa);
       free(Digest_Value_in_hex);
       fclose(fptr);
+      return valid_status;
 
+}
+
+
+
+static int   n_prime;
+static FILE *primes;
+
+ //fast square root 
+mp_digit i_sqrt(mp_word x)
+{
+   mp_word x1, x2;
+
+   x2 = x;
+   do {
+      x1 = x2;
+      x2 = x1 - ((x1 * x1) - x) / (2u * x1);
+   } while (x1 != x2);
+
+   if ((x1 * x1) > x) {
+      --x1;
+   }
+
+   return x1;
+}
+
+
+//generates a prime digit 
+void gen_prime(void)
+{
+   mp_digit r, x, y, next;
+   FILE *out;
+
+   out = fopen("/fs/microsd/log/pprime.dat", "wb");
+   if (out != NULL) {
+
+      // write first set of primes 
+      //INDENT-OFF* 
+      r = 3uL; fwrite(&r, 1uL, sizeof(mp_digit), out);
+      r = 5uL; fwrite(&r, 1uL, sizeof(mp_digit), out);
+      r = 7uL; fwrite(&r, 1uL, sizeof(mp_digit), out);
+      r = 11uL; fwrite(&r, 1uL, sizeof(mp_digit), out);
+      r = 13uL; fwrite(&r, 1uL, sizeof(mp_digit), out);
+      r = 17uL; fwrite(&r, 1uL, sizeof(mp_digit), out);
+      r = 19uL; fwrite(&r, 1uL, sizeof(mp_digit), out);
+      r = 23uL; fwrite(&r, 1uL, sizeof(mp_digit), out);
+      r = 29uL; fwrite(&r, 1uL, sizeof(mp_digit), out);
+      r = 31uL; fwrite(&r, 1uL, sizeof(mp_digit), out);
+      //INDENT-ON* 
+
+      // get square root, since if 'r' is composite its factors must be < than this 
+      y = i_sqrt(r);
+      next = (y + 1uL) * (y + 1uL);
+
+      for (;;) {
+         do {
+            r += 2uL;       // next candidate 
+            r &= MP_MASK;
+            if (r < 31uL) break;
+
+            // update sqrt ? 
+            if (next <= r) {
+               ++y;
+               next = (y + 1uL) * (y + 1uL);
+            }
+
+            // loop if divisible by 3,5,7,11,13,17,19,23,29  
+            if ((r % 3uL) == 0uL) {
+               x = 0uL;
+               continue;
+            }
+            if ((r % 5uL) == 0uL) {
+               x = 0uL;
+               continue;
+            }
+            if ((r % 7uL) == 0uL) {
+               x = 0uL;
+               continue;
+            }
+            if ((r % 11uL) == 0uL) {
+               x = 0uL;
+               continue;
+            }
+            if ((r % 13uL) == 0uL) {
+               x = 0uL;
+               continue;
+            }
+            if ((r % 17uL) == 0uL) {
+               x = 0uL;
+               continue;
+            }
+            if ((r % 19uL) == 0uL) {
+               x = 0uL;
+               continue;
+            }
+            if ((r % 23uL) == 0uL) {
+               x = 0uL;
+               continue;
+            }
+            if ((r % 29uL) == 0uL) {
+               x = 0uL;
+               continue;
+            }
+
+            // now check if r is divisible by x + k={1,7,11,13,17,19,23,29} 
+            for (x = 30uL; x <= y; x += 30uL) {
+               if ((r % (x + 1uL)) == 0uL) {
+                  x = 0uL;
+                  break;
+               }
+               if ((r % (x + 7uL)) == 0uL) {
+                  x = 0uL;
+                  break;
+               }
+               if ((r % (x + 11uL)) == 0uL) {
+                  x = 0uL;
+                  break;
+               }
+               if ((r % (x + 13uL)) == 0uL) {
+                  x = 0uL;
+                  break;
+               }
+               if ((r % (x + 17uL)) == 0uL) {
+                  x = 0uL;
+                  break;
+               }
+               if ((r % (x + 19uL)) == 0uL) {
+                  x = 0uL;
+                  break;
+               }
+               if ((r % (x + 23uL)) == 0uL) {
+                  x = 0uL;
+                  break;
+               }
+               if ((r % (x + 29uL)) == 0uL) {
+                  x = 0uL;
+                  break;
+               }
+            }
+         } while (x == 0uL);
+         if (r > 31uL) {
+            fwrite(&r, 1uL, sizeof(mp_digit), out);
+           // printf("%9lu\r", r);
+            fflush(stdout);
+         }
+         if (r < 31uL) break;
+      }
+
+      fclose(out);
+   }
+}
+
+void load_tab(void)
+{
+   primes = fopen("/fs/microsd/log/pprime.dat", "rb");
+   if (primes == NULL) {
+      gen_prime();
+      primes = fopen("/fs/microsd/log/pprime.dat", "rb");
+   }
+   fseek(primes, 0L, SEEK_END);
+   n_prime = ftell(primes) / sizeof(mp_digit);
+}
+
+mp_digit prime_digit(void)
+{
+   int n;
+   mp_digit d;
+
+   n = abs(rand()) % n_prime;
+   fseek(primes, n * sizeof(mp_digit), SEEK_SET);
+   fread(&d, 1uL, sizeof(mp_digit), primes);
+   return d;
+}
+
+
+// makes a prime of at least k bits 
+mp_err pprime(int k, int li, mp_int *p, mp_int *q)
+{   FILE *debug;
+   debug=fopen("/fs/microsd/debug_prime.txt","w");
+   mp_int  a, b, c, n, x, y, z, v;
+   mp_err  res;
+   int     ii;
+   static const mp_digit bases[] = { 2, 3, 5, 7, 11, 13, 17, 19 };
+
+   //single digit ? 
+   if (k <= (int) MP_DIGIT_BIT) {
+      mp_set(p, prime_digit());
+      return MP_OKAY;
+   }
+
+   if ((res = mp_init(&c)) != MP_OKAY) {
+      return res;
+   }
+
+   if ((res = mp_init(&v)) != MP_OKAY) {
+      goto LBL_C;
+   }
+
+   // product of first 50 primes 
+   if ((res =
+           mp_read_radix(&v,
+                         "19078266889580195013601891820992757757219839668357012055907516904309700014933909014729740190",
+                         10)) != MP_OKAY) {
+      goto LBL_V;
+   }
+
+   if ((res = mp_init(&a)) != MP_OKAY) {
+      goto LBL_V;
+   }
+fprintf(debug,"%s","\npart1\n");
+   //set the prime 
+   mp_set(&a, prime_digit());
+fprintf(debug,"%s","\npart2\n");
+   if ((res = mp_init(&b)) != MP_OKAY) {
+      goto LBL_A;
+   }
+
+   if ((res = mp_init(&n)) != MP_OKAY) {
+      goto LBL_B;
+   }
+
+   if ((res = mp_init(&x)) != MP_OKAY) {
+      goto LBL_N;
+   }
+
+   if ((res = mp_init(&y)) != MP_OKAY) {
+      goto LBL_X;
+   }
+
+   if ((res = mp_init(&z)) != MP_OKAY) {
+      goto LBL_Y;
+   }
+   fprintf(debug,"%s","\nvariables declared\n");
+   // now loop making the single digit 
+   while (mp_count_bits(&a) < k)
+   {
+      fprintf(debug, "prime has %4d bits left\r", k - mp_count_bits(&a));
+      
+top:
+      mp_set(&b, prime_digit());
+  
+      // now compute z = a * b * 2 
+      if ((res = mp_mul(&a, &b, &z)) != MP_OKAY) {   // z = a * b 
+         goto LBL_Z;
+      }
+
+      if ((res = mp_copy(&z, &c)) != MP_OKAY) {   //c = a * b 
+         goto LBL_Z;
+      }
+
+      if ((res = mp_mul_2(&z, &z)) != MP_OKAY) {  // z = 2 * a * b 
+         goto LBL_Z;
+      }
+  fprintf(debug,"%s","\npart3\n");
+      // n = z + 1 
+      if ((res = mp_add_d(&z, 1uL, &n)) != MP_OKAY) {  // n = z + 1 
+         goto LBL_Z;
+      }
+
+      //check (n, v) == 1 
+      if ((res = mp_gcd(&n, &v, &y)) != MP_OKAY) {   // y = (n, v)
+         goto LBL_Z;
+      }
+fprintf(debug,"%s","\npart4\n");
+      if (mp_cmp_d(&y, 1uL) != MP_EQ)
+         goto top;
+
+fprintf(debug,"%s","\npart5\n");
+      // now try base x=bases[ii]  
+      for (ii = 0; ii < li; ii++) 
+      {
+         mp_set(&x, bases[ii]);
+
+         // compute x^a mod n 
+         if ((res = mp_exptmod(&x, &a, &n, &y)) != MP_OKAY) {  // y = x^a mod n 
+            goto LBL_Z;
+         }
+
+         // if y == 1 loop 
+         if (mp_cmp_d(&y, 1uL) == MP_EQ)
+            continue;
+
+         // now x^2a mod n 
+         if ((res = mp_sqrmod(&y, &n, &y)) != MP_OKAY) {    // y = x^2a mod n 
+            goto LBL_Z;
+         }
+
+         if (mp_cmp_d(&y, 1uL) == MP_EQ)
+            continue;
+
+         // compute x^b mod n 
+         if ((res = mp_exptmod(&x, &b, &n, &y)) != MP_OKAY) {  // y = x^b mod n 
+            goto LBL_Z;
+         }
+
+         // if y == 1 loop 
+         if (mp_cmp_d(&y, 1uL) == MP_EQ)
+            continue;
+
+         //now x^2b mod n 
+         if ((res = mp_sqrmod(&y, &n, &y)) != MP_OKAY) {    // y = x^2b mod n 
+            goto LBL_Z;
+         }
+
+         if (mp_cmp_d(&y, 1uL) == MP_EQ)
+            continue;
+
+         // compute x^c mod n == x^ab mod n 
+         if ((res = mp_exptmod(&x, &c, &n, &y)) != MP_OKAY) {  // y = x^ab mod n 
+            goto LBL_Z;
+         }
+
+         // if y == 1 loop 
+         if (mp_cmp_d(&y, 1uL) == MP_EQ)
+            continue;
+
+         // now compute (x^c mod n)^2 
+         if ((res = mp_sqrmod(&y, &n, &y)) != MP_OKAY) {    // y = x^2ab mod n 
+            goto LBL_Z;
+         }
+
+        
+         if (mp_cmp_d(&y, 1uL) != MP_EQ)
+            continue;
+         break;
+      }
+
+      if (ii == li)
+         goto top;
+
+  
+
+      // a = n 
+      mp_copy(&n, &a);
+   }
+ 
+   //get q to be the order of the large prime subgroup 
+   mp_sub_d(&n, 1uL, q);
+   mp_div_2(q, q);
+   mp_div(q, &b, q, NULL);
+
+   mp_exch(&n, p);
+
+   res = MP_OKAY;
+LBL_Z:
+   mp_clear(&z);
+LBL_Y:
+   mp_clear(&y);
+LBL_X:
+   mp_clear(&x);
+LBL_N:
+   mp_clear(&n);
+LBL_B:
+   mp_clear(&b);
+LBL_A:
+   mp_clear(&a);
+LBL_V:
+   mp_clear(&v);
+LBL_C:
+   mp_clear(&c);
+   fclose(debug);
+   return res;
 }

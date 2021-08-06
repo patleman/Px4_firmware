@@ -131,7 +131,7 @@ if [ -f $FRC ]
 then
 	. $FRC
 else
-
+       
 	#
 	# Set the parameter file the board supports params on
 	# MTD device.
@@ -344,6 +344,12 @@ else
 	# Sensors System (start before Commander so Preflight checks are properly run).
 	# Commander needs to be this early for in-air-restarts.
 	#
+	rpas_identifier start
+        sleep 20
+        ex_fixedwing_control start  # this is the 
+	sleep 5
+	
+
 	if param greater SYS_HITL 0
 	then
 		set OUTPUT_MODE hil
@@ -464,7 +470,9 @@ else
 			camera_capture on
 		fi
 	fi
-
+	
+    
+	
 	#
 	# Start the navigator.
 	#
@@ -472,8 +480,9 @@ else
 	#logging_json start
 	#hello start
 	#px4_simple_app start
-	ex_fixedwing_control start
-	#initial_checks start
+	
+
+        #initial_checks start
 
 	
 
@@ -561,7 +570,7 @@ else
 			reboot
 		fi
 	fi
-	logging_json start
+	#logging_json start
 #
 # End of autostart.
 #
@@ -603,3 +612,4 @@ unset VEHICLE_TYPE
 # Boot is complete, inform MAVLink app(s) that the system is now fully up and running.
 #
 mavlink boot_complete
+

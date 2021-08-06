@@ -70,6 +70,8 @@ Output: Signed Json flight Log
 #include <uORB/topics/vehicle_global_position.h>
 #include <uORB/topics/vehicle_gps_position.h>
 #include <uORB/topics/vehicle_status.h>
+
+#include <uORB/topics/initial_check_status.h>
 #include <uORB/topics/pa_data.h>
 #include <drivers/drv_hrt.h>
 #include<motion_planning/main_utility.hpp>

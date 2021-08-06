@@ -32,10 +32,10 @@
 ############################################################################
 
 px4_add_module(
-	MODULE examples__logging_json
-	MAIN logging_json
-	SRCS	logging_json.hpp
-		logging_json.cpp
+	MODULE modules__registration_check
+	MAIN registraion_check
+	SRCS	registration_check.hpp
+		registration_check.cpp
 	DEPENDS
 		motion_planning
 	)

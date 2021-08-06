@@ -63,7 +63,7 @@
 //#include "json_support.h"
 
 /* process-specific header files */
-#include "initial_checks.hpp"
+#include "registration_check.hpp"
 
 using namespace time_literals;
 
@@ -78,12 +78,12 @@ using namespace time_literals;
  * the command line to one particular process or the need for bg/fg
  * ^Z support by the shell.
  */
-extern "C" __EXPORT int initial_checks_main(int argc, char *argv[]);
+extern "C" __EXPORT int registration_check_main(int argc, char *argv[]);
 
 /**
  * Mainloop of daemon.
  */
-int initial_checks_thread_main(int argc, char *argv[]);
+int registration_check_thread_main(int argc, char *argv[]);
 
 /**
  * Print the correct usage.
@@ -99,7 +99,7 @@ static int deamon_task;				/**< Handle of deamon task / thread */
 
 
 /* Main Thread */
-int initial_checks_thread_main(int argc, char *argv[])
+int registration_check_thread_main(int argc, char *argv[])
 {
 
 
@@ -119,119 +119,88 @@ int initial_checks_thread_main(int argc, char *argv[])
 	 * http://en.wikipedia.org/wiki/Publish–subscribe_pattern
 	 *
 	 */
+    
+	FILE *fptr_registration;
+	fptr_registration=fopen("/fs/microsd/UUID.txt","r");
+	// publish the identtiy check status to the uorb topic  
 
-	struct vehicle_global_position_s vgp;
-	memset(&vgp, 0, sizeof(vgp));
+    bool ics_updated;
+	
+	int ics_sub = orb_subscribe(ORB_ID(initial_check_status));
 
-
-	int vgp_sub = orb_subscribe(ORB_ID(vehicle_global_position));
-
-
-        orb_set_interval(vgp_sub,1000);
-
-	hrt_abstime then=hrt_absolute_time();
-
-	struct pollfd fds[1] {};
-
-	fds[0].fd = vgp_sub;
-
-	fds[0].events = POLLIN;
-
-	usleep(10000000);// 10 seconds break to get valid data from gps
-	while (!thread_should_exit) {
-
-		/*
-		 * Wait for a sensor or param update, check for exit condition every 500 ms.
-		 * This means that the execution will block here without consuming any resources,
-		 * but will continue to execute the very moment a new attitude measurement or
-		 * a param update is published. So no latency in contrast to the polling
-		 * design pattern (do not confuse the poll() system call with polling).
-		 *
-		 * This design pattern makes the controller also agnostic of the attitude
-		 * update speed - it runs as fast as the attitude updates with minimal latency.
-		 */
-		int ret = poll(fds, 1, 1000);
-
-		if (ret < 0) {
-			/*
-			 * Poll error, this will not really happen in practice,
-			 * but its good design practice to make output an error message.
-			 */
-			warnx("poll error");
-
-		} else if (ret == 0) {
-			/* no return value = nothing changed for 500 ms, ignore */
-		} else {
-
-			if (fds[0].revents & POLLIN) {
-
-				//this section runs  when a new estimate from vehicle_global_position arrives
-
-                                if (hrt_elapsed_time(&then)>1_s)
-				{
-					orb_copy(ORB_ID(vehicle_global_position),vgp_sub,&vgp);
-
-
-					//Function 1
-					// for this hardware parts would be needed.
-					// First we check for RPAS identifier, if any device has been changed or not
-					// there is a true value for drone id and a value calculated every time powering on the system
-					// if they both matched,then RPAS has not been tampered
-					// if they didnt , RPAS has been tampered , not allow to fly, A file is created and send to
-					//management client (signed by key/pair_C), then from management client to Management server.
-					//file informaton: 1)timestamp 2)Component's device id that didnt match.
-
-					static int RPAS_identifier_check=0;
-						return 0;
-					if (RPAS_identifier_check==0){
-						FILE *fptr;
-						fptr=fopen("/fs/microsd/gps_id.txt","w");
-						int identity_check= RPAS_identifier(fptr);
-						fprintf(fptr,"ide  %d",identity_check);
-						fclose(fptr);
-					
-
-						/*if(identity_check==0){
-
-							mavlink_log_critical(mavlink_log_pub, "Unautorized Hardware parts attached");
-
-							return false;
-						}
-						if(identity_check==2){
-							// this is the case when HArdwareInuse.tx fie is removed from the firmware
-							mavlink_log_critical(mavlink_log_pub, "Hardware refference file not found. Please update the firmware");
-							return false;
-						}
-						if(identity_check==1){
-							// all hardwares are authorized
-							RPAS_identifier_check=1;
-
-						}*/
-					}
-
-
-
-					then=hrt_absolute_time();
-				}
-
-
-				// check if landing has taken place or not
-
-
-
-
-
-			}
+		struct initial_check_status_s ics_fetch;
+	memset(&ics_fetch, 0, sizeof(ics_fetch));
+    int aux;
+	while(1){
+		orb_check(ics_sub, &ics_updated);
+		if(ics_updated){
+		
+	        orb_copy(ORB_ID(initial_check_status), ics_sub, &ics_fetch);
+			aux=ics_fetch.identifier_status;
+        
+             break;
 		}
+		usleep(500000);
 	}
+	
+    struct initial_check_status_s ics;
+	memset(&ics, 0, sizeof(ics));
+		
+	orb_advert_t ics_pub = orb_advertise(ORB_ID(initial_check_status), &ics);  
+
+
+	if(fptr_registration!=NULL)
+	{	//file is present
+		fclose(fptr_registration);
+		char DroneID_container_1[30];
+		char TAG_DRONE_ID_1[10]="DroneID";
+		char DRONE_ID_FILE_1[100]="/fs/microsd/UUID.txt";
+		int check_validity_DroneID_1=file_read(DRONE_ID_FILE_1,TAG_DRONE_ID_1,DroneID_container_1,1);
+		// if non tampered -->then continue
+		FILE *fptr;
+		fptr=fopen("/fs/microsd/debug_uuid.txt","w");
+		fprintf(fptr,"status  :::: %d\n",check_validity_DroneID_1);
+		fprintf(fptr,"status1  :::: %d\n",ics_fetch.identifier_status);
+		fclose(fptr);
+		if (check_validity_DroneID_1==0){
+			//UUID file is not valid, remove the invalid file
+			remove("/fs/microsd/UUID.txt");
+			ics.registration_status=3;
+			ics.identifier_status=ics_fetch.identifier_status;
+	
+		}else{
+			//file is valid, check for strings
+			if(strcmp(DroneID_container_1,"ABBDDJEDNDJK")==0){
+			//Drone is registered
+				printf("\n\nDrone is registered\n\n");
+				ics.registration_status=1;
+				ics.identifier_status=aux;
+				
+			}else{
+				// UUID.txt file is for different drone
+				// not UUID.txt of this drone
+				ics.registration_status=2;
+				ics.identifier_status=ics_fetch.identifier_status;
+				remove("/fs/microsd/UUID.txt");
+			}
+
+		}
 
 
 
+	}
+	else{
+	// registration has not been done, also recommend to connect to management client and
+	// internet
+	// UUID.txt file not present
+           ics.registration_status=0;
+		   ics.identifier_status=ics_fetch.identifier_status;
+		
+	}
+	ics.timestamp=hrt_absolute_time();
+	orb_publish(ORB_ID(initial_check_status), ics_pub, &ics);
 
-	thread_running = false;
 
-
-	fflush(stdout);
 
 	return 0;
 }
@@ -256,7 +225,7 @@ usage(const char *reason)
  * The actual stack size should be set in the call
  * to px4_task_spawn_cmd().
  */
-int initial_checks_main(int argc, char *argv[])
+int registration_check_main(int argc, char *argv[])
 {
 	if (argc < 2) {
 		usage("missing command");
@@ -270,23 +239,13 @@ int initial_checks_main(int argc, char *argv[])
 			/* this is not an error */
 			return 0;
 		}
-        usleep(10000000);
-	int indi_sub_fd = orb_subscribe(ORB_ID(indi_prc));
-        while(1){
-			struct indi_prc_s indi;
-			/* copy sensors raw data into local buffer */
-			orb_copy(ORB_ID(indi_prc), indi_sub_fd, &indi);
-			if(indi.valid==1){
-				break;
-			}
-			usleep(2000000);
-	}
+        
 		thread_should_exit = false;
-		deamon_task = px4_task_spawn_cmd("initial_checks",
+		deamon_task = px4_task_spawn_cmd("registration_check",
 						 SCHED_DEFAULT,
 						 SCHED_PRIORITY_MAX - 20,
-						 8048,
-						 initial_checks_thread_main,
+						 35048,
+						 registration_check_thread_main,
 						 (argv) ? (char *const *)&argv[2] : (char *const *)nullptr);
 		thread_running = true;
 		return 0;

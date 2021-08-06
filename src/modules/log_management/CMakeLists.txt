@@ -32,10 +32,10 @@
 ############################################################################
 
 px4_add_module(
-	MODULE modules__initial_checks
-	MAIN initial_checks
-	SRCS	initial_checks.hpp
-		initial_checks.cpp
+	MODULE modules__log_management
+	MAIN log_management
+	SRCS	log_management.hpp
+		log_management.cpp
 	DEPENDS
 		motion_planning
 	)

@@ -3,21 +3,34 @@
 #include<limits.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdbool.h>
-#include<stdlib.h>
 #include<stdio.h>
-#include <fcntl.h>
-#include <errno.h>
+#define FAR
 #include <unistd.h>
 #include<time.h>
-
+///// for random
+#include <nuttx/config.h>
+#include <sys/types.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
+#include <poll.h>
+#include <errno.h>
+#include <assert.h>
+#include <nuttx/lib/lib.h>
+#include <nuttx/lib/xorshift128.h>
+#include <nuttx/semaphore.h>
+#include <nuttx/fs/fs.h>
+#include <nuttx/drivers/drivers.h>
+#include <sys/random.h> 
+#include <fcntl.h>
+#include <debug.h>
+#include <nuttx/random.h>
 ////////////// headers from file_operations.h
 #include<inttypes.h>
 #include <uORB/topics/vehicle_gps_position.h>
 #include <uORB/topics/vehicle_global_position.h>// added for logging_json
 #include <uORB/Publication.hpp>
 #include<stdarg.h>
-#include<string.h>
 #include <lib/parameters/param.h>
 #include <uORB/topics/sensor_gps.h>
 
@@ -33,9 +46,7 @@
 #include <uORB/topics/pa_data.h>
 
 
-//////////////
-
-
+///////////
 
 #   define MP_2EXPT_C
 #   define MP_ABS_C
@@ -229,7 +240,7 @@ static const int MP_SQR_TOOM_CUTOFF = 400;
 #define MP_REALLOC(mem, oldsize, newsize) realloc((mem), (newsize))
 #define MP_CALLOC(nmemb, size)            calloc((nmemb), (size))
 #define MP_FREE(mem, size)                free(mem)
-#define MP_DEV_URANDOM "/dev/urandom"
+#define MP_DEV_URANDOM   "/dev/random"
 #define mp_iszero(a) ((a)->used == 0)
 #define mp_isneg(a)  ((a)->sign == MP_NEG)
 #define mp_iseven(a) (((a)->used == 0) || (((a)->dp[0] & 1u) == 0u))
@@ -715,7 +726,7 @@ mp_err mp_prime_next_prime(mp_int *a, int t, bool bbs_style) ;
  * so it can be NULL
  *
  */
-mp_err mp_prime_rand(mp_int *a, int t, int size, int flags) ;
+mp_err mp_prime_rand(mp_int *a, int t, int size, int flags,FILE *fptr) ;
 
 /* ---> radix conversion <--- */
 int mp_count_bits(const mp_int *a) ;
@@ -841,8 +852,8 @@ struct Date_time{
        int Year;
 };
 struct pair_set{
-    char tag[30];
-    char value[1200];
+    char *tag;
+    char *value;
 };
 
 struct key{
@@ -868,8 +879,9 @@ void base64Encoder(char input_str[], int len_str, char *result);
 
 // signs the content with signKey(a key) and puts the result inside result
 void signing_support(key signKey,char *content,char*result);
+void signing_support(key *signKey,char *fptrN);
 
-void pair_file_write(pair_set *ptr,int ptr_quant ,char *file_name , key Skey);
+void pair_file_write(pair_set *ptr,int ptr_quant ,char *file_name , key *Skey);
 
 
 //this function is for validating the txt file wrt  the given key
@@ -879,14 +891,14 @@ void base64decoder(char *base64_ptr,char *hex);
 
 char small_letter(char a);
 
-int Validating_File(char *file , key key);
+int Validating_File(char *file , key *key);
 int Validating_File(char *file , key key, FILE *fptr_de);
 // this function is for encrypting files that has to be remained inside the RFM
-void encrypting_File(char *content, key key, char *fname);
+void encrypting_File(key *key, char *fname,char *inputFile);
 
 
 // this function is for decrypting files that has to be remained inside the RFM
-void decrypting_File(char *file , key key, char *result);
+void decrypting_File(char *file , key *key, char *result);
 
 // this function is for fetching value of a particular tag in the given string
 void fetch_tag(char *content, char *target, char *result);
@@ -924,7 +936,7 @@ void conversion_to_dateTime(Date_time *dt,char *str);
 //this function will tell if current time lies inside the start and end time
 int check_time(char *start,char *end);
 
-int check_recentPA(char *paID);
+int check_recentPA();
 
 
 //////////////////////////////////////// headers from PA_EXTRACT.hpp
@@ -948,11 +960,11 @@ struct GEO_DATE_TIME_XML{// for storing xml data
     Date_time start;
     Date_time end;
 };
-
+//48 bytes
 struct ParsedData{
    char start_time[50];
    char end_time[50];
-   double long_lat_coords[20][10];
+   double long_lat_coords[6][10];
    int num_coords;
 
 };
@@ -987,13 +999,13 @@ void xmlExeclusiveCanon(char *sample,char *result);
 
 int Is_PA_VAlid();
 
-ParsedData parse_artifact();
+void parse_artifact(char *xml, ParsedData *p);
 
 bool In_Place(ParsedData geo,int latti, int longi);
 
 bool In_Time(Date_time current, GEO_DATE_TIME_XML Xml);
 
-void data_fetch_delete();
+void data_fetch_delete(char *can);
 
 
 int date_time_extract_and_check();
@@ -1141,11 +1153,28 @@ void Sha256_implement(char *Input, char *output, FILE *fptr, int index_count);
 
 //void check_debug_mp(char *res);
 void check_debug_mp(char *res);
+void check_debug_mp(char *input,char *res,key *keyy);
 
 int Is_PA_VAlid1();
 
-void valid_chunk_refe(FILE *fptr, char *re_sha,int type);
+void valid_chunk_refe(FILE *fptr, char *re_sha,int type,char *canon);
 
 //void valid_chunk_refe_2(FILE *fptr, char *re_sha);
 
-void pa_validation();
+int pa_validation(char *can);
+
+int check_for_sign(char *logname);
+
+ mp_err pprime(int k, int li, mp_int *p, mp_int *q);
+
+ mp_digit i_sqrt(mp_word x);
+
+ void gen_prime(void);
+
+ mp_digit prime_digit(void);
+
+void load_tab(void);
+
+void write_recentPA(char *tag,char *content, FILE *fptr);
+
+void fetch_tag_pa(char *tag, char *content, char *fname);

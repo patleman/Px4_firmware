@@ -61,6 +61,7 @@
 #include <uORB/topics/parameter_update.h>
 #include <uORB/topics/position_setpoint_triplet.h>
 #include <uORB/topics/vehicle_attitude.h>
+#include <uORB/topics/initial_check_status.h>
 #include <uORB/topics/vehicle_attitude_setpoint.h>
 #include <uORB/topics/vehicle_global_position.h>
 #include <uORB/topics/vehicle_global_position.h>
@@ -88,7 +89,7 @@
 #include<motion_planning/print_hello.hpp>
 
 /////////////
-
+#include <sys/random.h> 
 #include <px4_platform_common/px4_config.h>
 #include <px4_platform_common/tasks.h>
 #include <stdio.h>
@@ -148,7 +149,7 @@ static bool thread_running = false;		/**< Daemon status flag */
 /* Main Thread */
 int fixedwing_control_thread_main(int argc, char *argv[])
 {
-	Geo_tag content_holder[10];
+/*	Geo_tag content_holder[10];
 	memset(&content_holder[0],0,sizeof(content_holder));
 
 	//this is for knowing current time
@@ -187,13 +188,13 @@ int fixedwing_control_thread_main(int argc, char *argv[])
 
 
 
-	/*
-	 * Later used to Advertise RTL vehicle command
-	 * */
+	
+	 // Later used to Advertise RTL vehicle command
+	 
 	//orb_advert_t v_cmd_pub = orb_advertise(ORB_ID(vehicle_command), &v_cmd);
 
         static int pas_time=0;
-	/* subscribe to topics. */
+	// subscribe to topics. 
 	int vgp_sub = orb_subscribe(ORB_ID(vehicle_global_position));
 
 	int vgps_sub = orb_subscribe(ORB_ID(vehicle_gps_position));
@@ -206,18 +207,99 @@ int fixedwing_control_thread_main(int argc, char *argv[])
 
 	orb_set_interval(vgp_sub,1000);
 	orb_set_interval(vgps_sub,1000);
-	/* Setup of loop */
+	
 
 	struct pollfd fds[1] {};
 
 	fds[0].fd = vgp_sub;
 
 	fds[0].events = POLLIN;
+*/
 
-usleep(10000000);
-pa_validation();
+/*
+char file_id[20]="rt567";
+Key_rotation_start(file_id);*/
+  /*script for generating prime number
+  FILE *file;
+  file=fopen("/fs/microsd/key_new.txt","w");
+   fprintf(file,"\n%s\n","prime number generation");
+    mp_int  p1;
+	mp_int q1;
+    char    buf[1000];
+
+    mp_init(&p1);
+    mp_init(&q1);
+
+    mp_prime_rand(&p1,1,1024,MP_PRIME_2MSB_ON,file);
+    mp_to_decimal(&p1,buf,sizeof(buf));
+    fprintf(file,"\nPrime 1 :%s\n",buf);
+    memset(buf,0,sizeof(buf));
+    
+	mp_prime_rand(&q1,1,1024,MP_PRIME_2MSB_ON,file);
+    mp_to_decimal(&q1,buf,sizeof(buf));
+    fprintf(file,"\n\nPrime 2 :%s\n",buf);
+    memset(buf,0,sizeof(buf)); 
+	mp_clear(&p1);
+	mp_clear(&q1);*/
+
+//usleep(3000000);
+  /* script for testing file method for random genration
+    FILE *file;
+    file=fopen("/fs/microsd/key_new.txt","w");
+    
+    FILE *f;
+	f=fopen("/fs/microsd/log/pprime.dat","r");
+	if(f){
+		fprintf(file,"\n%s\n","opening....");
+		fclose(f);
+	}else{
+		fprintf(file,"\n%s\n","not opening....");
+	}
+   mp_int  p1,q1;
+   char    buf[1096];
+   int     k=40;
+   int  li=3;
+   
+   
+
+ 
+
+   load_tab();
+   int err;
+   err=mp_init(&p1);
+   err=mp_init(&q1);
+
+   
+  err= pprime(k, li, &p1, &q1);
+   int r=rand();
+   fprintf(file,"\nrandom number generated == %d\n", r);
+  err= mp_to_decimal(&p1, buf, sizeof(buf));
+   fprintf(file,"\nP == %s\n", buf);
+  err= mp_to_decimal(&q1, buf, sizeof(buf));
+   fprintf(file,"Q == %s\n", buf);
+    mp_clear(&q1);
+	mp_clear(&p1);
+
+    mp_int s;
+	mp_init(&s);
+	unsigned char buff[50]="100010010101";
+	err=mp_from_ubin(&s,buff, sizeof(buf));
+	mp_read_radix(&s,buf,10);
+	fprintf(file,"err code == %d\n", err);
+	fprintf(file,"decimal of binary == %s\n", buf);
+
+	mp_clear(&s);*/
+ // lib_dumpbuffer("Random values", (FAR const uint8_t*)buffer, nread);
+  //close(fd);
+ 
+	//fclose(file);
+
+//pa_validation();
+/*
 key key_rfm;
+
 FILE *fptr1;
+
 fptr1=fopen("/fs/microsd/debug.txt","w");
 get_RFM_Key(&key_rfm);
 fprintf(fptr1,"\n%s\n",key_rfm.modulus);
@@ -227,9 +309,9 @@ char f[60]="/fs/microsd/log/recentPA.txt";
 int valid_status=Validating_File(f,key_rfm,fptr1);
 
 fprintf(fptr1,"\n \n status :%d\n",valid_status);
+//fetching_publish_padata();
 
-
-fclose(fptr1);				
+fclose(fptr1);	*/			
  /*FILE *fptr;
       fptr=fopen("/fs/microsd/result.txt","w");
 
@@ -375,7 +457,8 @@ fclose(fptr1);
       free(message);
       free(Digest_Value_in_hex);
       fclose(fptr);*/
-usleep(3000000);
+	  
+//usleep(3000000);
 
 //fetching_publish_padata();
 /*struct indi_prc_s indi;
@@ -383,15 +466,106 @@ memset(&indi, 0, sizeof(indi));
 orb_advert_t indi_pub = orb_advertise(ORB_ID(indi_prc), &indi);
 indi.valid=1;
 orb_publish(ORB_ID(indi_prc), indi_pub, &indi);*/
+/*key RFM_key;
+get_RFM_Key(&RFM_key);
+char fname[60]="/fs/microsd/log/HardwareInuse.txt";
+char res[40];
+char tag[30]="GPS_ID";
+fetch_tag(NULL, tag,res, fname);
+int identity_check= Validating_File(fname,&RFM_key);
+FILE *fptr;
+fptr=fopen("/fs/microsd/hardware_valid.txt","w");
+fprintf(fptr,"\nthe validation status : %d\n",identity_check);
+fprintf(fptr,"\ntag gps_id %s\n",res);
+identity_check= RPAS_identifier(fptr);
+fprintf(fptr,"\n\n\nthe validation status : %d\n",identity_check);
+fprintf(fptr,"\ntag gps_id %s\n",res);
+fclose(fptr);*/
 
-/*FILE *fptr1;
-fptr1=fopen("/fs/microsd/gps_id.txt","w");
-int identity_check= RPAS_identifier(fptr1);
-fprintf(fptr1,"ide  %d",identity_check);
-fclose(fptr1);*/
+
+FILE *fptr_registration;
+fptr_registration=fopen("/fs/microsd/UUID.txt","r");
+// publish the identtiy check status to the uorb topic  
+
+    bool ics_updated;
+	
+	int ics_sub = orb_subscribe(ORB_ID(initial_check_status));
+
+		struct initial_check_status_s ics_fetch;
+	memset(&ics_fetch, 0, sizeof(ics_fetch));
+    int aux;
+	while(1){
+		orb_check(ics_sub, &ics_updated);
+		if(ics_updated){
+		
+	        orb_copy(ORB_ID(initial_check_status), ics_sub, &ics_fetch);
+			aux=ics_fetch.identifier_status;
+        
+             break;
+		}
+		usleep(500000);
+	}
+	
+    struct initial_check_status_s ics;
+	memset(&ics, 0, sizeof(ics));
+		
+	orb_advert_t ics_pub = orb_advertise(ORB_ID(initial_check_status), &ics);  
+
+
+	if(fptr_registration!=NULL)
+	{//file is present
+		fclose(fptr_registration);
+		char DroneID_container_1[30];
+		char TAG_DRONE_ID_1[10]="DroneID";
+		char DRONE_ID_FILE_1[100]="/fs/microsd/UUID.txt";
+		int check_validity_DroneID_1=file_read(DRONE_ID_FILE_1,TAG_DRONE_ID_1,DroneID_container_1,1);
+		// if non tampered -->then continue
+		FILE *fptr;
+		fptr=fopen("/fs/microsd/debug_uuid.txt","w");
+		fprintf(fptr,"status  :::: %d\n",check_validity_DroneID_1);
+		fprintf(fptr,"status1  :::: %d\n",ics_fetch.identifier_status);
+		fclose(fptr);
+		if (check_validity_DroneID_1==0){
+			//UUID file is not valid, remove the invalid file
+			remove("/fs/microsd/UUID.txt");
+			ics.registration_status=3;
+			ics.identifier_status=ics_fetch.identifier_status;
+	
+		}else{
+			//file is valid, check for strings
+			if(strcmp(DroneID_container_1,"ABBDDJEDNDJK")==0){
+			//Drone is registered
+				printf("\n\nDrone is registered\n\n");
+				ics.registration_status=1;
+				ics.identifier_status=aux;
+				
+			}else{
+				// UUID.txt file is for different drone
+				// not UUID.txt of this drone
+				ics.registration_status=2;
+				ics.identifier_status=ics_fetch.identifier_status;
+				remove("/fs/microsd/UUID.txt");
+			}
+
+		}
+
+
+
+	}
+	else{
+	// registration has not been done, also recommend to connect to management client and
+	// internet
+	// UUID.txt file not present
+           ics.registration_status=0;
+		   ics.identifier_status=ics_fetch.identifier_status;
+		
+	}
+   ics.timestamp=hrt_absolute_time();
+   orb_publish(ORB_ID(initial_check_status), ics_pub, &ics);
+
 return 0;
 //////////////////////////////////////////////////////
-reset_check:
+/*reset_check:
 	thread_should_exit=0;
 	int rtl_pass=0;
 	int geo_tag_count=0;
@@ -433,15 +607,16 @@ reset_check:
 		memset(&vgp,0,sizeof(vgp));
 
 
-	}/*else{
+	}*//*else{
 		usleep(5000000);
 		goto phirse_check;
 		//px4_usleep(10000);
 
 	}*/
+	/*
 	hrt_abstime then=hrt_absolute_time();
        printf("\n\ntakeoff detected block passed %d\n\n",TO_status.takeoff_state);
-	while (!thread_should_exit) {
+	while (!thread_should_exit) {*/
 
 		/*
 		 * Wait for a sensor or param update, check for exit condition every 500 ms.
@@ -453,17 +628,17 @@ reset_check:
 		 * This design pattern makes the controller also agnostic of the attitude
 		 * update speed - it runs as fast as the attitude updates with minimal latency.
 		 */
-		int ret = poll(fds, 1, 1000);
+	/*	int ret = poll(fds, 1, 1000);
 
 		if (ret < 0) {
-			/*
-			 * Poll error, this will not really happen in practice,
-			 * but its good design practice to make output an error message.
-			 */
+			
+			 //Poll error, this will not really happen in practice,
+			 // but its good design practice to make output an error message.
+			 
 			warnx("poll error");
 
 		} else if (ret == 0) {
-			/* no return value = nothing changed for 500 ms, ignore */
+			 //no return value = nothing changed for 500 ms, ignore 
 		} else {
 
 			if (fds[0].revents & POLLIN) {
@@ -542,11 +717,11 @@ reset_check:
 					orb_copy(ORB_ID(vehicle_gps_position),vgps_sub,&vgps);// for timestamp
 					// landing has taken place
 					//notedown the instance in log
-					/*content_holder[geo_tag_count].Entrytype=3;
-					content_holder[geo_tag_count].Timestamp=(vgps.time_utc_usec)/1000000;
-					content_holder[geo_tag_count].Lattitude=vgp.lat;
-					content_holder[geo_tag_count].Longitude=vgp.lon;
-					content_holder[geo_tag_count].Altitude=vgp.alt;*/
+					//content_holder[geo_tag_count].Entrytype=3;
+					//content_holder[geo_tag_count].Timestamp=(vgps.time_utc_usec)/1000000;
+					//content_holder[geo_tag_count].Lattitude=vgp.lat;
+					//content_holder[geo_tag_count].Longitude=vgp.lon;
+					//content_holder[geo_tag_count].Altitude=vgp.alt;
 					geo_tag_count++;
 
 					memset(&vgps,0,sizeof(vgps));
@@ -568,11 +743,11 @@ reset_check:
 					orb_copy(ORB_ID(vehicle_gps_position),vgps_sub,&vgps);// for timestamp
 
 					//notedown the instance in log
-					/*content_holder[geo_tag_count].Entrytype=4;
-					content_holder[geo_tag_count].Timestamp=vgps.time_utc_usec;
-					content_holder[geo_tag_count].Lattitude=vgp.lat;
-					content_holder[geo_tag_count].Longitude=vgp.lon;
-					content_holder[geo_tag_count].Altitude=vgp.alt;*/
+					//content_holder[geo_tag_count].Entrytype=4;
+					//content_holder[geo_tag_count].Timestamp=vgps.time_utc_usec;
+					//content_holder[geo_tag_count].Lattitude=vgp.lat;
+					//content_holder[geo_tag_count].Longitude=vgp.lon;
+					//content_holder[geo_tag_count].Altitude=vgp.alt;
 					geo_tag_count++;
 
 					memset(&vgps,0,sizeof(vgps));
@@ -612,7 +787,7 @@ reset_check:
 
 	fflush(stdout);
 
-	//return 0;
+	//return 0;*/
 }
 
 /* Startup Functions */
@@ -654,7 +829,7 @@ int ex_fixedwing_control_main(int argc, char *argv[])
 		deamon_task = px4_task_spawn_cmd("ex_fixedwing_control",
 						 SCHED_DEFAULT,
 						 SCHED_PRIORITY_MAX - 20,
-						 20048,
+						 25048,
 						 fixedwing_control_thread_main,
 						 (argv) ? (char *const *)&argv[2] : (char *const *)nullptr);
 		thread_running = true;
