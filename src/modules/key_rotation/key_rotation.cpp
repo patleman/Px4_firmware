@@ -121,7 +121,9 @@ int key_rotation_thread_main(int argc, char *argv[])
 	 */
      
 // Key rotation start, if needed
-
+	//char ffff[45]="fggg";
+	//Key_rotation_start(ffff);
+	//return 0;
 	FILE *fptr_key;
 	fptr_key=fopen("/fs/microsd/KeyRotation.txt","r");
 

@@ -151,7 +151,7 @@ bool ics_updated;
 //
 int recentPA_presence=0;
 
-char PA_ID[100];
+//char PA_ID[100];
 
 FILE *fptr_recent;
 
@@ -173,15 +173,16 @@ if(fptr_pa==NULL){
 	ics.pa_present=1;
 }
 
-fptr_recent=fopen("/fs/microsd/recentPA.txt","r");
+fptr_recent=fopen("/fs/microsd/log/recentPA.txt","r");
 
 	if(fptr_recent!=NULL){
         
 		//if file is present then there might be the possiblity upcoming PA to be the old one.
 		fclose(fptr_recent);
 		int action=check_recentPA();
-
-    if(action!=3){
+        int needTobundle=0;
+    	if(action!=3)
+		{
 			char log_name[100];
 			int needTosign=check_for_sign(log_name);
 
@@ -191,7 +192,7 @@ fptr_recent=fopen("/fs/microsd/recentPA.txt","r");
 
 			}
 
-			int needTobundle=check_for_bundle();
+			needTobundle=check_for_bundle();
 			if(needTobundle){
 				Bundling_begins();
 				char yes[2]="1";
@@ -217,7 +218,7 @@ fptr_recent=fopen("/fs/microsd/recentPA.txt","r");
 		}else if(action==3){
 			// file is not valid 
 			ics.recent_pa_present=0;
-			remove("/fs/microsd/recentPA.txt");
+			remove("/fs/microsd/log/recentPA.txt");
 
 		}else{//no need to start bundling 2
 
@@ -262,6 +263,7 @@ if(recentPA_presence)
 
 	if(status_fetch!=1){
 		//fetch is not required (no need to check for fetched.txt file_)
+		ics.fetch_required=0;
 	}else{
 		
 		// fetch is required (need to check for fetched.txt file)

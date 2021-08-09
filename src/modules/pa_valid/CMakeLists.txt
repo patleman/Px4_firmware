@@ -33,6 +33,7 @@
 
 px4_add_module(
 	MODULE modules__pa_valid
+	STACK_MAX 40750
 	MAIN pa_valid
 	SRCS	pa_valid.hpp
 		pa_valid.cpp

@@ -42,7 +42,7 @@
 #include <lib/parameters/param.h>
 #include <systemlib/mavlink_log.h>
 #include <uORB/Subscription.hpp>
-#include <uORB/topics/vehicle_gps_position.h>
+#include <uORB/topics/initial_check_status.h>
 #include <uORB/topics/pa_data.h>
 
 
@@ -964,7 +964,7 @@ struct GEO_DATE_TIME_XML{// for storing xml data
 struct ParsedData{
    char start_time[50];
    char end_time[50];
-   double long_lat_coords[6][10];
+   double long_lat_coords[4][4];
    int num_coords;
 
 };
@@ -1007,8 +1007,8 @@ bool In_Time(Date_time current, GEO_DATE_TIME_XML Xml);
 
 void data_fetch_delete(char *can);
 
-
-int date_time_extract_and_check();
+void get_MC_public(key *KEY);
+//int date_time_extract_and_check();
 
 int DroneIDverification(char *paID);
 
@@ -1134,10 +1134,14 @@ void writingKey_Value(char *str_ptr,char *Key,int *count,double value,int last);
 
 void writingKey(char *str_ptr,char *Key,int *count);
 
-void putSpace(int count_Space,char *ptr_string ,int *i_ptr);
+//void putSpace(int count_Space,char *ptr_string ,int *i_ptr);
+void putSpace(int count_Space,FILE *ptr_string ,int *i_ptr);
 
-void objectCreator(char *ptr,Geo_tag geo,int last,int space_count,int *count);
 
+//void objectCreator(char *ptr,Geo_tag geo,int last,int space_count,int *count);
+void objectCreator(FILE *ptr,Geo_tag geo,int last,int space_count,int *count);
+
+int check_for_bundle();
 
 void  log_naming_support(char *paID_firstTerm,char *done_freq);
 
@@ -1178,3 +1182,15 @@ void load_tab(void);
 void write_recentPA(char *tag,char *content, FILE *fptr);
 
 void fetch_tag_pa(char *tag, char *content, char *fname);
+
+int check_ID();
+
+void initiate_log(FILE *fptr,int *i_aux,int *space_count_aux,int *s_start,int*sign_write);
+
+//void closing_log(FILE *fptr,int space_count,int i);
+
+void closing_log(FILE *fptr,int space_count,int *i_aux,int *str_end);
+
+void canon_cum_hash(int sign_write_help,int str_start,int str_end,char *filename);
+
+void signing_support_log(char *log_name);

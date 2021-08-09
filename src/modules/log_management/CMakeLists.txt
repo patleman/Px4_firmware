@@ -33,6 +33,7 @@
 
 px4_add_module(
 	MODULE modules__log_management
+	STACK_MAX 40750
 	MAIN log_management
 	SRCS	log_management.hpp
 		log_management.cpp

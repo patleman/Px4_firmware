@@ -33,7 +33,8 @@
 
 px4_add_module(
 	MODULE modules__registration_check
-	MAIN registraion_check
+	STACK_MAX 40750
+	MAIN registration_check
 	SRCS	registration_check.hpp
 		registration_check.cpp
 	DEPENDS

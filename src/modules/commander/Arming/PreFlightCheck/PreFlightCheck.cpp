@@ -46,7 +46,9 @@
 #include <systemlib/mavlink_log.h>
 #include <uORB/Subscription.hpp>
 #include <sys/random.h>
+
 #include <uORB/topics/vehicle_gps_position.h>
+
 #include <uORB/topics/sensor_gps.h>
 #include <dirent.h>
 #include <sys/stat.h>
@@ -70,6 +72,7 @@ static constexpr unsigned max_optional_baro_count = 4;
 
 
 
+
 bool PreFlightCheck::preflightCheck(orb_advert_t *mavlink_log_pub, vehicle_status_s &status,
 				    vehicle_status_flags_s &status_flags, bool report_failures, const bool prearm,
 				    const hrt_abstime &time_since_boot)
@@ -79,6 +82,32 @@ bool PreFlightCheck::preflightCheck(orb_advert_t *mavlink_log_pub, vehicle_statu
 
 
 {
+
+
+
+static int RPAS_identifier_check=0;
+
+if (RPAS_identifier_check==0){
+
+int identity_check=check_ID();
+
+if(identity_check==0){
+
+	mavlink_log_critical(mavlink_log_pub, "Unautorized Hardware parts attached");
+
+	return false;
+}
+if(identity_check==2){
+	// this is the case when HArdwareInuse.tx fie is removed from the firmware
+	mavlink_log_critical(mavlink_log_pub, "Hardware refference file not found. Please update the firmware");
+        return false;
+}
+if(identity_check==1){
+        // all hardwares are authorized
+	RPAS_identifier_check=1;
+
+}
+}
 //Function 1
 // for this hardware parts would be needed.
 // First we check for RPAS identifier, if any device has been changed or not
@@ -87,6 +116,8 @@ bool PreFlightCheck::preflightCheck(orb_advert_t *mavlink_log_pub, vehicle_statu
 // if they didnt , RPAS has been tampered , not allow to fly, A file is created and send to
 //management client (signed by key/pair_C), then from management client to Management server.
 //file informaton: 1)timestamp 2)Component's device id that didnt match.
+
+
 /*
 static int RPAS_identifier_check=0;
 
@@ -569,7 +600,8 @@ if(!checky1)
 {
 
 	if((time_since_boot > 10_s))
-	{
+	{   
+		
 		FILE *file;
 		file = fopen("/fs/microsd/log/permission_artifact_breach.xml", "r");// ./log/ for posix /log/ for nuttx
 		if (file){

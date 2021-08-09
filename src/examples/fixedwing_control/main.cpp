@@ -104,7 +104,7 @@
 #include <uORB/Subscription.hpp>
 #include <uORB/SubscriptionInterval.hpp>
 
-#include <examples/logging_json/logging_json.hpp>
+//#include <examples/logging_json/logging_json.hpp>
 
 #include <uORB/topics/parameter_update.h>
 #include <parameters/param.h>

@@ -142,14 +142,27 @@ int pa_valid_thread_main(int argc, char *argv[])
 	
     struct initial_check_status_s ics;
 	memset(&ics, 0, sizeof(ics));
+	memcpy(&ics,&ics_fetch,sizeof(ics));
 		
 	orb_advert_t ics_pub = orb_advertise(ORB_ID(initial_check_status), &ics);  
 
-    char canon_content[2000];
-   if(ics_fetch.pa_present==1){
+	char canon_content[2000];
+   	if(ics_fetch.pa_present==1){
 
 		//check if file is present or not
 		int valid_status=pa_validation(canon_content);
+
+		if (valid_status==1){
+
+			ics.validate=1;//true non tampered
+
+		}else if(valid_status==0){
+
+			ics.validate=0;//false tampered
+
+		}else{
+			ics.bad_sign=1;  // sign is bad
+		}
 
 		if(ics_fetch.recent_pa_present==1 && valid_status==1)
 		{
@@ -164,8 +177,8 @@ int pa_valid_thread_main(int argc, char *argv[])
 			//this is the case when pa is not valid
 		}
 
-   }else
-   {
+   	}else
+   	{
 	   //pa not present
 	   if(ics_fetch.recent_pa_present==1){
 		   //this is done to check if incase bundling is needed to be done
@@ -203,11 +216,11 @@ int pa_valid_thread_main(int argc, char *argv[])
 			ics.same_pa=0;
 		}
 		else{
-			// bad drone id
+			// bad drone ids
 			ics.drone_id=0;
 		}
 	}
-
+    ics.recent_pa_present=ics_fetch.recent_pa_present;
 	ics.registration_status=ics_fetch.registration_status;
 	ics.identifier_status=ics_fetch.identifier_status;
 	

@@ -344,10 +344,18 @@ else
 	# Sensors System (start before Commander so Preflight checks are properly run).
 	# Commander needs to be this early for in-air-restarts.
 	#
+
 	rpas_identifier start
         sleep 20
-        ex_fixedwing_control start  # this is the 
-	sleep 5
+	registration_check start
+	sleep 8
+      #  ex_fixedwing_control start  # this is the 
+	key_rotation start
+	sleep 35
+        log_management start
+        sleep 20
+        pa_valid start
+	sleep 15
 	
 
 	if param greater SYS_HITL 0
@@ -477,7 +485,7 @@ else
 	# Start the navigator.
 	#
 	navigator start
-	#logging_json start
+	logging_json start
 	#hello start
 	#px4_simple_app start
 	
@@ -541,6 +549,8 @@ else
 		echo "Addons script: ${FEXTRAS}"
 		. $FEXTRAS
 	fi
+
+	 #logging_json start
 
 	#
 	# Start the logger.

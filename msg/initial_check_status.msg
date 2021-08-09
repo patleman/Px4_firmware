@@ -27,7 +27,7 @@ bool bad_sign  #if signature is not of the form "1ffffff...."
 
 bool drone_id # drone id doesnt match to what is write inside the firmware
 
-uint32 validate  # if the PA has come from DGCA and is non tampered
+bool validate  # if the PA has come from DGCA and is non tampered
 
 
 

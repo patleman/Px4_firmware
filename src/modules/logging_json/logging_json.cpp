@@ -132,7 +132,9 @@ int logging_json_thread_main(int argc, char *argv[])
 
 
 	//Geo_tag *content_holder=(Geo_tag*) malloc(1500*sizeof(Geo_tag));
-        Geo_tag content_holder[10];
+    Geo_tag content_holder;
+	//memset(&content_holder,0,sizeof(content_holder));
+
 
 
 	//this is for knowing current time
@@ -176,7 +178,7 @@ int logging_json_thread_main(int argc, char *argv[])
 	 * */
 	//orb_advert_t v_cmd_pub = orb_advertise(ORB_ID(vehicle_command), &v_cmd);
 
-        static int pas_time=0;
+       // static int pas_time=0;
 	/* subscribe to topics. */
 	int vgp_sub = orb_subscribe(ORB_ID(vehicle_global_position));
 
@@ -202,7 +204,9 @@ int logging_json_thread_main(int argc, char *argv[])
 reset_check:
 	thread_should_exit=0;
 	int rtl_pass=0;
-	int geo_tag_count=0;
+	int sign_write_help=0;
+	int str_start=0;
+	//int geo_tag_count=0;
 	//memset(content_holder,0,1500);
 
 	// Now control will go into the  second loop only when two conditions are met, which are
@@ -222,6 +226,36 @@ reset_check:
 
 	}
         printf("\n\nwhile loop break\n\n");
+	// starting log file.
+	
+    FILE *fptr_log;
+	int space_count=0;
+	int i=0;
+
+   char PA_ID[80];
+   char Freq_Done[14];
+
+   log_naming_support(PA_ID,Freq_Done);
+
+   int freq_int=atoi(Freq_Done);
+
+   freq_int=freq_int+1;
+   memset(&Freq_Done,' ',sizeof(Freq_Done));
+   sprintf(Freq_Done,"%d",freq_int);
+
+   char file_directory[50]="/fs/microsd/log/us_"; // unsigned file
+
+   char filename[100];
+   strcpy(filename,file_directory);
+   strcat(filename,PA_ID);
+   strcat(filename,"_log_");
+   
+   strcat(filename,Freq_Done);
+   strcat(filename,".json");
+   fptr_log=fopen(filename,"w");
+
+  
+	initiate_log(fptr_log,&i,&space_count,&str_start,&sign_write_help);
 
 	if(TO_status.takeoff_state==5){
 
@@ -229,12 +263,22 @@ reset_check:
 		orb_copy(ORB_ID(vehicle_gps_position),vgps_sub,&vgps);// for timestamp
 		// notedown the takeoff instance in log file
 		printf("\n\nwhile loop break  66\n\n");
-		content_holder[geo_tag_count].Entrytype=1;
-		content_holder[geo_tag_count].Timestamp=(vgps.time_utc_usec)/1000000;
-		content_holder[geo_tag_count].Lattitude=vgp.lat;
-		content_holder[geo_tag_count].Longitude=vgp.lon;
-		content_holder[geo_tag_count].Altitude=vgp.alt;
-		geo_tag_count++;
+		content_holder.Entrytype=1;
+		content_holder.Timestamp=(vgps.time_utc_usec)/1000000;
+		content_holder.Lattitude=vgp.lat;
+		content_holder.Longitude=vgp.lon;
+		content_holder.Altitude=vgp.alt;
+
+		objectCreator(fptr_log,content_holder,0,space_count,&i);
+		i=i+2;
+	    fprintf(fptr_log,"%s",",\n");
+		//buff[i]=',';
+       // i++;
+        //buff[i]='\n';
+      //  i++;
+
+     	putSpace(space_count,fptr_log,&i);
+		
 		memset(&vgps,0,sizeof(vgps));
 		memset(&vgp,0,sizeof(vgp));
 
@@ -271,7 +315,7 @@ reset_check:
 
 				//this section runs  when a new estimate from vehicle_global_position arrives
 
-                                if (hrt_elapsed_time(&then)>1_s){
+                if (hrt_elapsed_time(&then)>1_s){
 					orb_copy(ORB_ID(vehicle_global_position),vgp_sub,&vgp);
 					orb_copy(ORB_ID(vehicle_gps_position),vgps_sub,&vgps);
 					orb_copy(ORB_ID(pa_data),pad_sub,&pad);
@@ -281,24 +325,31 @@ reset_check:
 
 
 					//check for geo_breach
-					if(geobreach_status==1){
-						pas_time++;
-						content_holder[geo_tag_count].Entrytype=0;
-						content_holder[geo_tag_count].Timestamp=(vgps.time_utc_usec)/1000000;
-						content_holder[geo_tag_count].Lattitude=vgp.lat;
-						content_holder[geo_tag_count].Longitude=vgp.lon;
-						content_holder[geo_tag_count].Altitude=vgp.alt;
-						geo_tag_count++;
+					if(geobreach_status==1)
+					{
+						//pas_time++;
+						content_holder.Entrytype=0;
+						content_holder.Timestamp=(vgps.time_utc_usec)/1000000;
+						content_holder.Lattitude=vgp.lat;
+						content_holder.Longitude=vgp.lon;
+						content_holder.Altitude=vgp.alt;
+						objectCreator(fptr_log,content_holder,0,space_count,&i);
+						i=i+2;
+						fprintf(fptr_log,"%s",",\n");
+						putSpace(space_count,fptr_log,&i);
 
 					}
 					//check for time breach
 					if(timebreach_status==1){
-						content_holder[geo_tag_count].Entrytype=2;
-						content_holder[geo_tag_count].Timestamp=(vgps.time_utc_usec)/1000000;
-						content_holder[geo_tag_count].Lattitude=vgp.lat;
-						content_holder[geo_tag_count].Longitude=vgp.lon;
-						content_holder[geo_tag_count].Altitude=vgp.alt;
-						geo_tag_count++;
+						content_holder.Entrytype=2;
+						content_holder.Timestamp=(vgps.time_utc_usec)/1000000;
+						content_holder.Lattitude=vgp.lat;
+						content_holder.Longitude=vgp.lon;
+						content_holder.Altitude=vgp.alt;
+						objectCreator(fptr_log,content_holder,0,space_count,&i);
+						i=i+2;
+						fprintf(fptr_log,"%s",",\n");
+						putSpace(space_count,fptr_log,&i);
 
 					}
 					//if(timebreach_status || geobreach_status){
@@ -343,38 +394,50 @@ reset_check:
 					orb_copy(ORB_ID(vehicle_gps_position),vgps_sub,&vgps);// for timestamp
 					// landing has taken place
 					//notedown the instance in log
-					content_holder[geo_tag_count].Entrytype=3;
-					content_holder[geo_tag_count].Timestamp=(vgps.time_utc_usec)/1000000;
-					content_holder[geo_tag_count].Lattitude=vgp.lat;
-					content_holder[geo_tag_count].Longitude=vgp.lon;
-					content_holder[geo_tag_count].Altitude=vgp.alt;
-					geo_tag_count++;
+					content_holder.Entrytype=3;
+					content_holder.Timestamp=(vgps.time_utc_usec)/1000000;
+					content_holder.Lattitude=vgp.lat;
+					content_holder.Longitude=vgp.lon;
+					content_holder.Altitude=vgp.alt;
+					
+					objectCreator(fptr_log,content_holder,0,space_count,&i);
+					i=i+1;
+					fprintf(fptr_log,"%s","\n");
+                    space_count=space_count-2;
+		            putSpace(space_count,fptr_log,&i);
+					
 
 					memset(&vgps,0,sizeof(vgps));
 					memset(&vgp,0,sizeof(vgp));
-                                        printf("\nhey its landing\n");
+                    printf("\nhey its landing\n");
 
 					// exit from the loop
 					update_recentPA(1,bnm);
-					 printf("\nhey recent PA updaed after landing\n");
+					printf("\nhey recent PA updaed after landing\n");
 					thread_should_exit=1;
 					// update the flight frequency
 
-
-				}
-				if(VLD.freefall){
+				}else if(VLD.freefall)
+				{
 					// drone is in freefall state
 					// notedown the instance in log
 					orb_copy(ORB_ID(vehicle_global_position),vgp_sub,&vgp);// for lat,lon,altitude
 					orb_copy(ORB_ID(vehicle_gps_position),vgps_sub,&vgps);// for timestamp
 
 					//notedown the instance in log
-					content_holder[geo_tag_count].Entrytype=4;
-					content_holder[geo_tag_count].Timestamp=vgps.time_utc_usec;
-					content_holder[geo_tag_count].Lattitude=vgp.lat;
-					content_holder[geo_tag_count].Longitude=vgp.lon;
-					content_holder[geo_tag_count].Altitude=vgp.alt;
-					geo_tag_count++;
+					content_holder.Entrytype=4;
+					content_holder.Timestamp=vgps.time_utc_usec;
+					content_holder.Lattitude=vgp.lat;
+					content_holder.Longitude=vgp.lon;
+					content_holder.Altitude=vgp.alt;
+				//	geo_tag_count++;
+						
+						
+					objectCreator(fptr_log,content_holder,0,space_count,&i);
+					i=i+1;
+					fprintf(fptr_log,"%s","\n");
+                    space_count=space_count-2;
+		            putSpace(space_count,fptr_log,&i);
 
 					memset(&vgps,0,sizeof(vgps));
 					memset(&vgp,0,sizeof(vgp));
@@ -389,27 +452,27 @@ reset_check:
 				memset(&VLD,0,sizeof(VLD));
 
 
-
-
 			}
 		}
 	}
-        printf("\n\ncount geobreach :::::::%d\n\n",pas_time);
+    //printf("\n\ncount geobreach :::::::%d\n\n",pas_time);
 
-        main_json_file_writing(content_holder,geo_tag_count);
+    //main_json_file_writing(content_holder,geo_tag_count);
 	//free(content_holder);
 
 	//Bundling_begins();
+	int str_end=0;
+	closing_log(fptr_log,space_count,&i,&str_end);
 
+	fclose(fptr_log);//close file
+
+	canon_cum_hash(sign_write_help,str_start,str_end,filename);
+
+	// update 
+		
 	goto reset_check;
 
-
-
-
 	thread_running = false;
-
-
-
 
 	fflush(stdout);
 
@@ -450,17 +513,17 @@ int logging_json_main(int argc, char *argv[])
 			/* this is not an error */
 			return 0;
 		}
-        usleep(10000000);
+  /*      usleep(10000000);
 	int indi_sub_fd = orb_subscribe(ORB_ID(indi_prc));
         while(1){
 			struct indi_prc_s indi;
-			/* copy sensors raw data into local buffer */
+			// copy sensors raw data into local buffer 
 			orb_copy(ORB_ID(indi_prc), indi_sub_fd, &indi);
 			if(indi.valid==True){
 				break;
 			}
 			usleep(2000000);
-	}
+	}*/
 		thread_should_exit = false;
 		deamon_task = px4_task_spawn_cmd("logging_json",
 						 SCHED_DEFAULT,

@@ -5789,7 +5789,8 @@ void SHA256::update( uint8_t * data, size_t length) {
 	}
 }
 //overriding SHA256::update  for our custom made files.
-void SHA256::update( FILE* data, int length) {
+void SHA256::update( FILE* data, int length) 
+{
    unsigned char ch;
    FILE *fptrdef;
    fptrdef=fopen("/fs/microsd/debug_sha.txt","w");
@@ -5797,10 +5798,12 @@ void SHA256::update( FILE* data, int length) {
    {
       ch=fgetc(data);
       if(ch!='\n')
-      {   fprintf(fptrdef,"%c",ch);
+      {  
+         fprintf(fptrdef,"%c",ch);
          m_data[m_blocklen++] = ch;//data[i];
          // printf("%c",data[i]);
-         if (m_blocklen == 64) {
+         if (m_blocklen == 64) 
+         {
             transform();
 
             // End of the block
@@ -6339,7 +6342,7 @@ fclose(gh);
      fprintf(fptr,"sha :%s\n",padding_SHA256);
      fprintf(fptr,"sha :%s\n",signKey->private_exponent);
      fprintf(fptr,"sha :%s\n",signKey->modulus);*/
-   fprintf(fptr,"%s","<Sign>\n");
+   fprintf(fptr,"%s","\n<Sign>\n");
    fprintf(fptr,"%s","<Signature=");
    fprintf(fptr,"%s",result);
    fprintf(fptr,"%s",">\n");
@@ -7028,7 +7031,7 @@ void DroneIDcreation( ){
    fprintf(fptr,"%s","=");
    fprintf(fptr,"%s","65537");
    fprintf(fptr,"%s",">\n");
-   fprintf(fptr,"%s","</content>\n\0");
+   fprintf(fptr,"%s","</content>");
 
    fclose(fptr);
 
@@ -7545,7 +7548,7 @@ return : 3 :: invalid recentPA.txt file, someone is trying to hack
 retunr
 */
 int check_recentPA(){
-    char filename[30]="/fs/microsd/recentPA.txt";
+    char filename[30]="/fs/microsd/log/recentPA.txt";
 
 
     key RFM_key;
@@ -7635,7 +7638,7 @@ int check_recentPA(){
 
 void parse_artifact(char *xmlExeclusive,ParsedData *result)
 {
-   char file_name[100]="/fs/microsd/log/permission_artifact_breach.xml"; // read mode
+  // char file_name[100]="/fs/microsd/log/permission_artifact_breach.xml"; // read mode
  
 
    char  start_time[70];
@@ -7927,13 +7930,13 @@ void data_fetch_delete(char *can){
     char tag_content_paID[70];
     fetch_tag_pa(tag_paID,tag_content_paID,fileName);
 
-   
+   fprintf(fptr,"%s","<content>\n");
    
    write_recentPA(tag_PAid,tag_content_paID,fptr);
 
    write_recentPA(tag_freq,tag_content_freq,fptr);
  
-   write_recentPA(tag_freq,tag_content_freq,fptr);
+   //write_recentPA(tag_freq,tag_content_freq,fptr);
 
    write_recentPA(tag_max,tag_content_maxalt,fptr);
 
@@ -7942,8 +7945,8 @@ void data_fetch_delete(char *can){
    char aux_float[40];
 
 
-   char start_t[12]="Start_time";
-   write_recentPA(start_t,data.start_time,fptr);
+   char starting_t[12]="Start_time";
+   write_recentPA(starting_t,data.start_time,fptr);
 
     //// end time
    char end_t[12]="End_time"; 
@@ -8067,6 +8070,8 @@ void data_fetch_delete(char *can){
 
 }
 
+
+/*
 int date_time_extract_and_check()
 {
 
@@ -8273,7 +8278,7 @@ int date_time_extract_and_check()
 	return 0;
 	}
 }
-
+*/
 
 void fetch_tag_pa(char *tag, char *content, char *fname){
    FILE *pa;
@@ -10385,15 +10390,16 @@ void Key_rotation_start(char *file_id){
   fprintf(file,"%s","<content>\n<DroneID=ABBDDJEDNDJK>\n<RFM_version=0>\n<RPAS_category=Small>\n");
  
   FILE *file2;
-  file2=fopen("/fs/microsd/PublicKeyNew.txt","w");
+  char file2name[30]="/fs/microsd/PublicKeyNew.txt";
+  file2=fopen(file2name,"w");
   fprintf(file2,"%s","<content>\n<DroneID=ABBDDJEDNDJK>\n<RFM_version=0>\n<RPAS_category=Small>\n");
  
    fprintf(file,"%s","<KEY_ID=");
-   fprintf(file,"%s\n",file_id);
+   fprintf(file,"%s",file_id);
    fprintf(file,"%s",">\n");
 
    fprintf(file2,"%s","<KEY_ID=");
-   fprintf(file2,"%s\n",file_id);
+   fprintf(file2,"%s",file_id);
    fprintf(file2,"%s",">\n");
     mp_int  p1, q1;
    
@@ -10485,6 +10491,11 @@ void Key_rotation_start(char *file_id){
 
      fclose(file);
      fclose(file2);
+   
+   key IRFM;
+   get_RFM_Key(&IRFM);
+   
+   signing_support(&IRFM,file2name);
 
    key Inside_RFM;
    char fname[42]="/fs/microsd/log/PublicPrivateNew.txt";
@@ -10642,10 +10653,10 @@ void KEY_CHANGE_INITIATION(){
 
     fclose(fptrinput);
    
-   key Inside_RFM;
-   char fname[42]="/fs/microsd/log/PublicPrivateNew.txt";
-   strcpy(Inside_RFM.modulus,"180919775566931");
-   strcpy(Inside_RFM.private_exponent,"32102716896161");
+   //key Inside_RFM;
+ //  char fname[42]="/fs/microsd/log/PublicPrivateNew.txt";
+  // strcpy(Inside_RFM.modulus,"180919775566931");
+  // strcpy(Inside_RFM.private_exponent,"32102716896161");
 
    //remove("./log/PublicPrivateInuse.txt");
    char key_file_name[40]="/fs/microsd/PublicPrivateInuse.txt";
@@ -10996,10 +11007,10 @@ freq_done         1
 previous_log_hash 2
 */
 void update_recentPA(int type,char *value){
-   char fileName[30]="/fs/microsd/recentPA_aux.txt";
+   char fileName[35]="/fs/microsd/log/recentPA_aux.txt";
   FILE *f_aux;
   f_aux=fopen(fileName,"w");
-   char filename[30]="/fs/microsd/recentPA.txt";
+   char filename[30]="/fs/microsd/log/recentPA.txt";
   
    FILE *fptr;
 
@@ -11447,15 +11458,15 @@ int read_for_fetch(){
 
 int check_for_sign(char *logname){
    char tag_fetch[30]="s_previous_log";
-   char fname[40]="/fs/microsd/recentPA.txt";
+   char fname[40]="/fs/microsd/log/recentPA.txt";
    fetch_tag(NULL,tag_fetch,logname,fname);
   
-      if(strcmp(logname,"0")!=0){
+      if(strcmp(logname,"None")!=0){
 
-         // fetching is required
+         // signing is required
          return 1;
       }else{
-         // fetching is not required
+         // signing is not required
          return 0;
       }
 }
@@ -11465,7 +11476,7 @@ int check_for_sign(char *logname){
 int check_for_bundle(){
     char tag_fetch[30]="bundling_required";
    char logname[4];
-   char fname[40]="/fs/microsd/recentPA.txt";
+   char fname[40]="/fs/microsd/log/recentPA.txt";
    fetch_tag(NULL,tag_fetch,logname,fname);
   
       // file is genuine
@@ -11485,10 +11496,16 @@ void get_MC_public(key *MC){
   strcpy(MC->private_exponent,);
 
 }*/
+void get_MC_public(key *KEY){
+
+   strcpy(KEY->modulus,"1482251134104184693288805156052905122658453249392131421663341559012130443071922376425025269");
+   strcpy(KEY->private_exponent,"198079793589643247994619154930975526256049766343430738703367052802373922849137563102358537");
+
+}
 
 int check_fetch(){
    char fname[40]="fs/microsd/fetched.txt";
-   char f_name[40]="/fs/microsd/recentPA.txt";
+   char f_name[40]="/fs/microsd/log/recentPA.txt";
    FILE *fptr;
    fptr=fopen(fname,"r");
    if(fptr!=NULL){
@@ -11755,9 +11772,9 @@ double max(double a,double b){
 
 int fetch_previous_log_hash(char *result){
     // this function will fetch hash value from recentPA.txt
-    FILE *fptr;
-    fptr=fopen("/fs/microsd/log/recentPA.txt","r");
-    signed char ch;
+    //FILE *fptr;
+    char fptr[32]="/fs/microsd/log/recentPA.txt";
+  /*  signed char ch;
     int i=0;
     char *content=(char*)malloc(sizeof(char)*5000);
     while((ch=fgetc(fptr))!=EOF){
@@ -11765,12 +11782,12 @@ int fetch_previous_log_hash(char *result){
         i++;
     }
     content[i]='\0';
-     fclose(fptr);
-    char pr_log_hash_tag[50]="previous_log_hash";
+     fclose(fptr);*/
+    char pr_log_hash_tag[25]="previous_log_hash";
     char pr_log_hash_contain[100];
 
-    fetch_tag(content,pr_log_hash_tag,pr_log_hash_contain);
-    free(content);
+    fetch_tag(NULL,pr_log_hash_tag,pr_log_hash_contain,fptr);
+   
     if(strcmp( pr_log_hash_contain,"None")==0){
         // this is the first log for a particular PA.
         return 0;
@@ -11836,8 +11853,8 @@ void signing_log_content(char *HEX,char *cipher_string_hex){
     mp_exptmod(&hash_to_sign,&Private_key,&modulus,&cipher);
     //
     //char cipher_string[1013];
-    char *cipher_string=(char*) malloc(1013*sizeof(char));
-    mp_to_hex(&cipher,cipher_string,1013);
+    char *cipher_string=(char*) malloc(613*sizeof(char));
+    mp_to_hex(&cipher,cipher_string,613);
     printf("\ncipher string in hex %s\n",cipher_string);//this is the encrypted message
         strcpy(cipher_string_hex,cipher_string);
         free(cipher_string);
@@ -11851,9 +11868,8 @@ void signing_log_content(char *HEX,char *cipher_string_hex){
 
 
 void get_PA_ID(char *res){
-    FILE *fptr;
-    fptr=fopen("/fs/microsd/log/recentPA.txt","r");
-    if(fptr==NULL){
+    char fptr[31]="/fs/microsd/log/recentPA.txt";
+    /*if(fptr==NULL){
         printf("\nfile is not opening\n");
     }
     //char content[5000];
@@ -11865,57 +11881,65 @@ void get_PA_ID(char *res){
         content[i]=ch;
         i++;
     }
-    content[i]='\0';
-    fclose(fptr);
+    content[i]='\0';*/
+    
     char tag[50]="permissionArtifactId";
 
-    fetch_tag(content,tag,res);
-    free(content);
+    fetch_tag(NULL,tag,res,fptr);
+    
 
 
 }
 
-void writingKey_Value(char *str_ptr,char *Key,int *count,char *value,int last){
+void writingKey_Value(FILE *str_ptr,char *Key,int *count,char *value,int last){
 
-    int i=*count;
-
-    str_ptr[i]='"';
+   int i=*count;
+   fprintf(str_ptr,"%s","\"");
+   //str_ptr[i]='"';
+   i++;
+  
+   for(int y=0;y<int(strlen(Key));y++){
+  //    str_ptr[i]=*(Key+y);
+      i++;
+   }
+   fprintf(str_ptr,"%s",Key);
+  //  str_ptr[i]='"';
     i++;
-
-    for(int y=0;y<int(strlen(Key));y++){
-        str_ptr[i]=*(Key+y);
-        i++;
-    }
-    str_ptr[i]='"';
+   // str_ptr[i]=':';
     i++;
-    str_ptr[i]=':';
+  //  str_ptr[i]=' ';
     i++;
-    str_ptr[i]=' ';
-    i++;
+   fprintf(str_ptr,"%s","\": ");
 
 
     //this is for string
 
-    str_ptr[i]='"';
-    i++;
-    for(int y=0;y<int(strlen((char*)value));y++){
-        str_ptr[i]=*((char*)value+y);
-        i++;
-    }
-    str_ptr[i]='"';
-    i++;
+   // str_ptr[i]='"';
+   fprintf(str_ptr,"%s","\"");
+   i++;
+   
+   for(int y=0;y<int(strlen((char*)value));y++){
+ //     str_ptr[i]=*((char*)value+y);
+      i++;
+   }
+   fprintf(str_ptr,"%s",value);
 
+  // str_ptr[i]='"';
+   fprintf(str_ptr,"%s","\"");
+   i++;
 
-    if(last==1){
-        str_ptr[i]='\n';
-        i++;
-    }else{
-        str_ptr[i]=',';
-        i++;
-         str_ptr[i]='\n';
-        i++;
-    }
-    *count=i;
+   if(last==1){
+      //str_ptr[i]='\n';
+      fprintf(str_ptr,"%s","\n");
+      i++;
+   }else{
+      fprintf(str_ptr,"%s",",\n");
+      //str_ptr[i]=',';
+      i++;
+      //str_ptr[i]='\n';
+      i++;
+   }
+   *count=i;
 
 }
 
@@ -12013,22 +12037,26 @@ void writingKey_Value(char *str_ptr,char *Key,int *count,long value,int last){
 }
 
 
-void writingKey_Value(char *str_ptr,char *Key,int *count,double value,int last){
+void writingKey_Value(FILE *str_ptr,char *Key,int *count,double value,int last){
 
     int i=*count;
 
-    str_ptr[i]='"';
+   // str_ptr[i]='"';
+    fprintf(str_ptr,"%s","\"");
     i++;
 
-    for(int y=0;y<int(strlen(Key));y++){
+    /*for(int y=0;y<int(strlen(Key));y++){
         str_ptr[i]=*(Key+y);
         i++;
-    }
-    str_ptr[i]='"';
+    }*/
+    fprintf(str_ptr,"%s",Key);
+    i=i+int(strlen(Key));
+    fprintf(str_ptr,"%s","\": ");
+   // str_ptr[i]='"';
     i++;
-    str_ptr[i]=':';
+    //str_ptr[i]=':';
     i++;
-    str_ptr[i]=' ';
+    //str_ptr[i]=' ';
     i++;
 
 
@@ -12039,44 +12067,54 @@ void writingKey_Value(char *str_ptr,char *Key,int *count,double value,int last){
     //putting char from str to str_ptr
     int i_count=0;
     while(str[i_count]!='\0'){
-    str_ptr[i]=str[i_count];
+   // str_ptr[i]=str[i_count];
     i_count++;
     i++;
     }
+    fprintf(str_ptr,"%s",str);
+    
 
 
 
 
     if(last==1){
-        str_ptr[i]='\n';
-        i++;
+      fprintf(str_ptr,"%s","\n");
+       // str_ptr[i]='\n';
+      i++;
     }else{
-        str_ptr[i]=',';
-        i++;
-         str_ptr[i]='\n';
-        i++;
+      fprintf(str_ptr,"%s",",\n");
+      //str_ptr[i]=',';
+      i++;
+      //str_ptr[i]='\n';
+      i++;
     }
+
+
     *count=i;
 
 }
 
 
-void writingKey(char *str_ptr,char *Key,int *count){
+void writingKey(FILE *str_ptr,char *Key,int *count){
 
     int i=*count;
 
-    str_ptr[i]='"';
+    //str_ptr[i]='"';
+    fprintf(str_ptr,"%s","\"");
     i++;
 
-    for(int y=0;y<int(strlen(Key));y++){
+   /* for(int y=0;y<int(strlen(Key));y++){
         str_ptr[i]=*(Key+y);
         i++;
-    }
-    str_ptr[i]='"';
+    }*/
+    fprintf(str_ptr,"%s",Key);
+    i=i+int(strlen(Key));
+    fprintf(str_ptr,"%s","\": ");
+   // str_ptr[i]='"';
     i++;
-    str_ptr[i]=':';
+    //str_ptr[i]=':';
     i++;
-    str_ptr[i]=' ';
+    //str_ptr[i]=' ';
     i++;
     *count=i;
 
@@ -12084,16 +12122,17 @@ void writingKey(char *str_ptr,char *Key,int *count){
 
 
 
-void putSpace(int count_Space,char *ptr_string ,int *i_ptr){
+void putSpace(int count_Space,FILE *ptr_string ,int *i_ptr){
     int y=*i_ptr;
     for(int u=0;u<count_Space;u++){
-        ptr_string[y]=' ';
+       // ptr_string[y]=' ';
+        fprintf(ptr_string,"%s"," ");
         y++;
     }
     *i_ptr=y;
 }
 
-void objectCreator(char *ptr,Geo_tag geo,int last,int space_count,int *count){
+void objectCreator(FILE *ptr,Geo_tag geo,int last,int space_count,int *count){
 
     /// this function will make object entries inside LogEntries
     /*
@@ -12107,61 +12146,65 @@ void objectCreator(char *ptr,Geo_tag geo,int last,int space_count,int *count){
     */
 
 
-    char Geolat[]="Latitude";// float  Latitude in Degrees East
-    char Geolon[]="Longitude";//float  Longitude in Degrees North
-    char GeoTime[]="TimeStamp";//milliseconds, type : integer
-    char  GeoAlt[]="Altitude";//Ellipsoidal Height in Meters  type: integer
-    char GeoEntryType[]="Entry_type";//entry_type
+   char Geolat[]="Latitude";// float  Latitude in Degrees East
+   char Geolon[]="Longitude";//float  Longitude in Degrees North
+   char GeoTime[]="TimeStamp";//milliseconds, type : integer
+   char  GeoAlt[]="Altitude";//Ellipsoidal Height in Meters  type: integer
+   char GeoEntryType[]="Entry_type";//entry_type
 
-    int iterator=*count;
+   int iterator=*count;
 
-    ptr[iterator]='{';
-    iterator++;
-    ptr[iterator]='\n';
-    iterator++;
-    space_count=space_count+2;
-    // putting spaces
-    putSpace(space_count,ptr,&iterator);
-      /// Lattitude
-    writingKey_Value(ptr,Geolat,&iterator,geo.Lattitude,0);
-    putSpace(space_count,ptr,&iterator);
+   //ptr[iterator]='{';
+   iterator++;
+  // ptr[iterator]='\n';
+   iterator++;
+   fprintf(ptr,"%s","{\n");
+   space_count=space_count+2;
+   // putting spaces
+   putSpace(space_count,ptr,&iterator);
+   
+   /// Lattitudec
+  // char th[]="diud";
+   writingKey_Value(ptr,Geolat,&iterator,geo.Lattitude,0);
+   putSpace(space_count,ptr,&iterator);
 
-    // starting with entrytype
-    char entry[20];
-    if(geo.Entrytype==0){
-         strcpy(entry,"GEOFENCE_BREACH");
-    }else if(geo.Entrytype==1){
-         strcpy(entry,"TAKEOFF/ARM");
-    }else if(geo.Entrytype==2){
-         strcpy(entry,"TIME_BREACH");
-    }else if(geo.Entrytype==3){
-         strcpy(entry,"LAND");
-    }else{
-        strcpy(entry,"CRASH");
-    }
-    writingKey_Value(ptr,GeoEntryType,&iterator,entry,0);
-    putSpace(space_count,ptr,&iterator);
+   // starting with entrytype
+   char entry[20];
+   if(geo.Entrytype==0){
+      strcpy(entry,"GEOFENCE_BREACH");
+   }else if(geo.Entrytype==1){
+      strcpy(entry,"TAKEOFF/ARM");
+   }else if(geo.Entrytype==2){
+      strcpy(entry,"TIME_BREACH");
+   }else if(geo.Entrytype==3){
+      strcpy(entry,"LAND");
+   }else{
+      strcpy(entry,"CRASH");
+   }
+   writingKey_Value(ptr,GeoEntryType,&iterator,entry,0);
+   putSpace(space_count,ptr,&iterator);
 
     /// Altitude
-    writingKey_Value(ptr,GeoAlt,&iterator,geo.Altitude,0);
+   writingKey_Value(ptr,GeoAlt,&iterator,geo.Altitude,0);
 
-    putSpace(space_count,ptr,&iterator);
+   putSpace(space_count,ptr,&iterator);
     /// Longitude
-    writingKey_Value(ptr,Geolon,&iterator,geo.Longitude,0);
-    putSpace(space_count,ptr,&iterator);
+   writingKey_Value(ptr,Geolon,&iterator,geo.Longitude,0);
+   putSpace(space_count,ptr,&iterator);
 
      /// TimeStamp
-    writingKey_Value(ptr,GeoTime,&iterator,geo.Timestamp,1);
-    space_count=space_count-2;
-    putSpace(space_count,ptr,&iterator);
+   writingKey_Value(ptr,GeoTime,&iterator,geo.Timestamp,1);
+   space_count=space_count-2;
+   putSpace(space_count,ptr,&iterator);
 
 
     //closing
 
-    ptr[iterator]='}';
-    iterator++;
+   //ptr[iterator]='}';
+   fprintf(ptr,"%s","}");
+   iterator++;
 
-    *count=iterator;
+   *count=iterator;
 
 
 }
@@ -12170,10 +12213,9 @@ void objectCreator(char *ptr,Geo_tag geo,int last,int space_count,int *count){
 
 void  log_naming_support(char *paID_firstTerm,char *done_freq){
 
-    FILE *fptr;
 
-    fptr=fopen("/fs/microsd/log/recentPA.txt","r");
-    signed char ch;
+    char fptr[]="/fs/microsd/log/recentPA.txt";
+/*    signed char ch;
     int i=0;
     char *content=(char*)malloc(sizeof(char)*5000);
    // char content[5000];
@@ -12184,15 +12226,16 @@ void  log_naming_support(char *paID_firstTerm,char *done_freq){
     }
     content[i]='\0';
     fclose(fptr);
+    */
     char tag_paID[50]="permissionArtifactId";
     char tag_paID_contain[80];
     char tag_done_freq[50]="frequencies_done";
-    char tag_done_freq_contain[100];
+    char tag_done_freq_contain[10];
 
-    fetch_tag(content,tag_paID,tag_paID_contain);
-    fetch_tag(content,tag_done_freq,tag_done_freq_contain);
-    free(content);
-    i=0;
+    fetch_tag(NULL,tag_paID,tag_paID_contain,fptr);
+    fetch_tag(NULL,tag_done_freq,tag_done_freq_contain,fptr);
+    //free(content);
+   int i=0;
     while(tag_paID_contain[i]!='-'){
         paID_firstTerm[i]=tag_paID_contain[i];
         i++;
@@ -12202,136 +12245,134 @@ void  log_naming_support(char *paID_firstTerm,char *done_freq){
     strcpy(done_freq,tag_done_freq_contain);
 
 }
-
+/*
 void main_json_file_writing(Geo_tag *data_array, int length_dat){
-    char *buff=(char*) malloc(sizeof(char)*10000);
-    //char buff[10000];// this is where json would be written, later copied to a file
+   char *buff=(char*) malloc(sizeof(char)*10000);
+   //char buff[10000];// this is where json would be written, later copied to a file
 
-    int space_count=0;
-    //object {}
-    char object_start='{';
-  //  char object_end='}';
+   int space_count=0;
+   //object {}
+   char object_start='{';
 
-    //array []
-    char array_start='[';
+   //array []
+   char array_start='[';
  
 
 
-    // writting JSON flight log
-    int i=0;
+   // writting JSON flight log
+   int i=0;
 
-    buff[i]=object_start;
-    space_count=space_count+2;
-    i++;
-    buff[i]='\n';
-    i++;
-    // after { and new line spaces need to be put
+   buff[i]=object_start;
+   space_count=space_count+2;
+   i++;
+   buff[i]='\n';
+   i++;
+   // after { and new line spaces need to be put
 
-    putSpace(space_count,&buff[0],&i);
+   putSpace(space_count,&buff[0],&i);
 
-    // starting with writing Flight log
-    int write_signature_help=i;
-    char firstKey[]="FlightLog";
+   // starting with writing Flight log
+   int write_signature_help=i;
+   char firstKey[]="FlightLog";
 
-    writingKey(&buff[0],firstKey,&i);
+   writingKey(&buff[0],firstKey,&i);
 
-    int str_start=i;
+   int str_start=i;
 
-    buff[i]=object_start;
-    i++;
-    buff[i]='\n';
-    i++;
-    space_count=space_count+2;
+   buff[i]=object_start;
+   i++;
+   buff[i]='\n';
+   i++;
+   space_count=space_count+2;
 
-    // after { and new line, spaces need to be put
+   // after { and new line, spaces need to be put
 
-    putSpace(space_count,&buff[0],&i);
-
-
-
-    ////// LogEntries////
-    char Log[]="LogEntries";
-
-    writingKey(&buff[0],Log,&i);
-
-    buff[i]=array_start;
-    i++;
-    buff[i]='\n';
-    i++;
-    space_count=space_count+2;
-
-    // after { and new line, spaces need to be put
-
-    putSpace(space_count,&buff[0],&i);
-    // now a loop will run
-    for (int counter=0;counter<length_dat;counter++){
-        objectCreator(&buff[0],data_array[counter],0,space_count,&i);
-        if(counter==length_dat-1)
-        {
-            buff[i]='\n';
-            i++;
-            space_count=space_count-2;
-        }else{
-            buff[i]=',';
-            i++;
-            buff[i]='\n';
-            i++;
-        }
-
-        putSpace(space_count,&buff[0],&i);
-    }
-   /* space_count=space_count-2;
-    putSpace(space_count,&buff[0],&i);*/
-    buff[i]=']';
-    i++;
-    buff[i]=',';
-    i++;
-    buff[i]='\n';
-    i++;
-    putSpace(space_count,&buff[0],&i);
+   putSpace(space_count,&buff[0],&i);
 
 
-    printf("\nproblem at line 516\n");
+
+   ////// LogEntries////
+   char Log[]="LogEntries";
+
+   writingKey(&buff[0],Log,&i);
+
+   buff[i]=array_start;
+   i++;
+   buff[i]='\n';
+   i++;
+   space_count=space_count+2;
+
+   // after { and new line, spaces need to be put
+
+   putSpace(space_count,&buff[0],&i);
+   // now a loop will run
+   for (int counter=0;counter<length_dat;counter++){
+      objectCreator(&buff[0],data_array[counter],0,space_count,&i);
+      if(counter==length_dat-1)
+      {
+         buff[i]='\n';
+         i++;
+         space_count=space_count-2;
+      }else{// this is the case  for LAND/FREEFALL
+         buff[i]=',';
+         i++;
+         buff[i]='\n';
+         i++;
+      }
+
+      putSpace(space_count,&buff[0],&i);
+   }
+   // space_count=space_count-2;
+    //putSpace(space_count,&buff[0],&i);
+    /// ending tags in file.
+   buff[i]=']';
+   i++;
+   buff[i]=',';
+   i++;
+   buff[i]='\n';
+   i++;
+   putSpace(space_count,&buff[0],&i);
 
 
-    // writting permission artefact id from recentPA.txt
+   printf("\nproblem at line 516\n");
 
 
-    char PA_id[70];//="ABDHUBDUBBEBDIBWBID";
+   // writting permission artefact id from recentPA.txt
 
-    get_PA_ID(PA_id);
+
+   char PA_id[70];//="ABDHUBDUBBEBDIBWBID";
+
+   get_PA_ID(PA_id);
    printf("\nproblem at 525\n");
-    char PA[]="PermissionArtefact";
-    writingKey_Value(&buff[0],PA,&i,PA_id,0);
-    printf("\nproblem at 528\n");
-    putSpace(space_count,&buff[0],&i);
-    printf("\nproblem at 530\n");
+   char PA[]="PermissionArtefact";
+   writingKey_Value(&buff[0],PA,&i,PA_id,0);
+   printf("\nproblem at 528\n");
+   putSpace(space_count,&buff[0],&i);
+   printf("\nproblem at 530\n");
 
 
-    // fetching previous log hash from recentPA.txt
-    // if None then its the first log for the particular PA
-    // writing previous log hash
-    char previous_log_hash[70];//="aaaanfbofburbfubvoinvknvofn";
-    char previous_log_hash_2[70];//="aaaanfbofburbfubvoinvknvofn";
-    printf("\nproblem at 536\n");
-    int hash_status=fetch_previous_log_hash(previous_log_hash_2);
+   // fetching previous log hash from recentPA.txt
+   // if None then its the first log for the particular PA
+   // writing previous log hash
+   char previous_log_hash[70];//="aaaanfbofburbfubvoinvknvofn";
+   char previous_log_hash_2[70];//="aaaanfbofburbfubvoinvknvofn";
+   printf("\nproblem at 536\n");
+   int hash_status=fetch_previous_log_hash(previous_log_hash_2);
 
-    if(hash_status==0){
-        // no previous log hash is present.
-        strcpy(previous_log_hash,"First_log");
+   if(hash_status==0){
+      // no previous log hash is present.
+      strcpy(previous_log_hash,"First_log");
+   }else{
+      strcpy(previous_log_hash,previous_log_hash_2);
+   }
 
-    }else{
-        strcpy(previous_log_hash,previous_log_hash_2);
-    }
-
-    char prev_hash[]="previous_log_hash";
-    writingKey_Value(&buff[0],prev_hash,&i,previous_log_hash,1);
-
+   char prev_hash[]="previous_log_hash";
+   writingKey_Value(&buff[0],prev_hash,&i,previous_log_hash,1);
 
 
    // putSpace(space_count,&buff[0],&i);
 
-  printf("\nproblem at line 554\n");
+   // printf("\nproblem at line 554\n");
    space_count=space_count-2;
    putSpace(space_count,&buff[0],&i);
    int str_end=i;/////// the point where value of flightlog key ends
@@ -12344,73 +12385,73 @@ void main_json_file_writing(Geo_tag *data_array, int length_dat){
    buff[i]='}';
    i++;
    buff[i]='\0';
-    // At this point, json file is completed
-    // next step is to canonicalize the value(object) under "FLightlog" key
+   // At this point, json file is completed
+   // next step is to canonicalize the value(object) under "FLightlog" key
    char *canonicalized_flight=(char*) malloc(sizeof(char)*14000);
-  // char canonicalized_flight[14000];
+   // char canonicalized_flight[14000];
    int canon_count=0;
 
 
    for(int h=str_start;h<=str_end;h++)
-    {
-    /* canonicalize hack : all the serialization under objects have been taken care of
-    earlier only, now just keep on taking the elements one by one from one array to another
-    except new lines and spaces
-    */
-        if (buff[h]!=' ' && buff[h]!='\n'){
-            canonicalized_flight[canon_count]=buff[h];
-            canon_count++;
-        }
+   {
+    // canonicalize hack : all the serialization under objects have been taken care of
+    //earlier only, now just keep on taking the elements one by one from one array to another
+    //except new lines and spaces
+    
+      if (buff[h]!=' ' && buff[h]!='\n'){
+         canonicalized_flight[canon_count]=buff[h];
+         canon_count++;
+      }
 
-    }
-    canonicalized_flight[canon_count]='\0';
+   }
+   canonicalized_flight[canon_count]='\0';
 
 
-    // at this point canonicalization has been done
-    // our next step is to implement SHA256 algo
+   // at this point canonicalization has been done
+   // our next step is to implement SHA256 algo
 
-    signed char ch;
-    unsigned char *st=new unsigned char[10000];
-    unsigned int i_sha=0;
-    //// assigning char to unsigned char, this has to be done to implement sha256
-    while(1){
+   signed char ch;
+   unsigned char *st=new unsigned char[10000];
+   unsigned int i_sha=0;
+   //// assigning char to unsigned char, this has to be done to implement sha256
+   while(1){
 	   ch=canonicalized_flight[i_sha];
       // printf("%c",ch);
 	   if(ch=='\0'){
 		   break;
 	   }
-        *(st+i_sha)=ch;
+      *(st+i_sha)=ch;
 		printf("%c",*(st+i_sha));
 		i_sha++;
 
-    }
-  free(canonicalized_flight);
-  printf("\nproblem at line 607\n");
+   }
+   free(canonicalized_flight);
+   printf("\nproblem at line 607\n");
 
    SHA256 sha;
 
 	sha.update(st,i_sha);
 
 	uint8_t * digest = sha.digest();
-    int it=0;//just an iterator
+   int it=0;//just an iterator
 	//printing digest
 	printf("\n");
 
-    while(it<32){
-		printf("%02x ",*(digest+it));
+   while(it<32){
+	   printf("%02x ",*(digest+it));
 		it++;
 	}
-    char HEX_format_Digest[65];
+   char HEX_format_Digest[65];
 
-    // code for making hex string
-    int hex_count=0;
-    for(int yui=0;yui<32;yui++){
-         //printf("%d",*(digest+yui)>>4||0x0f);
-         HEX_format_Digest[hex_count]=HEX_ele[*(digest+yui)>>4 & 0x0f];
-         hex_count++;
-         HEX_format_Digest[hex_count]=HEX_ele[*(digest+yui) & 0x0f];
-         hex_count++;
-      }
+   // code for making hex string
+   int hex_count=0;
+   for(int yui=0;yui<32;yui++){
+      //printf("%d",*(digest+yui)>>4||0x0f);
+      HEX_format_Digest[hex_count]=HEX_ele[*(digest+yui)>>4 & 0x0f];
+      hex_count++;
+      HEX_format_Digest[hex_count]=HEX_ele[*(digest+yui) & 0x0f];
+      hex_count++;
+   }
    HEX_format_Digest[hex_count]='\0';
 
    printf("\nhere is the string:%s\n\n",HEX_format_Digest);
@@ -12432,30 +12473,30 @@ void main_json_file_writing(Geo_tag *data_array, int length_dat){
     //printf("%s",buff);
   // printf("\n");
 
-/*
-   FILE *fptr;
-   fptr=fopen("flight_log1.json","w");// this is the resultant json file
-   fprintf(fptr, "%s", buff);
-   fclose(fptr);
-*/
+
+//   FILE *fptr;
+  // fptr=fopen("flight_log1.json","w");// this is the resultant json file
+   //fprintf(fptr, "%s", buff);
+   //fclose(fptr);
+
 
 
     // Now RSA encryption is required
-    /* following elements are required
-    1)Private key
-    2) above calculated digest HEX_format_digest
-    */
+    // following elements are required
+    //1)Private key
+    //2) above calculated digest HEX_format_digest
+    
     //////////////////////// RSA Encryption ///////////////
-    char *cipher_string_hex=(char*) malloc(1013*sizeof(char));
+   //char *cipher_string_hex=(char*) malloc(1013*sizeof(char));
 
-    signing_log_content(HEX_format_Digest,cipher_string_hex);
+   //signing_log_content(HEX_format_Digest,cipher_string_hex);
 
 
 
 
 
     //char ty[]="734CB799A64A670D68F3AA84B2542BBEE1F7FD5AC022460CDD63E297DF55D8B04CBCB1103BDC720EB85D090CCA091D067A5F54BFADBECB09A2EBDDA9D92E00AF83D5E9FED29B38C295A315CBD52CB4ED1645BC3707D4ED165E5E4D906A1C149E5073AE6A8D5FC74CC11D63885CEFE236E4464C0D387A5861234814FF31A8A3A0B2D6022B8A8FAEC79DF61B638B0B85392F152D4743BFD2779C4472B73CF952027C83A8DB7EEA32D6A1B96ED8F92CF7576EBBB35F8CA341C69E60C352BD79628C17585030D8BF07C8E6D73FC0AB51D2226B1E7C42D5DA0BC4EAF5063C8F72601AC0090D92B74C17365463B3F07B0397692AF204F58A0ACB665CBA4C336121C4CA";
-    /*
+    
     mp_int Public_key;
     mp_read_radix(&Public_key,"65537",10);
     mp_int message;
@@ -12464,7 +12505,7 @@ void main_json_file_writing(Geo_tag *data_array, int length_dat){
    char message_string_hex[513];
     mp_to_hex(&message,message_string_hex,sizeof(message_string_hex));
     printf("\n%s\n",message_string_hex);//this is the decrypted message
-    */
+    
 
 
    /////////////////////// base64 Encoded //////////////// hex to base64
@@ -12487,24 +12528,25 @@ void main_json_file_writing(Geo_tag *data_array, int length_dat){
 
 
    /////////////////////// Writing Signature ///////////////// open file and rewrite
-   /* string insertion
-   1) length of string that has to be inserted  l1   res
-   2) length of string  where we want to insert  l2  buff
-   */
-    int i_sign=0;
-    char *buff1=(char*) malloc(sizeof(char)*15000);
-    //char buff1[15000];
-    space_count=0;
-    buff1[i_sign]=object_start;
-    space_count=space_count+4;
-    i_sign++;
-    buff1[i_sign]='\n';
-    i_sign++;
-    // after { and new line, spaces need to be put
+   // string insertion
+   //1) length of string that has to be inserted  l1   res
+   //2) length of string  where we want to insert  l2  buff
+   
+   int i_sign=0;
+   char *buff1=(char*) malloc(sizeof(char)*15000);
+   //char buff1[15000];
+   space_count=0;
+   buff1[i_sign]=object_start;
+   space_count=space_count+4;
+   i_sign++;
+   buff1[i_sign]='\n';
+   i_sign++;
+   // after { and new line, spaces need to be put
 
-    putSpace(space_count,&buff1[0],&i_sign);
-    int you=0;
-    while(signature[you]!='\0'){
+   putSpace(space_count,&buff1[0],&i_sign);
+   int you=0;
+   while(signature[you]!='\0')
+   {
       buff1[i_sign]=signature[you];
       i_sign++;
       you++;
@@ -12512,10 +12554,10 @@ void main_json_file_writing(Geo_tag *data_array, int length_dat){
    buff1[i_sign]='\n';
    i_sign++;
    putSpace(4,&buff1[0],&i_sign);
-   for(int iu=write_signature_help;iu<int(strlen(buff));iu++){
+   for(int iu=write_signature_help;iu<int(strlen(buff));iu++)
+   {
       buff1[i_sign]=buff[iu];
       i_sign++;
-
    }
    free(buff);
    buff1[i_sign]='\n';
@@ -12559,7 +12601,7 @@ void main_json_file_writing(Geo_tag *data_array, int length_dat){
 }
 
 
-
+*/
 int check_Geobreach(pa_data_s data,vehicle_global_position_s vgp){
     // return 1 if geofence breached
     // return 0 if geofence not breached
@@ -13258,4 +13300,405 @@ LBL_C:
    mp_clear(&c);
    fclose(debug);
    return res;
+}
+
+
+////////////////////// preflight functions
+
+int check_ID(){
+   	/* subscribe to topics. */
+	
+	int ics_sub = orb_subscribe(ORB_ID(initial_check_status));
+
+
+
+
+
+struct initial_check_status_s ics_fetch;
+memset(&ics_fetch, 0, sizeof(ics_fetch));
+
+
+
+orb_copy(ORB_ID(initial_check_status),ics_sub,&ics_fetch);// initial checks
+
+return ics_fetch.identifier_status ;
+
+}
+
+// this function is to open a log file with proper name
+void initiate_log(FILE *fptr,int *i_aux,int *space_count_aux, int *s_start,int*sign_write){
+
+  //////////////////// int space_count=0;
+   int space_count;
+   space_count=*space_count_aux;
+   int i=*i_aux;
+   //object {}
+  // char object_start='{';
+   //array []
+ //  char array_start='[';
+    // writting JSON flight log
+  //////////////////// int i=0;
+   fprintf(fptr,"%s\n","{");
+   // buff[i]=object_start;
+   space_count=space_count+2;
+   i=i+2;
+   
+   // after { and new line spaces need to be put
+
+   putSpace(space_count,fptr,&i);
+
+   // starting with writing Flight log
+   int write_signature_help=i;//////////////// helpful for creating another final log with signature;
+   
+   *sign_write=write_signature_help;
+   char firstKey[]="FlightLog";
+
+   writingKey(fptr,firstKey,&i);
+
+   int str_start=i;///////////////////////////////////// helpful for performing canoniclization
+   *s_start=str_start;
+   fprintf(fptr,"%s\n","{");
+   //buff[i]=object_start;
+   i=i+2;
+   // buff[i]='\n';
+    //i++;
+   space_count=space_count+2;
+
+   // after { and new line, spaces need to be put
+
+   putSpace(space_count,fptr,&i);
+
+
+
+    ////// LogEntries////
+   char Log[]="LogEntries";
+ 
+   writingKey(fptr,Log,&i);
+   fprintf(fptr,"%s\n","[");
+ //  buff[i]=array_start;
+   i++;
+   //buff[i]='\n';
+   i++;
+   space_count=space_count+2;
+
+   // after { and new line, spaces need to be put
+
+   putSpace(space_count,fptr,&i);
+   *space_count_aux=space_count;
+   *i_aux=i;
+
+}
+
+
+void closing_log(FILE *fptr,int space_count,int *i_aux,int *str_end)
+{  int i=*i_aux;
+   
+   fprintf(fptr,"%s","],\n");
+  // buff[i]=']';
+   i++;
+   //buff[i]=',';
+   i++;
+   //buff[i]='\n';
+   i++;
+   putSpace(space_count,fptr,&i);
+
+
+
+   char PA_id[70];//="ABDHUBDUBBEBDIBWBID";
+
+   get_PA_ID(PA_id);
+   printf("\nproblem at 525\n");
+  
+   char PA[]="PermissionArtefact";
+  
+   writingKey_Value(fptr,PA,&i,PA_id,0);
+  
+   printf("\nproblem at 528\n");
+   
+   putSpace(space_count,fptr,&i);
+   
+   printf("\nproblem at 530\n");
+
+
+   // fetching previous log hash from recentPA.txt
+   // if None then its the first log for the particular PA
+   // writing previous log hash
+   char previous_log_hash[70];//="aaaanfbofburbfubvoinvknvofn";
+   char previous_log_hash_2[70];//="aaaanfbofburbfubvoinvknvofn";
+   printf("\nproblem at 536\n");
+      
+   int hash_status=fetch_previous_log_hash(previous_log_hash_2);
+
+   if(hash_status==0){
+         // no previous log hash is present.
+      strcpy(previous_log_hash,"First_log");
+   }else{
+      strcpy(previous_log_hash,previous_log_hash_2);
+   }
+
+   char prev_hash[]="previous_log_hash";
+   writingKey_Value(fptr,prev_hash,&i,previous_log_hash,1);
+
+
+   // putSpace(space_count,&buff[0],&i);
+
+   // printf("\nproblem at line 554\n");
+   space_count=space_count-2;
+   putSpace(space_count,fptr,&i);
+   *str_end=i;/////// the point where value of flightlog key ends
+   fprintf(fptr,"%s","}\n");
+   //buff[i]='}';
+   i++;
+ //  buff[i]='\n';
+   i++;
+   space_count=space_count-2;
+   putSpace(space_count,fptr,&i);
+   fprintf(fptr,"%s","}\0");
+   //buff[i]='}';
+   i++;
+   *i_aux=i;
+  // buff[i]='\0';
+      // At this point, json file is completed
+      // next step is to canonicalize the value(object) under "FLightlog" key
+}
+
+void canon_cum_hash(int sign_write_help,int str_start,int str_end,char *filename){
+
+   // this is the function for computing Sha256 hash of input file.
+   // 1) first canonicalize the file content
+   // 2) compute sha of the canonicalizd content
+   // 3) update recentPA with calculated hash and s_previous log with the filename and
+   // sign_write_help integer (this would be needed later to sign the us_() flightlog to 
+   // have an output as signed flight log.
+   
+   // creating new file for canonicalized content 
+   FILE  *aux_canon;
+   aux_canon=fopen("/fs/microsd/aux_canon.txt","w");
+
+
+   FILE *read;
+   read=fopen(filename,"r");
+
+
+  // char *canonicalized_flight=(char*) malloc(sizeof(char)*14000);
+   // char canonicalized_flight[14000];
+  // int canon_count=0;
+   signed char ch;
+   int index_count=0;
+   int h=0;
+   while((ch=fgetc(read))!=EOF){
+
+      if( h>=str_start && h<=str_end )
+      {
+      /* canonicalize hack : all the serialization under objects have been taken care of
+      earlier only, now just keep on taking the elements one by one from one array to another
+      except new lines and spaces
+      */
+         if (ch!=' ' && ch!='\n'){
+           fprintf(aux_canon,"%c",ch);
+           index_count++;
+         }
+
+      }
+      h++;
+   }
+   fclose(aux_canon);// at this point canonicalized content has been put inside the file
+   fclose(read);
+
+   char HEX_hash[70];
+   aux_canon=fopen("/fs/microsd/aux_canon.txt","r");
+
+   Sha256_implement(NULL,HEX_hash,aux_canon,index_count);
+   //remove("/fs/microsd/aux_canon.txt");
+   update_recentPA(2,HEX_hash);// for hash 
+   char f[4];
+   sprintf(f,"%d",sign_write_help);
+   char aux[100];
+   char oo[]="us_";
+   int y_in=isSubstring(oo,filename,NULL);
+   int g=0;
+
+   while(filename[y_in]!='\0'){
+      aux[g]=filename[y_in];
+      g++;
+      y_in++;
+   }
+   //strcpy(aux,filename);
+   strcat(aux,"(");
+   strcat(aux,f);
+   strcat(aux,")\0");
+   update_recentPA(4,aux);// for us_ filename+sign_write_help and s_previous_log
+
+}
+
+
+
+
+
+
+void signing_support_log(char *log_name){
+   //this function is called upon at the pre boot time.(log_management module)
+   //it is called, when signing of previous unsigned log is required
+   // 1) log name is the file name to be signed with sign_write_help number.
+   // 2) fetch hash from recentPA.txt
+   // 3) sign it using RFM private key
+   // 4) write final flight log with signature
+
+   //fetching hash from recentPA
+   char HASH[70];
+
+   fetch_previous_log_hash(HASH);
+
+
+   char *cipher_string_hex=(char*) malloc(560*sizeof(char));
+
+   signing_log_content(HASH,cipher_string_hex);
+
+   /// fetching sign_write_help and unsigned filenme
+   char inputFile[30];
+   int inp_c=0;
+   char bracket='(';
+   int swh_c=0;
+   int start=2;
+   char aux[5];
+   int aux_c=0;
+   while(log_name[swh_c]!='\0'){
+      if(log_name[swh_c]==bracket){
+         
+         start=1;
+      }
+      if(log_name[swh_c]==')'){
+         
+         start=0;
+      }
+      if(start==2){
+         inputFile[inp_c]=log_name[swh_c];
+         inp_c++;
+      }
+      if(start==1){
+         aux[aux_c]=log_name[swh_c];
+         aux_c++;
+      }
+      swh_c++;
+   }
+   aux[aux_c]='\0';
+   inputFile[inp_c]='\0';
+   int sign_write_help=atoi(aux);
+  ///// sign_write_help fetched
+
+   /////////////////////// base64 Encoded //////////////// hex to base64
+   char *res=(char*) malloc(sizeof(char)*500);
+   //char res[2500];
+   base64Encoder(cipher_string_hex,strlen(cipher_string_hex),res);
+   free(cipher_string_hex);
+   printf("\n\nbase 64 encoder %s\n",res);
+   char signature[700]="\"signature\": \"";
+   strcat(signature,res);
+   free(res);
+   char t[4];
+   char *gio=&t[0];
+   t[0]='"';
+   t[1]=',';
+   t[2]='\0';
+   strcat(signature,gio);
+   printf("\n%s\n",signature);
+   printf("the length of string %d",(int)strlen(signature));
+
+
+   /////////////////////// Writing Signature ///////////////// open file and rewrite
+   /* string insertion
+   1) length of string that has to be inserted  l1   res
+   2) length of string  where we want to insert  l2  buff
+   */
+
+   char paID_firstTerm[20];
+   char done_freq[10];
+
+   log_naming_support(paID_firstTerm,done_freq);
+
+   char file_directory[50]="/fs/microsd/log/";
+
+   char filename[100];
+
+   strcpy(filename,file_directory);
+   strcat(filename,paID_firstTerm);
+   strcat(filename,"_log_");
+   char aux_start_filename[40];
+   strcpy(aux_start_filename,filename);
+
+   strcat(filename,done_freq);
+   strcat(filename,".json");
+
+   printf("%s\n\n",filename);
+   //writting file with signature final log 
+   FILE *final_log;
+   final_log=fopen(filename,"w");// this is without us_
+
+   int i_sign=0;
+   //char *buff1=(char*) malloc(sizeof(char)*15000);
+   //char buff1[15000];
+   int space_count=0;
+   fprintf(final_log,"%s","{\n");
+   //buff1[i_sign]=object_start;
+   space_count=space_count+4;
+   i_sign++;
+   
+   //buff1[i_sign]='\n';
+   i_sign++;
+   // after { and new line, spaces need to be put
+
+   putSpace(space_count,final_log,&i_sign);
+   int you=0;
+   while(signature[you]!='\0')
+   {
+  //    buff1[i_sign]=signature[you];
+      i_sign++;
+      you++;
+   }
+   fprintf(final_log,"%s\n",signature);
+   //buff1[i_sign]='\n';
+   i_sign++;
+   putSpace(4,final_log,&i_sign);
+   char IN_FI[50];
+   strcpy(IN_FI,file_directory);
+   strcat(IN_FI,inputFile);
+
+   FILE *f_input;
+   f_input=fopen(IN_FI,"r");
+   signed char ch;
+   int tally=0;
+   while((ch=fgetc(f_input))!=EOF){
+      if(tally>=sign_write_help){
+         fprintf(final_log,"%c",ch);
+         i_sign++;
+      }
+      tally++;
+
+   }
+  
+  /* for(int iu=sign_write_help;iu<int(strlen(buff));iu++)
+   {
+    //  buff1[i_sign]=buff[iu];
+      i_sign++;
+   }
+   free(buff);*/
+   fprintf(final_log,"%s","\n");
+   //buff1[i_sign]='\n';
+   i_sign++;
+   //buff1[i_sign]='\0';
+   //printf("\n\n%s\n\n",buff1);
+
+   //deciding file name for logs
+   // current approach : take note of the done frequencies inside recentPA.txt
+   //and last four letters of pa id first term.
+   //filename ==== paidfirst_term-log-(done_frequency+1)
+   char PA_id[70];//="ABDHUBDUBBEBDIBWBID";
+
+   get_PA_ID(PA_id);
+
+   update_log_of_logs(filename,HASH,done_freq,PA_id,aux_start_filename);
+
+
+
+
 }

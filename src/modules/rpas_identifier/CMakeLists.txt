@@ -33,6 +33,7 @@
 
 px4_add_module(
 	MODULE modules__rpas_identifier
+	STACK_MAX 40750
 	MAIN rpas_identifier
 	SRCS	rpas_identifier.hpp
 		rpas_identifier.cpp

@@ -73,7 +73,6 @@ px4_add_board(
 		load_mon
 		local_position_estimator
 		logger
-		#logging_json
 		mavlink
 		mc_att_control
 		mc_hover_thrust_estimator
@@ -90,7 +89,13 @@ px4_add_board(
 		uuv_pos_control
 		vmount
 		vtol_att_control
+                #new modules
+		logging_json
 		rpas_identifier
+		pa_valid
+		log_management
+		key_rotation
+		registration_check
 	SYSTEMCMDS
 		bl_update
 		#dmesg

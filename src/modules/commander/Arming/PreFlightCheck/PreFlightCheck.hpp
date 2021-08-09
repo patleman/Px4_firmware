@@ -42,7 +42,12 @@
 
 #include <uORB/topics/safety.h>
 #include <uORB/topics/vehicle_status_flags.h>
-
+//////
+#include <uORB/topics/vehicle_global_position.h>
+#include <uORB/topics/vehicle_gps_position.h>
+#include <uORB/topics/initial_check_status.h>
+#include <uORB/topics/pa_data.h>
+/////
 #include <uORB/topics/vehicle_status.h>
 #include <drivers/drv_hrt.h>
 
@@ -51,6 +56,8 @@ class PreFlightCheck
 public:
 	PreFlightCheck() = default;
 	~PreFlightCheck() = default;
+	
+
 
 	/**
 	* Runs a preflight check on all sensors to see if they are properly calibrated and healthy
