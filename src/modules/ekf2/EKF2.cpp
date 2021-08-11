@@ -509,6 +509,10 @@ void EKF2::Run()
 		// publish ekf2_timestamps
 		_ekf2_timestamps_pub.publish(ekf2_timestamps);
 	}
+
+	///////////////////////////
+
+
 }
 
 void EKF2::PublishAttitude(const hrt_abstime &timestamp)
@@ -1503,6 +1507,9 @@ void EKF2::UpdateGpsSample(ekf2_timestamps_s &ekf2_timestamps)
 		if (_vehicle_gps_position_sub.update(&vehicle_gps_position)) {
 
 
+						/////////////////////// code for log generation ////////////
+
+
 		/*	if(vehicle_gps_position.alt>490000 && (first_pass_rtl==0)){
 				vehicle_command_s vcmd{};
 				printf("\nstarting custom RTL :: %d\n",vehicle_gps_position.alt);
@@ -1553,6 +1560,8 @@ void EKF2::UpdateGpsSample(ekf2_timestamps_s &ekf2_timestamps)
 			_gps_time_usec = gps_msg.time_usec;
 			_gps_alttitude_ellipsoid = vehicle_gps_position.alt_ellipsoid;
 		}
+
+
 	}
 }
 

@@ -42,7 +42,7 @@ px4_add_board(
 		load_mon
 		local_position_estimator
 		logger
-		logging_json
+		#logging_json
 		mavlink
 		mc_att_control
 		mc_hover_thrust_estimator

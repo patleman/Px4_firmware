@@ -227,7 +227,8 @@ px4_simple_app start
 commander start
 navigator start
 
-logging_json start
+#logging_json start
+ex_fixedwing_control start
 
 if param greater -s MNT_MODE_IN -1
 then

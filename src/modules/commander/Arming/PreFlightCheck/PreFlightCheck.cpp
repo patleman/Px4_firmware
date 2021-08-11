@@ -579,6 +579,8 @@ if(!checky1)
 
 				verification=Is_PA_VAlid();// if pa
 
+				printf("\nproblem at 8896\n");
+
 				if (verification==1)
 				{
 					//printf("bale bale\n");

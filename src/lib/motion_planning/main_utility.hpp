@@ -14,6 +14,7 @@
 ////////////// headers from file_operations.h
 #include<inttypes.h>
 #include <uORB/topics/vehicle_gps_position.h>
+#include <uORB/topics/vehicle_global_position.h>// added for logging_json
 #include <uORB/Publication.hpp>
 #include<stdarg.h>
 #include<string.h>
@@ -1076,3 +1077,49 @@ void Bundling_begins();
 // keeping track of log files and their hash values.
 
 void update_log_of_logs(char *tag,char *value,char *done_freq,char *pa_id,char *start_file);
+///////////////////
+
+struct Geo_tag{
+
+    int Entrytype ;
+    long Timestamp;
+    float Longitude;
+    float Lattitude;
+    int Altitude;
+
+};
+// functions in logging json
+
+double max(double a,double b);
+
+int fetch_previous_log_hash(char *result);
+
+void signing_log_content(char *HEX,char *cipher_string_hex);
+
+
+void get_PA_ID(char *res);
+
+void writingKey_Value(char *str_ptr,char *Key,int *count,char *value,int last);
+
+void writingKey_Value(char *str_ptr,char *Key,int *count,int value,int last);
+
+
+void writingKey_Value(char *str_ptr,char *Key,int *count,long value,int last);
+
+
+void writingKey_Value(char *str_ptr,char *Key,int *count,double value,int last);
+
+void writingKey(char *str_ptr,char *Key,int *count);
+
+void putSpace(int count_Space,char *ptr_string ,int *i_ptr);
+
+void objectCreator(char *ptr,Geo_tag geo,int last,int space_count,int *count);
+
+
+void  log_naming_support(char *paID_firstTerm,char *done_freq);
+
+void main_json_file_writing(Geo_tag *data_array, int length_dat);
+
+int check_Geobreach(pa_data_s data,vehicle_global_position_s vgp);
+
+int check_Timebreach(pa_data_s data,vehicle_gps_position_s vgp);

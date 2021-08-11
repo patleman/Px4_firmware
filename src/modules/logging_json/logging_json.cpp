@@ -218,6 +218,7 @@ reset_check:
 		if((pad.updated==1)&&(TO_status.takeoff_state==5)){
 			break;
 		}
+		usleep(1000000);
 
 	}
         printf("\n\nwhile loop break\n\n");
